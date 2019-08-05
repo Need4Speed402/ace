@@ -32,7 +32,7 @@ public class ValueIdentifier extends Value {
 		this.referenced = referenced;
 		
 		this.function = p -> {
-			if (p.compare(":=") && this.referenced == null){
+			if (p.compare("\\=") && this.referenced == null){
 				return new Value (p2 -> {
 					this.setReference(p2);
 					

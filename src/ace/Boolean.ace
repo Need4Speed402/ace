@@ -1,18 +1,18 @@
 Class {
-	,this ? {{
-		, . {} {}
+	:this ? {{
+		: . {} {}
 	}}
 	
-	,this ?! {{
-		, {} . {}
+	:this ?! {{
+		: {} . {}
 	}}
 	
-	,this ?: {{
-		res := , (.) {} {}
+	:this ?? {{
+		res \= : (.) {} {}
 		
 		Object {
-			,this ! {{
-				,, {
+			:this ! {{
+				:: {
 					res
 				} . {}
 			}}
@@ -21,60 +21,32 @@ Class {
 		}
 	}}
 	
-	,this $! {
-		,this ?: {
-			false
-		} ! {
-			true
-		}
+	:this $! {
+		: false true
 	}
 	
-	,this ! {
-		,this ?: {
-			false
-		} ! {
-			true
-		}
-	}
-	
-	,this & {{
-		. ?: {
-			,this
-		} ! {
-			false
-		}
+	:this & {{
+		: . false
 	}}
 	
-	,this | {{
-		. ?: {
-			true
-		} ! {
-			,this
-		}
+	:this | {{
+		: true .
 	}}
 	
-	,this ~ {{
-		. ?: {
-			!,this
-		} ! {
-			,this
-		}
+	:this ~ {{
+		: !. .
 	}}
 	
-	,this == {{
-		. ?: {
-			,this
-		} ! {
-			!,this
-		}
+	:this == {{
+		: . !.
 	}}
 	
-	,this =! {{
-		,this ~ .
+	:this =! {{
+		: !. .
 	}}
 	
-	,this toString {
-		,this ?: {
+	:this toString {
+		:this ?? {
 			'true'
 		} ! {
 			'false'

@@ -1,25 +1,25 @@
-Modifiable := package unsafe bootstrap Modifiable
+Modifiable \= package unsafe bootstrap Modifiable
 
 Class {
-	value := Modifiable ,
+	value \= Modifiable :
 	
-	,this _dynamic_value {
+	:this _dynamic_value {
 		value get
 	}
 	
-	,this = {{
-		. =~ Dynamic ?: {
+	:this = {{
+		. =~ Dynamic ?? {
 			value set .._dynamic_value
 	 	} ! {
 	 		value set (..)
 		}
 	}}
 	
-	,this += {{
+	:this += {{
 		value set (value get + .)
 	}}
 	
-	,this -= {{
+	:this -= {{
 		value set (value get - .)
 	}}
 	

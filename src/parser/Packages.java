@@ -25,6 +25,8 @@ public class Packages {
 	}
 	
 	public static Value file (String path) {
+		System.out.println("Loading: " + path);
+		
 		try {
 			return Packages.load(ByteBuffer.wrap(Files.readAllBytes(new File(path).toPath())));
 		}catch (Exception e) {

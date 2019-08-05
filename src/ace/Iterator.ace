@@ -1,83 +1,83 @@
-null := Object {
-	,this first {{}}
-	,this rest {null}
-	,this null {true}
+null \= Object {
+	:this first {{}}
+	:this rest {null}
+	:this null {true}
 }
 
 Class {
-	,this @ {{
-		cb := .
-		loop := {
+	:this @ {{
+		cb \= .
+		loop \= {
 			.null ?! {
 				cb ..first
 				loop ..rest
 			}
 		}
 		
-		loop ,
+		loop :
 	}}
 	
-	,this backing {,}
+	:this backing {:}
 	
-	,this first {,first}
-	,this rest {Iterator (,rest)}
-	,this empty {,null}
+	:this first {:first}
+	:this rest {Iterator (:rest)}
+	:this empty {:null}
 	
-	,this / {{
-		zip := {{
+	:this / {{
+		zip \= {{
 			..empty & .empty ? {..empty}
 			
 			Object {
-				,this first {[....first; ...first]}
-				,this rest {zip ....rest ...rest}
+				:this first {[....first; ...first]}
+				:this rest {zip ....rest ...rest}
 			}
 		}}
 		
-		Iterator (zip ,this .)
+		Iterator (zip :this .)
 	}}
 	
-	,this + {{
-		add := .
-		walk := {
-			current := .
+	:this + {{
+		add \= .
+		walk \= {
+			current \= .
 			current empty ? {add}
 			
 			Object {
-				,this first {current first}
-				,this null {false}
-				,this next {walk (current next)}
+				:this first {current first}
+				:this null {false}
+				:this next {walk (current next)}
 			}
 		}
 		
-		Iterator (walk ,this)
+		Iterator (walk :this)
 	}}
 	
-	,this map {{
-		fn := .
+	:this map {{
+		fn \= .
 		
-		create := {
+		create \= {
 			.null ? {..}
 			
-			value := fn .first
-			next := create .rest
+			value \= fn .first
+			next \= create .rest
 			
 			Object {
-				,this first {value}
-				,this rest {next}
-				,this null {false}
+				:this first {value}
+				:this rest {next}
+				:this null {false}
 			}
 		}
 		
-		Iterator (create ,) 
+		Iterator (create :) 
 	}}
 	
-	,this length {
-		loop := {
+	:this length {
+		loop \= {
 			.null ? {0}
 			
 			1 + (loop .rest)
 		}
 		
-		loop ,
+		loop :
 	}
 }

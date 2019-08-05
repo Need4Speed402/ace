@@ -110,7 +110,7 @@ public class Parser {
 			return new TokenArgument(ident.length() - 1);
 		}
 		
-		if (hasOnlyCharacters(ident, ",")) {
+		if (hasOnlyCharacters(ident, ":")) {
 			return new TokenArgumentModifier(ident.length() - 1);
 		}
 		
@@ -125,9 +125,9 @@ public class Parser {
 			}
 		}
 		
-		if (ident.startsWith(",")) {
+		if (ident.startsWith(":")) {
 			int i = 1;
-			for (; ident.charAt(i) == ','; i++);
+			for (; ident.charAt(i) == ':'; i++);
 			
 			return new TokenArgumentModifierImmediate(i - 1, getToken(ident.substring(i)));
 		}

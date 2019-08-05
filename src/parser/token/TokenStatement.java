@@ -8,7 +8,7 @@ import event.EventStatic;
 import value.Value;
 
 public class TokenStatement extends TokenCompound{
-	public static final String operators = "?:@! |&~ =<> +- */\\% ^ $#`";
+	public static final String operators = "?,@! |&~ =<> +- */\\% ^ $#`";
 	public static final int[] operatorValues;
 	
 	static {

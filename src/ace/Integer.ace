@@ -1,5 +1,5 @@
-isNull := {
-	null := Dynamic false
+isNull \= {
+	null \= Dynamic false
 	
 	() (
 		.
@@ -10,44 +10,44 @@ isNull := {
 }
 
 Class {
-	,this bits {,}
+	:this bits {:}
 	
-	,this $+ {
-		,this
+	:this $+ {
+		:this
 	}
 	
-	,this $- {
-		a := Dynamic true
+	:this $- {
+		a \= Dynamic true
 		
-		Integer (, map {
-			val := !. ~ a
+		Integer (: map {
+			val \= !. ~ a
 			a = a & !.
 			
 			val
 		})
 	}
 	
-	,this $~ {
-		Integer (, map {
+	:this $~ {
+		Integer (: map {
 			!.
 		})
 	}
 	
-	,this ~ {{
-		Integer ((, / .bits) map {
+	:this ~ {{
+		Integer ((: / .bits) map {
 			(.first; false) ~ (.second; false)
 		})
 	}}
 	
-	,this << {{
-		i := Dynamic .
+	:this << {{
+		i \= Dynamic .
 		
-		loop := {
+		loop \= {
 			i == 0 ?: {
 				..
 			} ! {
 				i -= 1
-				next := loop ..
+				next \= loop ..
 				
 				{
 					(. =~ next) ? {next}
@@ -59,10 +59,10 @@ Class {
 		Integer (loop value)
 	}}
 	
-	,this >> {{
-		i := Dynamic .
+	:this >> {{
+		i \= Dynamic .
 		
-		loop := {
+		loop \= {
 			i == 0 ?: {
 				..
 			} ! {
@@ -74,61 +74,61 @@ Class {
 		Integer (loop value)
 	}}
 	
-	,this + {{
-		carry := Dynamic false
-		first := Dynamic false
-		last := Dynamic false
+	:this + {{
+		carry \= Dynamic false
+		first \= Dynamic false
+		last \= Dynamic false
 		
-		vval := Dynamic false
+		vval \= Dynamic false
 		
-		null := Object {
-			,this rest {null}
-			,this null {true}
+		null \= Object {
+			:this rest {null}
+			:this null {true}
 		}
 		
-		loop := {{
-			..empty & .empty ?: {
+		loop \= {{
+			..empty & .empty ?? {
 				carry = carry ~ last ~ first
 				
 				;;vval =! carry ? {
 					Object {
-						,this first {carry}
-						,this rest {null}
-						,this null {false}
+						:this first {carry}
+						:this rest {null}
+						:this null {false}
 					}
 				;;}
 			} ! {
 				first = (...first; first)
 				last = (..first; last)
 				
-				a := first ~ last
-				val := a ~ carry
+				a \= first ~ last
+				val \= a ~ carry
 				vval = val
 				carry = carry & a | (first & last)
 				
-				next := loop ...rest ..rest
+				next \= loop ...rest ..rest
 				
 				Object {
-					,this rest {next}
-					,this first {val}
-					,this null {false}
+					:this rest {next}
+					:this first {val}
+					:this null {false}
 				}
 			}
 		}}
 		
-		Integer Iterator (loop , .bits)
+		Integer Iterator (loop : .bits)
 	}}
 	
-	,this - {{
-		,this + -.
+	:this - {{
+		:this + -.
 	}}
 	
-	,this == {{
-		first := Dynamic false
-		last := Dynamic false
+	:this == {{
+		first \= Dynamic false
+		last \= Dynamic false
 		
-		loop := {{
-			.empty & ..empty ?: {
+		loop \= {{
+			.empty & ..empty ?? {
 				true
 			} ! {
 				first = (...first; first)
@@ -139,35 +139,35 @@ Class {
 			}
 		}}
 		
-		loop , .bits
+		loop : .bits
 	}}
 	
-	,this =! {{
-		!(,this == .)
+	:this =! {{
+		!(:this == .)
 	}}
 	
-	,this times {
-		0 to ,this
+	:this times {
+		0 to :this
 	}
 	
-	,this to {{
-		until := .
+	:this to {{
+		until \= .
 		
-		create := {
-			index := .
+		create \= {
+			index \= .
 			
-			index == until ?! {
+			index == until ?? {
 				Object {
-					, first {index}
-					, rest {create (index + 1)}
+					: first {index}
+					: rest {create (index + 1)}
 				}	
 			}
 		}
 		
-		Iterator (create ,this)
+		Iterator (create :this)
 	}}
 	
-	,this toString {
-		int2string ,this
+	:this toString {
+		int2string :this
 	}
 }
