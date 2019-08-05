@@ -1,0 +1,24 @@
+Class {
+	[dyn; type] := (
+		.arg =~ Class ? {
+			[(); ..]
+		}
+		
+		.arg =~ Object ? {
+			[Dynamic ..; ..constructor]
+		}
+		
+		;;throw an error
+	)
+	
+	. = {{
+		. =~ type ?! {
+			console println error
+			;; throw an error
+		}
+		
+		dyn = .
+	}}
+	
+	dyn
+}

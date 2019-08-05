@@ -1,0 +1,114 @@
+Identifier := package unsafe ID
+cmp := package unsafe bootstrap IdentCompare
+Modifiable := package unsafe bootstrap Modifiable
+
+createNode := {{{
+	next := Modifiable ...
+	cb := ..
+	
+	{
+		cmp . def {{{.()}}}
+		cmp . cmp {{
+			cmp . .... {cb}
+			. =~ .... ? {cb}
+		}}
+		cmp . next {next}
+	}
+}}}
+
+classcid := Identifier ()
+
+class~ := {
+	classcid .cid | (Object cid .cid)
+}
+
+Class := {
+	cmp . =~ {class~}
+	cmp . cid {classcid}
+	
+	id := Identifier ()
+	
+	constructor := {
+		cmp . =~ {class~}
+		cmp . cid {id}
+		
+		node := Modifiable {
+			cmp , def {{{..()}}}
+		}
+
+		default := (
+			.. {
+				(
+					cmp . this {{
+						instance
+						
+						search := {
+							n := .get
+							
+							n def {
+								{{....set (createNode n . ..)}}
+							} {
+								n cmp ...
+								search (n next)
+							}
+						}
+						
+						search node
+					}}
+					
+					..
+				) .
+			}
+			
+			{
+				cmp . =~ {{
+					Object cid .cid
+				}}
+			}
+		)
+		
+		instance := {
+			cmp . constructor {
+				constructor
+			}
+			
+			cmp . extend {{
+				obj := .
+				
+				Object {
+					,this =~ {
+						instance =~ . | obj =~ .
+					}
+					
+					{
+						instance .
+						obj .
+					}
+				}
+			}}
+			
+			search := {
+				. def {
+					default
+				} {
+					..cmp ...
+					
+					search (..next get)
+				}
+			}
+			
+			cmp . =~ {{
+				id .cid ? {true}
+				search (node get) ... .
+			}}
+			
+			search (node get) .
+		}
+		
+		instance
+	}
+	
+	constructor
+}
+
+Class

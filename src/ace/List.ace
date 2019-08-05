@@ -1,0 +1,103 @@
+Memory := package unsafe Memory
+
+Class {
+	,this first {
+		, get 0
+	}
+	
+	,this second {
+		, get 1
+	}
+	
+	,this third {
+		, get 2
+	}
+	
+	,this last {
+		, get (value length - 1)
+	}
+	
+	,this length {
+		, length	
+	}
+	
+	,this = {{
+		Iterator from 0 to (value length) @ {
+			value get .index = .. .index
+		}
+	}}
+	
+	,this := {{
+		Iterator from 0 to (value length) @ {
+			value get .index := .. .index
+		}
+	}}
+	
+	,this + {{
+		mem := Memory ((value length) + .length)
+		
+		Iterator from 0 to (value length) @ {
+			mem set .index (value get .index)
+		}
+		
+		Iterator from 0 to .length @ {
+			mem set (.index + value length) (.. .index)
+		}
+		
+		List mem
+	}}
+	
+	,this / {{
+		mem := Memory (value length)
+		
+		Iterator from 0 to (value length) @ {
+			mem set .index [value get .index; .. .index]
+		}
+		
+		List mem
+	}}
+	
+	,this @ {{
+		cb := .
+		index := Dynamic 0
+		
+		loop := {
+			index =! (value length) ? {
+				val := value get index
+				
+				cb ({
+					(. =~ index) ? {index}
+					
+					val .
+				})
+				
+				index += 1
+				loop ()
+			}
+		}
+		
+		loop ()
+	}}
+	
+	,this => {{
+		exec := .
+		
+		{
+			args := .
+			
+			exec {
+				Iterator from 0 to (value length) @ {
+					(value get .index =~ ..) ? {
+						args ..index
+					}
+				}
+				
+				args .
+			}
+		}
+	}}
+	
+	,this (Integer) {
+		, get .
+	}
+}

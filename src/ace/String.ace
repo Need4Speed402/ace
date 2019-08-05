@@ -1,0 +1,21 @@
+makeString := {
+	chars := .
+	
+	self := {
+		(. =~ toString) ? {self}
+		
+		(. =~ +) ? {{
+			list := chars + .
+			
+			makeString list
+		}}
+		
+		chars .
+	}
+	
+	self
+}
+
+{
+	makeString (List .)
+}

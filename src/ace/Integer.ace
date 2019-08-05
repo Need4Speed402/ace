@@ -1,0 +1,173 @@
+isNull := {
+	null := Dynamic false
+	
+	() (
+		.
+		null = true
+	)
+	
+	null
+}
+
+Class {
+	,this bits {,}
+	
+	,this $+ {
+		,this
+	}
+	
+	,this $- {
+		a := Dynamic true
+		
+		Integer (, map {
+			val := !. ~ a
+			a = a & !.
+			
+			val
+		})
+	}
+	
+	,this $~ {
+		Integer (, map {
+			!.
+		})
+	}
+	
+	,this ~ {{
+		Integer ((, / .bits) map {
+			(.first; false) ~ (.second; false)
+		})
+	}}
+	
+	,this << {{
+		i := Dynamic .
+		
+		loop := {
+			i == 0 ?: {
+				..
+			} ! {
+				i -= 1
+				next := loop ..
+				
+				{
+					(. =~ next) ? {next}
+					false .
+				}
+			}
+		}
+		
+		Integer (loop value)
+	}}
+	
+	,this >> {{
+		i := Dynamic .
+		
+		loop := {
+			i == 0 ?: {
+				..
+			} ! {
+				i -= 1
+				loop ..next
+			}
+		}
+		
+		Integer (loop value)
+	}}
+	
+	,this + {{
+		carry := Dynamic false
+		first := Dynamic false
+		last := Dynamic false
+		
+		vval := Dynamic false
+		
+		null := Object {
+			,this rest {null}
+			,this null {true}
+		}
+		
+		loop := {{
+			..empty & .empty ?: {
+				carry = carry ~ last ~ first
+				
+				;;vval =! carry ? {
+					Object {
+						,this first {carry}
+						,this rest {null}
+						,this null {false}
+					}
+				;;}
+			} ! {
+				first = (...first; first)
+				last = (..first; last)
+				
+				a := first ~ last
+				val := a ~ carry
+				vval = val
+				carry = carry & a | (first & last)
+				
+				next := loop ...rest ..rest
+				
+				Object {
+					,this rest {next}
+					,this first {val}
+					,this null {false}
+				}
+			}
+		}}
+		
+		Integer Iterator (loop , .bits)
+	}}
+	
+	,this - {{
+		,this + -.
+	}}
+	
+	,this == {{
+		first := Dynamic false
+		last := Dynamic false
+		
+		loop := {{
+			.empty & ..empty ?: {
+				true
+			} ! {
+				first = (...first; first)
+				last = (..first; last)
+				
+				first =! last ? {false}
+				loop ...rest ..rest
+			}
+		}}
+		
+		loop , .bits
+	}}
+	
+	,this =! {{
+		!(,this == .)
+	}}
+	
+	,this times {
+		0 to ,this
+	}
+	
+	,this to {{
+		until := .
+		
+		create := {
+			index := .
+			
+			index == until ?! {
+				Object {
+					, first {index}
+					, rest {create (index + 1)}
+				}	
+			}
+		}
+		
+		Iterator (create ,this)
+	}}
+	
+	,this toString {
+		int2string ,this
+	}
+}
