@@ -1,4 +1,4 @@
-Memory \= package unsafe Memory
+Memory <= package unsafe Memory
 
 Class {
 	:this first {
@@ -27,14 +27,14 @@ Class {
 		}
 	}}
 	
-	:this \= {{
+	:this <= {{
 		Iterator from 0 to (value length) @ {
-			value get .index \= .. .index
+			value get .index <= .. .index
 		}
 	}}
 	
 	:this + {{
-		mem \= Memory ((value length) + .length)
+		mem <= Memory ((value length) + .length)
 		
 		Iterator from 0 to (value length) @ {
 			mem set .index (value get .index)
@@ -48,7 +48,7 @@ Class {
 	}}
 	
 	:this / {{
-		mem \= Memory (value length)
+		mem <= Memory (value length)
 		
 		Iterator from 0 to (value length) @ {
 			mem set .index [value get .index; .. .index]
@@ -58,12 +58,12 @@ Class {
 	}}
 	
 	:this @ {{
-		cb \= .
-		index \= Dynamic 0
+		cb <= .
+		index <= Dynamic 0
 		
-		loop \= {
+		loop <= {
 			index =! (value length) ? {
-				val \= value get index
+				val <= value get index
 				
 				cb ({
 					(. =~ index) ? {index}
@@ -80,10 +80,10 @@ Class {
 	}}
 	
 	:this => {{
-		exec \= .
+		exec <= .
 		
 		{
-			args \= .
+			args <= .
 			
 			exec {
 				Iterator from 0 to (value length) @ {
@@ -102,8 +102,8 @@ Class {
 	}
 	
 	{;(
-		walk \= {
-			index \= .
+		walk <= {
+			index <= .
 			
 			index == :length ? {
 				Object {

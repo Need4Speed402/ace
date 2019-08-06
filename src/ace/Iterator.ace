@@ -1,4 +1,4 @@
-null \= Object {
+null <= Object {
 	:this first {{}}
 	:this rest {null}
 	:this null {true}
@@ -6,8 +6,8 @@ null \= Object {
 
 Class {
 	:this @ {{
-		cb \= .
-		loop \= {
+		cb <= .
+		loop <= {
 			.null ?! {
 				cb ..first
 				loop ..rest
@@ -24,7 +24,7 @@ Class {
 	:this empty {:null}
 	
 	:this / {{
-		zip \= {{
+		zip <= {{
 			..empty & .empty ? {..empty}
 			
 			Object {
@@ -37,9 +37,9 @@ Class {
 	}}
 	
 	:this + {{
-		add \= .backing
-		walk \= {
-			current \= .
+		add <= .backing
+		walk <= {
+			current <= .
 			current null ? {add}
 			
 			Object {
@@ -53,13 +53,13 @@ Class {
 	}}
 	
 	:this map {{
-		fn \= .
+		fn <= .
 		
-		create \= {
+		create <= {
 			.null ? {..}
 			
-			value \= fn .first
-			next \= create .rest
+			value <= fn .first
+			next <= create .rest
 			
 			Object {
 				:this first {value}
@@ -72,7 +72,7 @@ Class {
 	}}
 	
 	:this length {
-		loop \= {
+		loop <= {
 			.null ? {0}
 			
 			1 + (loop .rest)
@@ -82,10 +82,10 @@ Class {
 	}
 	
 	:this clone {
-		walk \= {
+		walk <= {
 			.null ? {..}
-			rest \= walk .rest
-			first \= .first
+			rest <= walk .rest
+			first <= .first
 			
 			Object {
 				:this first {first}

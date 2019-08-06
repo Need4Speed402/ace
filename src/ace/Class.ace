@@ -1,10 +1,10 @@
-Identifier \= package unsafe ID
-cmp \= package unsafe bootstrap IdentCompare
-Modifiable \= package unsafe bootstrap Modifiable
+Identifier <= package unsafe ID
+cmp <= package unsafe bootstrap IdentCompare
+Modifiable <= package unsafe bootstrap Modifiable
 
-createNode \= {{{
-	next \= Modifiable ...
-	cb \= ..
+createNode <= {{{
+	next <= Modifiable ...
+	cb <= ..
 	
 	{
 		cmp . def {{{.()}}}
@@ -16,34 +16,34 @@ createNode \= {{{
 	}
 }}}
 
-classcid \= Identifier ()
+classcid <= Identifier ()
 
-class~ \= {
+class~ <= {
 	classcid .cid | (Object cid .cid)
 }
 
-Class \= {
+Class <= {
 	cmp . =~ {class~}
 	cmp . cid {classcid}
 	
-	id \= Identifier ()
+	id <= Identifier ()
 	
-	constructor \= {
+	constructor <= {
 		cmp . =~ {class~}
 		cmp . cid {id}
 		
-		node \= Modifiable {
+		node <= Modifiable {
 			cmp : def {{{..()}}}
 		}
 
-		default \= (
+		default <= (
 			.. {
 				(
 					cmp . this {{
 						instance
 						
-						search \= {
-							n \= .get
+						search <= {
+							n <= .get
 							
 							n def {
 								{{....set (createNode n . ..)}}
@@ -67,13 +67,13 @@ Class \= {
 			}
 		)
 		
-		instance \= {
+		instance <= {
 			cmp . constructor {
 				constructor
 			}
 			
 			cmp . extend {{
-				obj \= .
+				obj <= .
 				
 				Object {
 					:this =~ {
@@ -87,7 +87,7 @@ Class \= {
 				}
 			}}
 			
-			search \= {
+			search <= {
 				. def {
 					default
 				} {

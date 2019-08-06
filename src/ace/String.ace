@@ -1,11 +1,11 @@
-makeString \= {
-	chars \= .
+makeString <= {
+	chars <= .
 	
-	self \= {
+	self <= {
 		(. =~ toString) ? {self}
 		
 		(. =~ +) ? {{
-			list \= chars + .
+			list <= chars + .
 			
 			makeString list
 		}}

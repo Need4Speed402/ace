@@ -8,7 +8,7 @@ Class {
 	}}
 	
 	:this ?? {{
-		res \= : (.) {} {}
+		res <= : (.) {} {}
 		
 		Object {
 			:this ! {{

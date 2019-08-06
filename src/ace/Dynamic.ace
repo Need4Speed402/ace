@@ -1,7 +1,7 @@
-Modifiable \= package unsafe bootstrap Modifiable
+Modifiable <= package unsafe bootstrap Modifiable
 
 Class {
-	value \= Modifiable :
+	value <= Modifiable :
 	
 	:this _dynamic_value {
 		value get

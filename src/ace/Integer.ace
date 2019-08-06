@@ -1,5 +1,5 @@
-isNull \= {
-	null \= Dynamic false
+isNull <= {
+	null <= Dynamic false
 	
 	() (
 		.
@@ -17,10 +17,10 @@ Class {
 	}
 	
 	:this $- {
-		a \= Dynamic true
+		a <= Dynamic true
 		
 		Integer (: map {
-			val \= !. ~ a
+			val <= !. ~ a
 			a = a & !.
 			
 			val
@@ -40,14 +40,14 @@ Class {
 	}}
 	
 	:this << {{
-		i \= Dynamic .
+		i <= Dynamic .
 		
-		loop \= {
-			i == 0 ?: {
+		loop <= {
+			i == 0 ?? {
 				..
 			} ! {
 				i -= 1
-				next \= loop ..
+				next <= loop ..
 				
 				{
 					(. =~ next) ? {next}
@@ -60,10 +60,10 @@ Class {
 	}}
 	
 	:this >> {{
-		i \= Dynamic .
+		i <= Dynamic .
 		
-		loop \= {
-			i == 0 ?: {
+		loop <= {
+			i == 0 ?? {
 				..
 			} ! {
 				i -= 1
@@ -75,18 +75,18 @@ Class {
 	}}
 	
 	:this + {{
-		carry \= Dynamic false
-		first \= Dynamic false
-		last \= Dynamic false
+		carry <= Dynamic false
+		first <= Dynamic false
+		last <= Dynamic false
 		
-		vval \= Dynamic false
+		vval <= Dynamic false
 		
-		null \= Object {
+		null <= Object {
 			:this rest {null}
 			:this null {true}
 		}
 		
-		loop \= {{
+		loop <= {{
 			..empty & .empty ?? {
 				carry = carry ~ last ~ first
 				
@@ -101,12 +101,12 @@ Class {
 				first = (...first; first)
 				last = (..first; last)
 				
-				a \= first ~ last
-				val \= a ~ carry
+				a <= first ~ last
+				val <= a ~ carry
 				vval = val
 				carry = carry & a | (first & last)
 				
-				next \= loop ...rest ..rest
+				next <= loop ...rest ..rest
 				
 				Object {
 					:this rest {next}
@@ -124,10 +124,10 @@ Class {
 	}}
 	
 	:this == {{
-		first \= Dynamic false
-		last \= Dynamic false
+		first <= Dynamic false
+		last <= Dynamic false
 		
-		loop \= {{
+		loop <= {{
 			..empty & .empty ? {true}
 			
 			first = (..first; first)
@@ -149,10 +149,10 @@ Class {
 	}
 	
 	:this to {{
-		until \= .
+		until <= .
 		
-		create \= {
-			index \= .
+		create <= {
+			index <= .
 			
 			index == until ? {
 				Object {
