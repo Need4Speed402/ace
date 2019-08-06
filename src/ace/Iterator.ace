@@ -37,19 +37,19 @@ Class {
 	}}
 	
 	:this + {{
-		add \= .
+		add \= .backing
 		walk \= {
 			current \= .
-			current empty ? {add}
+			current null ? {add}
 			
 			Object {
 				:this first {current first}
 				:this null {false}
-				:this next {walk (current next)}
+				:this rest {walk (current rest)}
 			}
 		}
 		
-		Iterator (walk :this)
+		Iterator (walk :)
 	}}
 	
 	:this map {{
@@ -79,5 +79,21 @@ Class {
 		}
 		
 		loop :
+	}
+	
+	:this clone {
+		walk \= {
+			.null ? {..}
+			rest \= walk .rest
+			first \= .first
+			
+			Object {
+				:this first {first}
+				:this rest {rest}
+				:this null {false}
+			}
+		}
+		
+		Iterator (walk :)
 	}
 }

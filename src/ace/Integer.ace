@@ -128,15 +128,13 @@ Class {
 		last \= Dynamic false
 		
 		loop \= {{
-			.empty & ..empty ?? {
-				true
-			} ! {
-				first = (...first; first)
-				last = (..first; last)
-				
-				first =! last ? {false}
-				loop ...rest ..rest
-			}
+			..empty & .empty ? {true}
+			
+			first = (..first; first)
+			last = (.first; last)
+			
+			first =! last ? {false}
+			loop ..rest .rest
 		}}
 		
 		loop : .bits
@@ -156,11 +154,16 @@ Class {
 		create \= {
 			index \= .
 			
-			index == until ?? {
+			index == until ? {
 				Object {
-					: first {index}
-					: rest {create (index + 1)}
+					:this null {true}
 				}	
+			}
+			
+			Object {
+				:this first {index}
+				:this rest {create (index + 1)}
+				:this null {false}
 			}
 		}
 		

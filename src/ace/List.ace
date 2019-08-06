@@ -100,4 +100,24 @@ Class {
 	:this (Integer) {
 		: get .
 	}
+	
+	{;(
+		walk \= {
+			index \= .
+			
+			index == :length ? {
+				Object {
+					:this null {true}
+				}
+			}
+			
+			Object {
+				:this null {false}
+				:this first {::get index}
+				:this rest {walk (index + 1)}
+			}
+		}
+		
+		Iterator (walk 0)
+	);}
 }
