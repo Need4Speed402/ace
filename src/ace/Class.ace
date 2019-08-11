@@ -49,7 +49,7 @@ Class <= {
 								{{....set (createNode n . ..)}}
 							} {
 								n cmp ...
-								search (n next)
+								search n:next
 							}
 						}
 						

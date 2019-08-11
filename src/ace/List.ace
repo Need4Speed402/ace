@@ -1,24 +1,28 @@
 Memory <= package unsafe Memory
 
 Class {
+	length <= :length
+	get <= :get
+	set <= :set
+	
 	:this first {
-		: get 0
+		get 0
 	}
 	
 	:this second {
-		: get 1
+		get 1
 	}
 	
 	:this third {
-		: get 2
+		get 2
 	}
 	
 	:this last {
-		: get (value length - 1)
+		get (value length - 1)
 	}
 	
 	:this length {
-		: length	
+		length	
 	}
 	
 	:this = {{
@@ -26,7 +30,7 @@ Class {
 			value get .index = .. .index
 		}
 	}}
-	
+
 	:this <= {{
 		Iterator from 0 to (value length) @ {
 			value get .index <= .. .index
@@ -98,7 +102,7 @@ Class {
 	}}
 	
 	:this (Integer) {
-		: get .
+		get .
 	}
 	
 	{;(

@@ -17,6 +17,7 @@ import parser.token.TokenFloat;
 import parser.token.TokenFunction;
 import parser.token.TokenIIFE;
 import parser.token.TokenIdentifier;
+import parser.token.TokenImmediate;
 import parser.token.TokenInteger;
 import parser.token.TokenList;
 import parser.token.TokenOperatorImmediate;
@@ -58,8 +59,10 @@ public class Parser {
 	public static Object parseNumber (String ident) {
 		ident = ident.toLowerCase();
 		
-		if (ident.endsWith("*")) { //hexadecimal
+		if (ident.endsWith("^")) { //hexadecimal
 			return parseNumber(ident.substring(0, ident.length() - 1), "0123456789abcdef");
+		}else if (ident.endsWith("*")) { //octal
+			return parseNumber(ident.substring(0, ident.length() - 1), "01234567");
 		}else if (ident.endsWith("!")) { // binary
 			return parseNumber(ident.substring(0, ident.length() - 1), "01");
 		}else if (ident.endsWith(".")) { // decimal
@@ -137,6 +140,29 @@ public class Parser {
 			for (; ident.charAt(i) == '.'; i++);
 			
 			return new TokenArgumentImmediate(i - 1, getToken(ident.substring(i)));
+		}
+		
+		if (ident.contains(":") && ident.indexOf(':') < ident.length() - 1) {
+			Token result = null;
+			int last = 0;
+			boolean valid = false;
+			
+			for (int i = 0; i < ident.length() - 1; i++) {
+				char c = ident.charAt(i);
+				
+				if (c == ':' && valid) {
+					if (result == null) {
+						result = getToken(ident.substring(last, i));
+					}else {
+						result = new TokenImmediate(result, getToken(ident.substring(last, i)));
+					}
+					last = i + 1;
+				}else if (c != '.' && c != ':' && TokenStatement.operators.indexOf(c) == -1) {
+					valid = true;
+				}
+			}
+			
+			return new TokenImmediate(result, getToken(ident.substring(last)));
 		}
 		
 		if (ident.length() >= 1){
