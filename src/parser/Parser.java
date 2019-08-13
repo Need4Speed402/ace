@@ -46,16 +46,6 @@ public class Parser {
 	private LinkedList<TokenCompound> stack = new LinkedList<>();
 	private StringBuilder identifier = new StringBuilder ();
 	
-	private static boolean hasOnlyCharacters (String s, String compare) {
-		for (int i = 0; i < s.length(); i++) {
-			if (compare.indexOf(s.charAt(i)) == -1) {
-				return false;
-			}
-		}
-		
-		return true;
-	}
-	
 	public static Object parseNumber (String ident) {
 		ident = ident.toLowerCase();
 		
@@ -109,40 +99,7 @@ public class Parser {
 	}
 	
 	private Token getToken (String ident) {
-		if (hasOnlyCharacters(ident, ".")) {
-			return new TokenArgument(ident.length() - 1);
-		}
-		
-		if (hasOnlyCharacters(ident, ":")) {
-			return new TokenArgumentModifier(ident.length() - 1);
-		}
-		
-		if (TokenStatement.operators.indexOf(ident.charAt(0)) >= 0) {
-			int i = 1;
-			for (; i < ident.length() && TokenStatement.operators.indexOf(ident.charAt(i)) >= 0; i++);
-			
-			if (i == ident.length()) {
-				return new TokenIdentifier(ident);
-			}else {
-				return new TokenOperatorImmediate(ident.substring(0, i), getToken(ident.substring(i)));
-			}
-		}
-		
-		if (ident.startsWith(":")) {
-			int i = 1;
-			for (; ident.charAt(i) == ':'; i++);
-			
-			return new TokenArgumentModifierImmediate(i - 1, getToken(ident.substring(i)));
-		}
-		
-		if (ident.startsWith(".")) {
-			int i = 1;
-			for (; ident.charAt(i) == '.'; i++);
-			
-			return new TokenArgumentImmediate(i - 1, getToken(ident.substring(i)));
-		}
-		
-		if (ident.contains(":") && ident.indexOf(':') < ident.length() - 1) {
+		if (ident.contains(":")) {
 			Token result = null;
 			int last = 0;
 			boolean valid = false;
@@ -162,7 +119,42 @@ public class Parser {
 				}
 			}
 			
-			return new TokenImmediate(result, getToken(ident.substring(last)));
+			if (last != 0) {
+				return new TokenImmediate(result, getToken(ident.substring(last)));
+			}
+		}
+		
+		if (TokenStatement.operators.indexOf(ident.charAt(0)) >= 0) {
+			int i = 1;
+			for (; i < ident.length() && TokenStatement.operators.indexOf(ident.charAt(i)) >= 0; i++);
+			
+			if (i == ident.length()) {
+				return new TokenIdentifier(ident);
+			}else {
+				return new TokenOperatorImmediate(ident.substring(0, i), getToken(ident.substring(i)));
+			}
+		}
+		
+		if (ident.startsWith(":")) {
+			int i = 1;
+			for (; i < ident.length() && ident.charAt(i) == ':'; i++);
+			
+			if (i == ident.length()) {
+				return new TokenArgumentModifier(i - 1);
+			}else {
+				return new TokenArgumentModifierImmediate(i - 1, getToken(ident.substring(i)));
+			}
+		}
+		
+		if (ident.startsWith(".")) {
+			int i = 1;
+			for (; i < ident.length() && ident.charAt(i) == '.'; i++);
+			
+			if (i == ident.length()) {
+				return new TokenArgument(i - 1);
+			}else {
+				return new TokenArgumentImmediate(i - 1, getToken(ident.substring(i)));
+			}
 		}
 		
 		if (ident.length() >= 1){

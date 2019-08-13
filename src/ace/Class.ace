@@ -93,16 +93,16 @@ Class <= {
 				} {
 					..cmp ...
 					
-					search (..next get)
+					search ..next:get
 				}
 			}
 			
 			cmp . =~ {{
 				id .cid ? {true}
-				search (node get) ... .
+				search node:get ... .
 			}}
 			
-			search (node get) .
+			search node:get .
 		}
 		
 		instance

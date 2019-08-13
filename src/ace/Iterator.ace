@@ -20,7 +20,7 @@ Class {
 	:this backing {:}
 	
 	:this first {:first}
-	:this rest {Iterator (:rest)}
+	:this rest {Iterator :rest}
 	:this empty {:null}
 	
 	:this / {{
@@ -55,20 +55,17 @@ Class {
 	:this map {{
 		fn <= .
 		
-		create <= {
+		walk <= {
 			.null ? {..}
 			
-			value <= fn .first
-			next <= create .rest
-			
 			Object {
-				:this first {value}
-				:this rest {next}
+				:this first {fn ..first}
+				:this rest {walk ..rest}
 				:this null {false}
 			}
 		}
 		
-		Iterator (create :) 
+		Iterator (walk :) 
 	}}
 	
 	:this length {
@@ -84,8 +81,8 @@ Class {
 	:this clone {
 		walk <= {
 			.null ? {..}
-			rest <= walk .rest
 			first <= .first
+			rest <= walk .rest
 			
 			Object {
 				:this first {first}

@@ -18,6 +18,6 @@ public class TokenImmediate extends Token{
 
 	@Override
 	public String toString() {
-		return this.first.toString() + ":" + this.second.toString();
+		return '(' + this.first.toString() + " " + this.second.toString() + ')';
 	}
 }

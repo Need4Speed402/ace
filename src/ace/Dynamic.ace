@@ -3,13 +3,13 @@ Modifiable <= package unsafe bootstrap Modifiable
 Class {
 	value <= Modifiable :
 	
-	:this _dynamic_value {
+	:this $* {
 		value get
 	}
 	
 	:this = {{
-		. =~ Dynamic ?? {
-			value set .._dynamic_value
+		(. =~ Dynamic) ?? {
+			value set *..
 	 	} ! {
 	 		value set (..)
 		}

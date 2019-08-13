@@ -15,7 +15,6 @@ import value.Value;
 public class Packages {
 	public static Value load (ByteBuffer buf) {
 		Token ast = Parser.parse(buf);
-		//System.out.println(ast);
 		
 		Event event = new EventScope(ast.createEvent());
 		event.init();

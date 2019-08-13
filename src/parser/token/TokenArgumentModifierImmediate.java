@@ -22,7 +22,7 @@ public class TokenArgumentModifierImmediate extends Token{
 	public String toString () {
 		StringBuilder b = new StringBuilder(this.level);
 		
-		for (int i = 0; i <= this.level; i++) b.append('#');
+		for (int i = 0; i <= this.level; i++) b.append(':');
 		
 		b.append(this.immediate.toString());
 		

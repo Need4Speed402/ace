@@ -1,14 +1,3 @@
-isNull <= {
-	null <= Dynamic false
-	
-	() (
-		.
-		null = true
-	)
-	
-	null
-}
-
 Class {
 	:this bits {:}
 	
@@ -19,18 +8,16 @@ Class {
 	:this $- {
 		a <= Dynamic true
 		
-		Integer (: map {
-			val <= !. ~ a
-			a = a & !.
+		Integer (:map {
+			val <= !. ~ *a
+			a = !. & *a
 			
 			val
-		})
+		} clone)
 	}
 	
 	:this $~ {
-		Integer (: map {
-			!.
-		})
+		Integer (:map {!.} clone)
 	}
 	
 	:this ~ {{
@@ -88,7 +75,7 @@ Class {
 		
 		loop <= {{
 			..empty & .empty ?? {
-				carry = carry ~ last ~ first
+				carry = carry ~ *last ~ *first
 				
 				;;vval =! carry ? {
 					Object {
@@ -101,10 +88,10 @@ Class {
 				first = (...first; first)
 				last = (..first; last)
 				
-				a <= first ~ last
-				val <= a ~ carry
+				a <= *first ~ *last
+				val <= a ~ *carry
 				vval = val
-				carry = carry & a | (first & last)
+				carry = *carry & a | (*first & *last)
 				
 				next <= loop ...rest ..rest
 				
