@@ -37,4 +37,9 @@ public class EventCall implements Event{
 		this.function.paramaterHeight(pHeight, mHeight);
 		this.argument.paramaterHeight(pHeight, mHeight);
 	}
+	
+	@Override
+	public String toString() {
+		return "(" + this.function.toString() + " " + this.argument.toString() + ")";
+	}
 }

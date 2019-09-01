@@ -49,4 +49,17 @@ public class EventCompound implements Event{
 			this.events[i].paramaterHeight(pHeight, mHeight);
 		}
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder b = new StringBuilder ();
+		
+		for (int i = 0; i < this.events.length; i++) {
+			b.append(this.events[i].toString());
+			
+			if (i + 1 < this.events.length) b.append('\n');
+		}
+		
+		return b.toString();
+	}
 }

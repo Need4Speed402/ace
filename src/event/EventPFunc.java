@@ -26,4 +26,11 @@ public class EventPFunc implements Event{
 	
 	@Override
 	public void indexIdentifiers(EventScope scope, List<EventIdentifier> idnt) {}
+	
+	@Override
+	public String toString() {
+		StringBuilder b = new StringBuilder();
+		for (int i = 0; i <= this.level; i++) b.append('.');
+		return b.toString();
+	}
 }

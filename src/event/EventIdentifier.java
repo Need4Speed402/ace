@@ -24,4 +24,9 @@ public class EventIdentifier implements Event{
 	public void indexIdentifiers(EventScope scope, List<EventIdentifier> idnt) {
 		idnt.add(this);
 	}
+	
+	@Override
+	public String toString() {
+		return name;
+	}
 }

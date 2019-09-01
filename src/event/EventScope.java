@@ -124,4 +124,9 @@ public class EventScope implements Event{
 		
 		public Definition (String name) {this.name = name;}
 	}
+	
+	@Override
+	public String toString() {
+		return "(" + this.contents.toString() + ")";
+	}
 }
