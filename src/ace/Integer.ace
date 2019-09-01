@@ -1,43 +1,43 @@
 Class {
 	:this bits {:}
 	
-	:this $+ {
+	:this +$ {
 		:this
 	}
 	
-	:this $- {
-		a <= Dynamic true
+	:this -$ {
+		$a = Dynamic true
 		
 		Integer (:map {
-			val <= !. ~ *a
+			$val = . == *a
 			a = !. & *a
 			
 			val
 		} clone)
 	}
 	
-	:this $~ {
+	:this ~$ {
 		Integer (:map {!.} clone)
 	}
 	
-	:this ~ {{
+	:this ! {{
 		Integer ((: / .bits) map {
-			(.first; false) ~ (.second; false)
+			(.first; false) ! (.second; false)
 		})
 	}}
 	
 	:this << {{
-		i <= Dynamic .
+		$i = Dynamic .
 		
-		loop <= {
+		$loop = {
 			i == 0 ?? {
 				..
-			} ! {
+			} ~ {
 				i -= 1
-				next <= loop ..
+				$next = loop ..
 				
 				{
-					(. =~ next) ? {next}
+					(. ~= next) ? {next}
 					false .
 				}
 			}
@@ -47,13 +47,13 @@ Class {
 	}}
 	
 	:this >> {{
-		i <= Dynamic .
+		$i = Dynamic .
 		
-		loop <= {
+		$loop = {
 			i == 0 ?? {
 				..
-			} ! {
-				i -= 1
+			} ~ {
+				i =- 1
 				loop ..next
 			}
 		}
@@ -62,38 +62,38 @@ Class {
 	}}
 	
 	:this + {{
-		carry <= Dynamic false
-		first <= Dynamic false
-		last <= Dynamic false
+		$carry = Dynamic false
+		$first = Dynamic false
+		$last = Dynamic false
 		
-		vval <= Dynamic false
+		$vval = Dynamic false
 		
-		null <= Object {
+		$null = Object {
 			:this rest {null}
 			:this null {true}
 		}
 		
-		loop <= {{
+		$loop = {{
 			..empty & .empty ?? {
-				carry = carry ~ *last ~ *first
+				carry = carry ! *last ! *first
 				
-				;;vval =! carry ? {
+				;;vval != carry ? {
 					Object {
 						:this first {carry}
 						:this rest {null}
 						:this null {false}
 					}
 				;;}
-			} ! {
+			} ~ {
 				first = (...first; first)
 				last = (..first; last)
 				
-				a <= *first ~ *last
-				val <= a ~ *carry
+				$a = *first ! *last
+				$val = a ! *carry
 				vval = val
 				carry = *carry & a | (*first & *last)
 				
-				next <= loop ...rest ..rest
+				$next = loop ...rest ..rest
 				
 				Object {
 					:this rest {next}
@@ -111,23 +111,23 @@ Class {
 	}}
 	
 	:this == {{
-		first <= Dynamic false
-		last <= Dynamic false
+		$first = Dynamic false
+		$last = Dynamic false
 		
-		loop <= {{
+		$loop = {{
 			..empty & .empty ? {true}
 			
 			first = (..first; first)
 			last = (.first; last)
 			
-			first =! last ? {false}
+			first != last ? {false}
 			loop ..rest .rest
 		}}
 		
 		loop : .bits
 	}}
 	
-	:this =! {{
+	:this != {{
 		!(:this == .)
 	}}
 	
@@ -136,10 +136,10 @@ Class {
 	}
 	
 	:this to {{
-		until <= .
+		until => .
 		
-		create <= {
-			index <= .
+		create => {
+			index => .
 			
 			index == until ? {
 				Object {

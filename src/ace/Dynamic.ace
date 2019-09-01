@@ -1,25 +1,25 @@
-Modifiable <= package unsafe bootstrap Modifiable
+$Modifiable = package unsafe bootstrap Modifiable
 
 Class {
-	value <= Modifiable :
+	$value = Modifiable :
 	
-	:this $* {
+	:this *$ {
 		value get
 	}
 	
 	:this = {{
-		(. =~ Dynamic) ?? {
+		(. ~= Dynamic) ?? {
 			value set *..
-	 	} ! {
+	 	} ~ {
 	 		value set (..)
 		}
 	}}
 	
-	:this += {{
+	:this =+ {{
 		value set (value get + .)
 	}}
 	
-	:this -= {{
+	:this =+ {{
 		value set (value get - .)
 	}}
 	

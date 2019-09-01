@@ -1,55 +1,55 @@
-Identifier <= package unsafe ID
-cmp <= package unsafe bootstrap IdentCompare
-Modifiable <= package unsafe bootstrap Modifiable
+$Identifier = package unsafe ID
+$cmp = package unsafe bootstrap IdentCompare
+$Modifiable = package unsafe bootstrap Modifiable
 
-createNode <= {{{
-	next <= Modifiable ...
-	cb <= ..
+$createNode = {{{
+	$next = Modifiable ...
+	$cb = ..
 	
 	{
 		cmp . def {{{.()}}}
 		cmp . cmp {{
 			cmp . .... {cb}
-			. =~ .... ? {cb}
+			. ~= .... ? {cb}
 		}}
 		cmp . next {next}
 	}
 }}}
 
-classcid <= Identifier ()
+$classcid = Identifier ()
 
-class~ <= {
+$class~ = {
 	classcid .cid | (Object cid .cid)
 }
 
-Class <= {
-	cmp . =~ {class~}
+$Class = {
+	cmp . ~= {class~}
 	cmp . cid {classcid}
 	
-	id <= Identifier ()
+	$id = Identifier ()
 	
-	constructor <= {
-		cmp . =~ {class~}
+	$constructor = {
+		cmp . ~= {class~}
 		cmp . cid {id}
 		
-		node <= Modifiable {
+		$node = Modifiable {
 			cmp : def {{{..()}}}
 		}
 
-		default <= (
+		$default = (
 			.. {
 				(
 					cmp . this {{
 						instance
 						
-						search <= {
-							n <= .get
+						$search = {
+							$n = .get
 							
 							n def {
 								{{....set (createNode n . ..)}}
 							} {
 								n cmp ...
-								search n:next
+								search (n next)
 							}
 						}
 						
@@ -61,23 +61,23 @@ Class <= {
 			}
 			
 			{
-				cmp . =~ {{
+				cmp . ~= {{
 					Object cid .cid
 				}}
 			}
 		)
 		
-		instance <= {
+		$instance = {
 			cmp . constructor {
 				constructor
 			}
 			
 			cmp . extend {{
-				obj <= .
+				$obj = .
 				
 				Object {
-					:this =~ {
-						instance =~ . | obj =~ .
+					:this ~= {
+						instance ~= . | obj ~= .
 					}
 					
 					{
@@ -87,22 +87,22 @@ Class <= {
 				}
 			}}
 			
-			search <= {
+			$search = {
 				. def {
 					default
 				} {
 					..cmp ...
 					
-					search ..next:get
+					search (.. next get)
 				}
 			}
 			
-			cmp . =~ {{
+			cmp . ~= {{
 				id .cid ? {true}
-				search node:get ... .
+				search (node get) ... .
 			}}
 			
-			search node:get .
+			search (node get) .
 		}
 		
 		instance

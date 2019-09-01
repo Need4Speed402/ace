@@ -1,10 +1,10 @@
 Class {
-	[dyn; type] <= (
-		.arg =~ Class ? {
+	$[dyn; type] = (
+		.arg ~= Class ? {
 			[(); ..]
 		}
 		
-		.arg =~ Object ? {
+		.arg ~= Object ? {
 			[Dynamic ..; ..constructor]
 		}
 		
@@ -12,7 +12,7 @@ Class {
 	)
 	
 	. = {{
-		. =~ type ?! {
+		. ~= type ?! {
 			console println error
 			;; throw an error
 		}

@@ -1,19 +1,18 @@
-makeString <= {
-	chars <= .
+$makeString = {
+	$chars = .
 	
-	self <= {
-		(. =~ toString) ? {self}
+	Object {
+		:this toString {
+			:this
+		}
 		
-		(. =~ +) ? {{
-			list <= chars + .
-			
+		:this + {
+			$list = chars + .
 			makeString list
-		}}
+		}
 		
-		chars .
+		chars
 	}
-	
-	self
 }
 
 {

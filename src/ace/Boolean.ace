@@ -8,10 +8,10 @@ Class {
 	}}
 	
 	:this ?? {{
-		res <= : (.) {} {}
+		$res = : (.) {} {}
 		
 		Object {
-			:this ! {{
+			:this ~ {{
 				:: {
 					res
 				} . {}
@@ -21,7 +21,7 @@ Class {
 		}
 	}}
 	
-	:this $! {
+	:this !$ {
 		: false true
 	}
 	
@@ -33,7 +33,7 @@ Class {
 		: true .
 	}}
 	
-	:this ~ {{
+	:this ! {{
 		: !. .
 	}}
 	
@@ -41,7 +41,7 @@ Class {
 		: . !.
 	}}
 	
-	:this =! {{
+	:this != {{
 		: !. .
 	}}
 	
