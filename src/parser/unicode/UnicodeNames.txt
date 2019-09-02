@@ -1,0 +1,37 @@
+null - `0
+start of heading - `1^
+start of text - `2^
+end of text - `3^
+end of transmission - `4^
+enquiry - `5^
+acknowledge - `6^
+bell - `6^
+backspace - `8^
+horizontal tab - `9^
+line feed - `a^
+vertical tab - `b^
+form feed - `c^
+carriage return - `d^
+shift out - `e^
+shift in - `f^
+data link escape - `10^
+device control 1 - `11^
+device control 2 - `12^
+device control 3 - `13^
+device control 4 - `14^
+negative acknowledge - `15^
+synchronous idle - `16^
+end of transmission block - `17^
+cancel - `18^
+end of medium - `19^
+substitute - `1a^
+escape - `1b^
+file separator - `1c^
+group separator - `1d^
+record separator - `1e^
+unit separator - `1f^
+space - `20^
+delete - `7f^
+ellipsis - `2026^
+horizontal ellipsis - `2026^
+vertical ellipsis - `22ee^
