@@ -10,11 +10,14 @@ import java.nio.file.Files;
 import event.Event;
 import event.EventScope;
 import parser.token.Token;
+import parser.token.TokenBase;
 import value.Value;
 
 public class Packages {
 	public static Value load (ByteBuffer buf) {
-		Token ast = Parser.parse(buf);
+		Token ast = new TokenBase(new Stream(buf));
+		
+		//System.out.println(ast);
 		
 		Event event = new EventScope(ast.createEvent());
 		event.init();

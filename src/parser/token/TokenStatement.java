@@ -1,15 +1,24 @@
 package parser.token;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Arrays;
 
 import event.Event;
 import event.EventCall;
 import event.EventStatic;
+import parser.Stream;
+import parser.TokenList;
 import value.Value;
 
 public class TokenStatement extends TokenCompound{
-	public static final String operators = "?,@! |&~ =<> +- */\\% ^ $#`";
+	public static final String operators = "?,@~_ |&! =<> +- */\\% ^ $#`";
+	public static final char[] ops = operators.replaceAll(" ", "").toCharArray();
 	public static final int[] operatorValues;
+	
+	public TokenStatement (Stream s) {
+		super(TokenStatement.readStatement(s));
+	}
 	
 	static {
 		operatorValues = new int[operators.length()];
@@ -35,75 +44,60 @@ public class TokenStatement extends TokenCompound{
 	}
 	
 	public static boolean isOperator (Token t) {
-		if (t instanceof TokenIdentifier) {
-			return isOperator(((TokenIdentifier) t).getName());
-		}else {
-			return false;
-		}
-	}
-	
-	public static boolean isOperator (String s) {
-		if (s.length() == 0) return false;
-		
-		for (int i = 0; i < s.length(); i++) {
-			char c = s.charAt(i);
-			
-			if (operators.indexOf(c) == -1) {
-				return false;
-			}
-		}
-		
-		return true;
+		return t instanceof TokenOperator;
 	}
 	
 	public static boolean isModifier (Token t) {
-		if (t instanceof TokenIdentifier) {
-			return isModifier(((TokenIdentifier) t).getName());
-		}else {
-			return false;
-		}
-	}
-	
-	public static boolean isModifier (String s) {
-		if (s.length() == 0) return false;
-		
-		char c = s.charAt(0);
-		
-		if (Character.toLowerCase(c) == Character.toUpperCase(c)) {
-			return false;
-		}else if (Character.toUpperCase(c) == c) {
-			for (int i = 1; i < s.length(); i++) {
-				if (TokenStatement.operators.indexOf(s.charAt(i)) >= 0) {
-					return false;
-				}
-			}
+		if (t instanceof TokenImmediate) {
+			return isModifier(((TokenImmediate) t).getFirst());
+		}else if (t instanceof TokenOperatorImmediate) {
+			return isModifier(((TokenOperatorImmediate) t).getToken());
+		}else if (t instanceof TokenImmediateArgument) {
+			return isModifier(((TokenImmediateArgument) t).getContent());
+		}else if (t instanceof TokenImmediateArgumentModifier) {
+			return isModifier(((TokenImmediateArgumentModifier) t).getContent());
+		}else if (t instanceof TokenIdentifier) {
+			String s = ((TokenIdentifier) t).getName();
 			
-			return true;
+			if (s.length() == 0) return false;
+			
+			char c = s.charAt(0);
+			
+			if (Character.toLowerCase(c) == Character.toUpperCase(c)) {
+				return false;
+			}else if (Character.toUpperCase(c) == c) {
+				for (int i = 1; i < s.length(); i++) {
+					if (TokenStatement.operators.indexOf(s.charAt(i)) >= 0) {
+						return false;
+					}
+				}
+				
+				return true;
+			}else {
+				return false;
+			}
 		}else {
 			return false;
 		}
 	}
 	
 	public static boolean isSetter (Token t) {
-		if (t instanceof TokenIdentifier) {
-			return isSetter(((TokenIdentifier) t).getName());
+		if (t instanceof TokenOperator) {
+			String s = ((TokenOperator) t).getName();
+			
+			if (s.length() == 0) return false;
+			if (s.charAt(0) != '=') return false;
+			
+			for (int i = 1; i < s.length(); i++) {
+				char c = s.charAt(i);
+				
+				if (c == '=') return false;
+			}
+			
+			return true;
 		}else {
 			return false;
 		}
-	}
-	
-	public static boolean isSetter (String s) {
-		if (s.length() == 0) return false;
-		if (s.charAt(s.length() - 1) != '=') return false;
-		
-		for (int i = 0; i < s.length() - 1; i++) {
-			char c = s.charAt(i);
-			
-			if (c == '=') return false;
-			if (operators.indexOf(c) == -1) return false;
-		}
-		
-		return true;
 	}
 	
 	public static Token linear (Token[] tokens) {
@@ -194,8 +188,8 @@ public class TokenStatement extends TokenCompound{
 					break;
 				}
 				
-				int o1p = operatorValues[operators.indexOf(o1.charAt(i))];
-				int o2p = operatorValues[operators.indexOf(o2.charAt(i))];
+				int o1p = operatorValues[operators.indexOf(o1.charAt(o1.length() - 1 - i))];
+				int o2p = operatorValues[operators.indexOf(o2.charAt(o2.length() - 1 - i))];
 				
 				if (o1p != o2p) {
 					if (o1p < o2p) {
@@ -302,8 +296,7 @@ public class TokenStatement extends TokenCompound{
 		
 		@Override
 		public String toString() {
-			//return new Caller(new Caller(this.a, this.operator), this.b).toString();
-			return "(" + this.a + " " + this.operator + " " + this.b + ")";
+			return this.a + " " + this.operator + " " + this.b;
 		}
 	}
 	
@@ -347,24 +340,104 @@ public class TokenStatement extends TokenCompound{
 		
 		@Override
 		public String toString () {
-			StringBuilder b = new StringBuilder();
-			
-			if (this.function instanceof Caller || this.function instanceof Operator || this.function instanceof ModifierCaller) {
-				b.append('(').append(this.function).append(')');
-			}else {
-				b.append(this.function);
-			}
-			
-			b.append(' ');
-			
-			if (this.param instanceof Caller || this.param instanceof Operator || this.param instanceof ModifierCaller) {
-				b.append('(').append(this.param).append(')');
-			}else {
-				b.append(this.param);
-			}
-			
-			return b.toString();
+			return this.function.toString() + " " + this.param.toString();
 		}
+	}
+	
+	public static Token[] readStatement (Stream s) {
+		TokenList tokens = new TokenList();
+		
+		while (true) {
+			if (!s.hasChr()) break;
+			
+			if (s.isNext(';', '\n')) break;
+			if (s.isNext(")]}".toCharArray())) break;
+			if (s.next(Stream.whitespace)) continue;
+			
+			tokens.push(TokenStatement.readImmeditates(s));
+		}
+		
+		return tokens.toArray();
+	}
+	
+	private static Token combine (Token a, Token b) {
+		if (b == null) {
+			return a;
+		}else {
+			return new TokenImmediate(a, b);
+		}
+	}
+	
+	public static Token readImmeditates (Stream s) {
+		while (s.hasChr()) {
+			if (s.isNext(Stream.whitespace)) break;
+			if (s.isNext(";)]}".toCharArray())) break;
+			
+			if (s.next(':')) {
+				int count = 0;
+				while (s.next(':')) count++;
+				
+				Token next = readImmeditates(s);
+				
+				if (next == null) {
+					return new TokenArgumentModifier(count);
+				}else {
+					return new TokenImmediateArgumentModifier(count, next);
+				}
+			}
+			
+			if (s.next('.')) {
+				int count = 0;
+				while (s.next('.')) count++;
+				
+				Token next = readImmeditates(s);
+				
+				if (next == null) {
+					return new TokenArgument(count);
+				}else {
+					return new TokenImmediateArgument(count, next);
+				}
+			}
+			
+			if (s.isNext(ops)) {
+				StringBuilder operator = new StringBuilder();
+				while (s.isNext(ops)) operator.append(s.chr());
+				
+				Token next = readImmeditates(s);
+				
+				if (next == null) {
+					return new TokenOperator(operator.toString());
+				}else {
+					return new TokenOperatorImmediate(operator.toString(), next);
+				}
+			}
+			
+			if (s.next('(')) return combine(new TokenScope(s), readImmeditates(s));
+			if (s.next('{')) return combine(new TokenFunction(s), readImmeditates(s));
+			if (s.next('[')) return combine(new TokenArray(s), readImmeditates(s));
+			if (s.next('"')) return combine(TokenString.readEscapedString(s), readImmeditates(s));
+			if (s.next('\'')) return combine (TokenString.readString(s), readImmeditates(s));
+			
+			{
+				StringBuilder ident = new StringBuilder();
+				
+				while (s.hasChr() && !s.isNext(Stream.whitespace) && !s.isNext("()[]{}'\";".toCharArray())) ident.append(s.chr());
+				
+				Object number = TokenInteger.parseNumber(ident.toString());
+				
+				if (number != null) {
+					if (number instanceof BigInteger) {
+						return combine(new TokenInteger((BigInteger) number), readImmeditates(s));
+					}else if (number instanceof BigDecimal) {
+						return combine(new TokenFloat((BigDecimal) number), readImmeditates(s));
+					}
+				}else{
+					return combine(new TokenIdentifier(ident.toString()), readImmeditates(s));
+				}
+			}
+		}
+		
+		return null;
 	}
 }
  

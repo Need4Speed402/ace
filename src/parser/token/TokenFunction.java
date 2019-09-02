@@ -4,9 +4,14 @@ import event.Event;
 import event.EventFunction;
 import event.EventModifier;
 import event.EventStatic;
+import parser.Stream;
 import value.Value;
 
 public class TokenFunction extends TokenCompound {
+	public TokenFunction (Stream s) {
+		super(TokenBase.readBlock(s, '}'));
+	}
+	
 	public static String indent (String s) {
 		StringBuilder ss = new StringBuilder();
 		ss.append('\t');

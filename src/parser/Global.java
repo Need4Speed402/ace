@@ -15,16 +15,50 @@ public class Global extends Local{
 	}
 	
 	public static String getText (Value e) {
-		if (e instanceof ValueIdentifier) {
-			return "ident[" + ((ValueIdentifier) e).id + "]";
-		}else if (e == Value.NULL) {
-			return "null";
+		if (e == Value.NULL) return "null";
+		
+		StringBuilder b = new StringBuilder ();
+		
+		e.call("~=").call(Global.Boolean).call("?").call(new Value(p -> {
+			e.call("??").call(new Value(p2 -> {
+				b.append("true");
+				return Value.NULL;
+			})).call("~").call(new Value(p2 -> {
+				b.append("false");
+				return Value.NULL;
+			}));
+			
+			return Value.NULL;
+		}));
+		
+		e.call("~=").call(Global.Integer).call("?").call(new Value(p -> {
+			b.append(TokenInteger.getInt(e).toString());
+			
+			return Value.NULL;
+		}));
+		
+		e.call("~=").call(Global.Iterator).call("?").call(new Value(p -> {
+			b.append("Iterator[");
+			
+			e.call("@").call(new Value(p2 -> {
+				if (b.length() > 9) {
+					b.append(", ");
+				}
+				
+				b.append(getText(p2));
+				
+				return Value.NULL;
+			}));
+			
+			b.append("]");
+			
+			return Value.NULL;
+		}));
+		
+		if (b.length() == 0) {
+			return "Arbitrary function";
 		}else {
-			try {
-				return TokenInteger.getInt(e).toString();
-			}catch (Exception ee) {
-				return "Arbitrary function";
-			}
+			return b.toString();
 		}
 		
 		/*e = e.call("toString");
@@ -45,7 +79,7 @@ public class Global extends Local{
 	}
 	
 	public static Value Boolean = Value.NULL, TRUE = Value.NULL, FALSE = Value.NULL;
-	public static Value Integer = Value.NULL, String = Value.NULL;
+	public static Value Integer = Value.NULL, Iterator = Value.NULL, String = Value.NULL;
 	
 	static {
 		global.put("package", new ValuePackage());
@@ -68,7 +102,7 @@ public class Global extends Local{
 		global.put("false", FALSE = Boolean.call(new Value (v1 -> new Value (v2 -> v2))));
 		
 		global.put("Dynamic", Packages.getPackage("Dynamic.ace"));
-		global.put("Iterator", Packages.getPackage("Iterator.ace"));
+		global.put("Iterator", Iterator = Packages.getPackage("Iterator.ace"));
 		global.put("Integer", Integer = Packages.getPackage("Integer.ace"));
 		global.put("List", Packages.getPackage("List.ace"));
 		

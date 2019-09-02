@@ -1,5 +1,6 @@
 package parser.token;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
@@ -154,5 +155,62 @@ public class TokenInteger extends Token{
 		}
 		
 		return new BigInteger(bytes);
+	}
+	
+	public static Object parseNumber (String ident) {
+		ident = ident.toLowerCase();
+		
+		if (ident.endsWith("^")) { //hexadecimal
+			return parseNumber(ident.substring(0, ident.length() - 1), "0123456789abcdef");
+		}else if (ident.endsWith("*")) { //octal
+			return parseNumber(ident.substring(0, ident.length() - 1), "01234567");
+		}else if (ident.endsWith("!")) { // binary
+			return parseNumber(ident.substring(0, ident.length() - 1), "01");
+		}else if (ident.endsWith(".")) { // decimal
+			return parseNumber(ident.substring(0, ident.length() - 1), "0123456789");
+		}else{ //implicit decimal
+			return parseNumber(ident, "0123456789");
+		}
+	}
+	
+	public static Object parseNumber (String ident, String radix) {
+		if (ident.length() == 0) return null;
+		if (ident.charAt(0) == '.' || ident.charAt(0) == ',') return null;
+		if (ident.charAt(ident.length() - 1) == '.' || ident.charAt(ident.length() - 1) == ',') return null;
+		
+		int decimal = -1;
+		
+		for (int i = 0; i < ident.length(); i++) {
+			char c = ident.charAt(i);
+			
+			if (c == '.') {
+				if (decimal != -1) return null;
+				decimal = i;
+			}else if (c == ','){
+				if (ident.charAt(i - 1) == '.' || ident.charAt(i - 1) == ',') return null;
+				if (ident.charAt(i + 1) == '.' || ident.charAt(i + 1) == ',') return null;
+			}else if (radix.indexOf(c) == -1) {
+				return null;
+			}
+		}
+		
+		if (decimal != -1) {
+			BigDecimal whole = new BigDecimal((BigInteger) parseNumber(ident.substring(0, decimal), radix));
+			BigDecimal partial = new BigDecimal((BigInteger) parseNumber(ident.substring(decimal + 1), radix));
+			
+			return whole.add(partial.divide(BigDecimal.valueOf(radix.length()).pow(ident.length() - 1 - decimal)));
+		}else {
+			BigInteger num = BigInteger.ZERO;
+			
+			for (int i = 0; i < ident.length(); i++) {
+				char c = ident.charAt(i);
+				
+				if (c == ',') continue;
+				
+				num = num.multiply(BigInteger.valueOf(radix.length())).add(BigInteger.valueOf(radix.indexOf(c)));
+			}
+			
+			return num;
+		}
 	}
 }

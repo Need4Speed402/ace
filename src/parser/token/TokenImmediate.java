@@ -10,6 +10,14 @@ public class TokenImmediate extends Token{
 		this.first = first;
 		this.second = second;
 	}
+	
+	public Token getFirst() {
+		return first;
+	}
+	
+	public Token getSecond() {
+		return second;
+	}
 
 	@Override
 	public Event createEvent() {
@@ -18,6 +26,6 @@ public class TokenImmediate extends Token{
 
 	@Override
 	public String toString() {
-		return '(' + this.first.toString() + " " + this.second.toString() + ')';
+		return this.first.toString() + this.second.toString();
 	}
 }

@@ -30,8 +30,6 @@ public class Unicode {
 			map.put(bind.toString().trim(), ((TokenString.StringSegment) tokens[0]).toString());
 		}
 		
-		System.out.println(map);
-		
 		return map;
 	}
 }

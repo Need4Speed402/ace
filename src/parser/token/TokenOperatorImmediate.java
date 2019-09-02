@@ -4,19 +4,21 @@ import event.Event;
 import event.EventCall;
 import event.EventIdentifier;
 
-public class TokenOperatorImmediate extends TokenCompound{
-	private Token token;
+public class TokenOperatorImmediate extends Token{
+	private final Token token;
 	private final String operator;
-	private final String op2;
-	
-	public TokenOperatorImmediate(String operator) {
-		this.operator = operator;
-		this.op2 = ("$" + operator).intern();
-	}
 	
 	public TokenOperatorImmediate(String operator, Token token) {
-		this(operator);
+		this.operator = operator;
 		this.token = token;
+	}
+	
+	public String getOperator() {
+		return operator;
+	}
+	
+	public Token getToken() {
+		return token;
 	}
 	
 	@Override
@@ -26,11 +28,6 @@ public class TokenOperatorImmediate extends TokenCompound{
 	
 	@Override
 	public Event createEvent() {
-		return new EventCall(this.token.createEvent(), new EventIdentifier(op2));
-	}
-	
-	@Override
-	public void add(Token t) {
-		this.token = t;
+		return new EventCall(this.token.createEvent(), new EventIdentifier((this.operator + '$').intern()));
 	}
 }

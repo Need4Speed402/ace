@@ -2,8 +2,13 @@ package parser.token;
 
 import event.Event;
 import event.EventScope;
+import parser.Stream;
 
-public class TokenIIFE extends TokenCompound{
+public class TokenScope extends TokenCompound{
+	public TokenScope (Stream s) {
+		super(TokenBase.readBlock(s, ')'));
+	}
+	
 	@Override
 	public String toString (){
 		if (this.getTokens().length == 0) {

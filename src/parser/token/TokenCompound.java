@@ -6,17 +6,10 @@ import event.EventStatic;
 import value.Value;
 
 public class TokenCompound extends Token{
-	private Token[] tokens = new Token[0];
+	Token[] tokens;
 	
-	public TokenCompound () {
-		
-	}
-	
-	public void add (Token t) {
-		Token[] nt = new Token[this.tokens.length + 1];
-		nt[this.tokens.length] = t;
-		System.arraycopy(this.tokens, 0, nt, 0, this.tokens.length);
-		this.tokens = nt;
+	public TokenCompound (Token[] tokens) {
+		this.tokens = tokens;
 	}
 	
 	public int getLength () {

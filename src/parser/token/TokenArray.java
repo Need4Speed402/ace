@@ -4,8 +4,13 @@ import event.Event;
 import event.EventCall;
 import event.EventIdentifier;
 import event.EventList;
+import parser.Stream;
 
-public class TokenList extends TokenCompound{
+public class TokenArray extends TokenCompound{
+	public TokenArray(Stream s) {
+		super(TokenBase.readBlock(s, ']'));
+	}
+	
 	@Override
 	public String toString () {
 		if (this.getTokens().length == 0) {
