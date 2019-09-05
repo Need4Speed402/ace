@@ -1,6 +1,6 @@
 $Memory = package unsafe Memory
 
-Class {
+Class ;;{
 	$length = :length
 	$get = :get
 	$set = :set
