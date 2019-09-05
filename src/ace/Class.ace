@@ -72,21 +72,6 @@ $Class = {
 				constructor
 			}
 			
-			cmp . extend {{
-				$obj = .
-				
-				Object {
-					:this ~= {
-						instance ~= . | obj ~= .
-					}
-					
-					{
-						instance .
-						obj .
-					}
-				}
-			}}
-			
 			$search = {
 				. def {
 					default
@@ -99,7 +84,7 @@ $Class = {
 			
 			cmp . ~= {{
 				id .cid ? {true}
-				search (node get) ... .
+				search (node get) .. .
 			}}
 			
 			search (node get) .

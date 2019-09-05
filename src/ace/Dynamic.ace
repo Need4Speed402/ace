@@ -9,9 +9,9 @@ Class {
 	
 	:this = {{
 		(. ~= Dynamic) ?? {
-			value set *..
+			value set *.
 	 	} ~ {
-	 		value set (..)
+	 		value set (.)
 		}
 	}}
 	

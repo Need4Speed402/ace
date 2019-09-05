@@ -5,12 +5,12 @@ $null = Object {
 }
 
 Class {
-	:this @ {{
+	:this for {{
 		$cb = .
 		$loop = {
-			.null ?! {
-				cb ..first
-				loop ..rest
+			.null !? {
+				cb .first
+				loop .rest
 			}
 		}
 		
@@ -23,9 +23,9 @@ Class {
 	:this rest {Iterator :rest}
 	:this empty {:null}
 	
-	:this / {{
+	:this zip {{
 		$zip = {{
-			..empty & .empty ? {..empty}
+			..empty & .empty ? {.empty}
 			
 			Object {
 				:this first {[....first; ...first]}
@@ -39,13 +39,12 @@ Class {
 	:this + {{
 		$add = .backing
 		$walk = {
-			$current = .
-			current null ? {add}
+			.null ? {add}
 			
 			Object {
-				:this first {current first}
+				:this first {.first}
 				:this null {false}
-				:this rest {walk (current rest)}
+				:this rest {walk .rest}
 			}
 		}
 		
@@ -56,7 +55,7 @@ Class {
 		$fn = .
 		
 		$walk = {
-			.null ? {..}
+			.null ? {.}
 			
 			Object {
 				:this first {fn ..first}
@@ -80,7 +79,7 @@ Class {
 	
 	:this clone {
 		$walk = {
-			.null ? {..}
+			.null ? {.}
 			$first = .first
 			$rest = walk .rest
 			

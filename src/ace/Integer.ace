@@ -85,15 +85,15 @@ Class {
 					}
 				;;}
 			} ~ {
-				first = (...first; first)
-				last = (..first; last)
+				first = (..first; first)
+				last = (.first; last)
 				
 				$a = *first ! *last
 				$val = a ! *carry
 				vval = val
 				carry = *carry & a | (*first & *last)
 				
-				$next = loop ...rest ..rest
+				$next = loop ..rest .rest
 				
 				Object {
 					:this rest {next}
