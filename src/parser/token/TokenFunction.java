@@ -2,6 +2,7 @@ package parser.token;
 
 import event.Event;
 import event.EventFunction;
+import event.EventHiddenFunction;
 import event.EventModifier;
 import event.EventStatic;
 import parser.Stream;
@@ -43,6 +44,14 @@ public class TokenFunction extends TokenCompound {
 			return new EventStatic(Value.NULL);
 		}else {
 			return new EventModifier(super.createEvent());
+		}
+	}
+	
+	public Event createHiddenEvent () {
+		if (this.getTokens().length == 0) {
+			return new EventStatic(Value.NULL);
+		}else {
+			return new EventHiddenFunction(super.createEvent());
 		}
 	}
 	

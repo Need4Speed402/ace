@@ -114,7 +114,7 @@ public class TokenInteger extends Token{
 	public static BigInteger getInt (Value v) {
 		ArrayList<Value> arr = new ArrayList<Value>();
 		
-		v.call("bits").call("@").call(new Value(p -> {
+		v.call("bits").call("for").call(new Value(p -> {
 			arr.add(p);
 			
 			return Value.NULL;

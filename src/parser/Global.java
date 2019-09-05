@@ -40,7 +40,7 @@ public class Global extends Local{
 		e.call("~=").call(Global.Iterator).call("?").call(new Value(p -> {
 			b.append("Iterator[");
 			
-			e.call("@").call(new Value(p2 -> {
+			e.call("for").call(new Value(p2 -> {
 				if (b.length() > 9) {
 					b.append(", ");
 				}

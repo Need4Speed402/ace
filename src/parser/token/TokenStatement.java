@@ -12,7 +12,7 @@ import parser.TokenList;
 import value.Value;
 
 public class TokenStatement extends TokenCompound{
-	public static final String operators = "?,@~_ |&! =<> +- */\\% ^ $#`";
+	public static final String operators = "?,~_ @ |&! =<> +- */\\% ^ $#`";
 	public static final char[] ops = operators.replaceAll(" ", "").toCharArray();
 	public static final int[] operatorValues;
 	
@@ -291,7 +291,11 @@ public class TokenStatement extends TokenCompound{
 		
 		@Override
 		public Event createEvent() {
-			return new EventCall(new EventCall(this.a.createEvent(), this.operator.createEvent()), this.b.createEvent());
+			if (this.b instanceof TokenFunction) {
+				return new EventCall(new EventCall(this.a.createEvent(), this.operator.createEvent()), ((TokenFunction) this.b).createHiddenEvent());
+			}else {
+				return new EventCall(new EventCall(this.a.createEvent(), this.operator.createEvent()), this.b.createEvent());
+			}
 		}
 		
 		@Override
