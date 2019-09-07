@@ -4,7 +4,7 @@ import event.Event;
 import event.EventScope;
 import parser.Stream;
 
-public class TokenScope extends TokenCompound{
+public class TokenScope extends TokenBlock{
 	public TokenScope (Stream s) {
 		super(TokenBase.readBlock(s, ')'));
 	}
@@ -16,7 +16,7 @@ public class TokenScope extends TokenCompound{
 		}else if (this.getTokens().length == 1) {
 			return "(" + this.getTokens()[0].toString() + ")";
 		}else {
-			return "(\n" + TokenFunction.indent(TokenCompound.toString(this, '\n')) + "\n)";
+			return "(\n" + TokenFunction.indent(TokenBlock.toString(this, '\n')) + "\n)";
 		}
 	}
 	

@@ -4,7 +4,7 @@ import parser.ParserException;
 import parser.Stream;
 import parser.TokenList;
 
-public class TokenBase extends TokenCompound {
+public class TokenBase extends TokenBlock {
 	public TokenBase (Stream s) {
 		super (TokenBase.readBlock(s, '\0'));
 	}
@@ -27,35 +27,9 @@ public class TokenBase extends TokenCompound {
 			}
 			
 			//comments
-			if (s.next(";;") && s.isNext('{', '(', '[')){
-				char c = s.chr();
-				char n = '\0';
-				
-				if (c == '{') n = '}';
-				if (c == '[') n = ']';
-				if (c == '(') n = ')';
-				
-				int level = 0;
-				
-				while (true) {
-					if (!s.hasChr()) break;
-					
-					if (s.next(n)) {
-						if (level-- == 0) break;
-						continue;
-					}
-					
-					if (s.next(c)) {
-						level++;
-						continue;
-					}
-					
-					s.chr();
-				}
-			}
-			 
 			if (s.next(";;")) {
-				while (s.hasChr() && !s.isNext('\n')) s.chr();
+				new TokenStatement(s);
+				
 				continue;
 			}
 			
@@ -79,7 +53,7 @@ public class TokenBase extends TokenCompound {
 			
 			if (s.next(Stream.whitespace)) continue;
 			
-			if (s.isNext("]})".toCharArray())) {
+			if (s.isNext(']', ')', '}')) {
 				char next = s.chr();
 				
 				if (next == terminator) {
@@ -91,6 +65,7 @@ public class TokenBase extends TokenCompound {
 			
 			tokens.push(new TokenStatement(s));
 			semiLegal = true;
+			semiUsed = false;
 		}
 		
 		return tokens.toArray();

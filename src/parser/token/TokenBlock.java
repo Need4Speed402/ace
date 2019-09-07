@@ -5,10 +5,10 @@ import event.EventCompound;
 import event.EventStatic;
 import value.Value;
 
-public class TokenCompound extends Token{
+public class TokenBlock extends Token{
 	Token[] tokens;
 	
-	public TokenCompound (Token[] tokens) {
+	public TokenBlock (Token[] tokens) {
 		this.tokens = tokens;
 	}
 	
@@ -25,7 +25,7 @@ public class TokenCompound extends Token{
 		return toString(this, '\n');
 	}
 	
-	protected static String toString(TokenCompound compound, char separator) {
+	protected static String toString(TokenBlock compound, char separator) {
 		StringBuilder b = new StringBuilder();
 		
 		for (int i = 0; i < compound.tokens.length; i++) {

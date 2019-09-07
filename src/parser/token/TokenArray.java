@@ -6,7 +6,7 @@ import event.EventIdentifier;
 import event.EventList;
 import parser.Stream;
 
-public class TokenArray extends TokenCompound{
+public class TokenArray extends TokenBlock{
 	public TokenArray(Stream s) {
 		super(TokenBase.readBlock(s, ']'));
 	}
@@ -18,7 +18,7 @@ public class TokenArray extends TokenCompound{
 		}else if (this.getTokens().length == 1) {
 			return "[" + this.getTokens()[0].toString() + "]";
 		}else {
-			return "[\n" + TokenFunction.indent(TokenCompound.toString(this, '\n')) + "\n]";
+			return "[\n" + TokenFunction.indent(TokenBlock.toString(this, '\n')) + "\n]";
 		}
 	}
 	

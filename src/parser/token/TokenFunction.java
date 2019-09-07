@@ -8,7 +8,7 @@ import event.EventStatic;
 import parser.Stream;
 import value.Value;
 
-public class TokenFunction extends TokenCompound {
+public class TokenFunction extends TokenBlock {
 	public TokenFunction (Stream s) {
 		super(TokenBase.readBlock(s, '}'));
 	}
@@ -33,9 +33,9 @@ public class TokenFunction extends TokenCompound {
 	@Override
 	public String toString () {
 		if (this.getLength() <= 1) {
-			return "{" + TokenCompound.toString(this, '\n') + "}";
+			return "{" + TokenBlock.toString(this, '\n') + "}";
 		}else {
-			return "{\n" + indent(TokenCompound.toString(this, '\n')) + "\n}";
+			return "{\n" + indent(TokenBlock.toString(this, '\n')) + "\n}";
 		}
 	}
 	

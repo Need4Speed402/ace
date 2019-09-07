@@ -11,7 +11,7 @@ import parser.Stream;
 import parser.TokenList;
 import value.Value;
 
-public class TokenStatement extends TokenCompound{
+public class TokenStatement extends TokenBlock{
 	public static final String operators = "?,~_ @ |&! =<> +- */\\% ^ $#`";
 	public static final char[] ops = operators.replaceAll(" ", "").toCharArray();
 	public static final int[] operatorValues;
@@ -35,6 +35,8 @@ public class TokenStatement extends TokenCompound{
 	@Override
 	public String toString() {
 		boolean verbose = true;
+		
+		if (this.getTokens().length == 0) return "";
 		
 		if (verbose) {
 			return getCaller(this.getTokens()).toString();
@@ -300,7 +302,7 @@ public class TokenStatement extends TokenCompound{
 		
 		@Override
 		public String toString() {
-			return this.a + " " + this.operator + " " + this.b;
+			return "(" + this.a + " " + this.operator + " " + this.b + ")";
 		}
 	}
 	
@@ -324,7 +326,7 @@ public class TokenStatement extends TokenCompound{
 		
 		@Override
 		public String toString() {
-			return this.modifier.toString() + " " + this.function.toString();
+			return "(" + this.modifier.toString() + " " + this.function.toString() + ")";
 		}
 	}
 	

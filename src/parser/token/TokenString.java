@@ -16,7 +16,7 @@ import parser.unicode.Unicode;
 import unsafe.Memory;
 import value.Value;
 
-public class TokenString extends TokenCompound{
+public class TokenString extends TokenBlock{
 	public static HashMap<String, String> unicodeNames = Unicode.getLookup();
 	
 

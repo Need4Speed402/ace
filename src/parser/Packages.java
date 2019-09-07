@@ -1,10 +1,6 @@
 package parser;
 
-
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
 import java.nio.file.Files;
 
 import event.Event;
@@ -14,8 +10,16 @@ import parser.token.TokenBase;
 import value.Value;
 
 public class Packages {
-	public static Value load (ByteBuffer buf) {
-		Token ast = new TokenBase(new Stream(buf));
+	public static Value load (Stream s, String name) {
+		Token ast;
+		
+		try {
+			ast = new TokenBase(s);
+		}catch (ParserException e) {
+			System.out.println(name + ":" + (s.getLine() + 1) + ":" + (s.getCol() + 1) + ": " + e.getMessage());
+			
+			throw e;
+		}
 		
 		//System.out.println(ast);
 		
@@ -27,10 +31,8 @@ public class Packages {
 	}
 	
 	public static Value file (String path) {
-		System.out.println("Loading: " + path);
-		
 		try {
-			return Packages.load(ByteBuffer.wrap(Files.readAllBytes(new File(path).toPath())));
+			return Packages.load(new Stream(Files.readAllBytes(new File(path).toPath())), path);
 		}catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -39,16 +41,7 @@ public class Packages {
 	
 	public static Value getPackage (String name) {
 		try {
-			InputStream stream = Packages.class.getClassLoader().getResourceAsStream("ace/" + name);
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			
-			byte[] buf = new byte[1024];
-			int len = 0;
-			while ((len = stream.read(buf)) > 0) {
-				out.write(buf, 0, len);
-			}
-			
-			return Packages.load(ByteBuffer.wrap(out.toByteArray()));
+			return Packages.load(new Stream(Packages.class.getClassLoader().getResourceAsStream("ace/" + name)), name);
 		}catch (Exception e) {
 			e.printStackTrace();
 			return null;

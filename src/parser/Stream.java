@@ -12,8 +12,14 @@ public class Stream {
 	private final String code;
 	private int pointer = 0;
 	
+	private int line = 0, col = 0;
+	
 	public Stream (ByteBuffer buffer) {
 		this(charset.decode(buffer).toString());
+	}
+	
+	public Stream (byte[] code) {
+		this(ByteBuffer.wrap(code));
 	}
 	
 	public Stream (InputStream input) {
@@ -64,7 +70,7 @@ public class Stream {
 				if (this.code.charAt(ii) != next[i].charAt(ii - this.pointer)) break;
 				
 				if (++ii - this.pointer == next[i].length()) {
-					this.pointer = ii;
+					while (this.pointer < ii) this.chr();
 					return true;
 				}
 			}
@@ -80,7 +86,7 @@ public class Stream {
 		
 		for(int i = 0; i < next.length; i++) {
 			if (peek == next[i]) {
-				this.pointer += 1;
+				this.chr();
 				return true;
 			}
 		}
@@ -125,10 +131,27 @@ public class Stream {
 			throw new RuntimeException("no more bytes in stream");
 		}
 		
-		return this.code.charAt(this.pointer++);
+		char c = this.code.charAt(this.pointer++);
+		
+		if (c == '\n') {
+			this.line++;
+			this.col = 0;
+		}else if (c != '\r'){
+			this.col++;
+		}
+		
+		return c;
 	}
 	
 	public boolean hasChr () {
 		return this.pointer < this.code.length();
+	}
+	
+	public int getLine() {
+		return line;
+	}
+	
+	public int getCol() {
+		return col;
 	}
 }
