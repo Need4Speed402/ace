@@ -27,6 +27,11 @@ public class TokenBase extends TokenBlock {
 			}
 			
 			//comments
+			if (s.next(";;;")) {
+				while (s.hasChr() && !s.isNext('\n')) s.chr();
+				continue;
+			}
+			
 			if (s.next(";;")) {
 				new TokenStatement(s);
 				

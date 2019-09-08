@@ -77,13 +77,13 @@ Class {
 			..empty & .empty ?? {
 				carry = carry ! *last ! *first
 				
-				;;vval != carry ? {
+				;;; vval != carry ? {
 					Object {
 						:this first {carry}
 						:this rest {null}
 						:this null {false}
 					}
-				;;}
+				;;; }
 			} ~ {
 				first = (..first; first)
 				last = (.first; last)
@@ -136,10 +136,10 @@ Class {
 	}
 	
 	:this to {{
-		until => .
+		$until = .
 		
-		create => {
-			index => .
+		$create = {
+			$index = .
 			
 			index == until ? {
 				Object {
