@@ -1,6 +1,6 @@
 package value;
 
-public class ValueIdentifier extends Value {
+public class ValueIdentifier implements Value {
 	public final String id;
 	private Value referenced;
 	private final ValueIdentifier parent;
@@ -36,19 +36,18 @@ public class ValueIdentifier extends Value {
 	}
 	
 	private ValueIdentifier(String id, ValueIdentifier parent, Value referenced) {
-		super (null);
-		
 		this.id = id;
 		this.parent = parent;
 		this.referenced = referenced;
-		
-		this.function = p -> {
-			if (p.compare(">$")){
-				return new IdentifierReference(this);
-			}else{
-				return this.getReference().call(p);
-			}
-		};
+	}
+	
+	@Override
+	public Value call(Value p) {
+		if (Value.compare(p, ">$")){
+			return new IdentifierReference(this);
+		}else{
+			return this.getReference().call(p);
+		}
 	}
 	
 	public void setReference (Value v) {
@@ -64,33 +63,35 @@ public class ValueIdentifier extends Value {
 		return super.toString() + "[" + this.id + "]";
 	}
 	
-	@Override
-	public boolean compare(String ident) {
-		return ident == this.id;
-	}
-	
-	public static class IdentifierReference extends Value {
+	public static class IdentifierReference implements Value {
+		public final ValueIdentifier ref;
+		
 		public IdentifierReference(ValueIdentifier ref) {
-			super(p -> {
-				if (ref.compare(">$")) {
-					ValueIdentifier parent = ref.getParent();
-					
-					if (parent != null) {
-						return new IdentifierReference(parent);
-					}
-				}
+			this.ref = ref;
+		}
+		
+		@Override
+		public Value call(Value p) {
+			if (Value.compare(ref, ">$")) {
+				ValueIdentifier parent = ref.getParent();
 				
-				if (ref.referenced == null && p.compare("=")) {
-					return new Value(val -> {
+				if (parent != null) {
+					return new IdentifierReference(parent);
+				}
+			}
+			
+			if (ref.referenced == null && Value.compare(p, "=")) {
+				return new Value() {
+					@Override
+					public Value call(Value val) {
 						//TODO: return error when identifier already has value
 						ref.setReference(val);
 						return Value.NULL;
-					});
-				}
-				
-				return ref.referenced.call(p);
-			});
+					}
+				};
+			}
+			
+			return ref.referenced.call(p);
 		}
-		
 	}
 }

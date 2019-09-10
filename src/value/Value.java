@@ -1,27 +1,24 @@
 package value;
 
-public class Value {
-	public static final Value NULL = new Value(p -> Value.NULL);
+public interface Value {
+	public static final Value NULL = new Value() {
+		@Override
+		public Value call(Value v) {
+			return Value.NULL;
+		}
+	};
 	
-	public Function function;
+	public Value call (Value v);
 	
-	public Value (Function function) {
-		this.function = function;
+	public default Value call (String s) {
+		return this.call(new ValueIdentifier(s));
 	}
 	
-	public Value call (Value v) {
-		return this.function.call(v);
-	}
-	
-	public Value call (String v) {
-		return this.function.call(new ValueIdentifier(v));
-	}
-	
-	public boolean compare (String ident) {
+	public static boolean compare(Value v, String identifier){
+		if (v instanceof ValueIdentifier) {
+			return ((ValueIdentifier) v).id == identifier;
+		}
+		
 		return false;
-	}
-	
-	public interface Function {
-		public Value call (Value v);
 	}
 }

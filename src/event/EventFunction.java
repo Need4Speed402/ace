@@ -12,7 +12,7 @@ public class EventFunction extends EventScope{
 	
 	@Override
 	public Value run(Local local) {
-		return new Value(p -> super.run(local, p));
+		return p -> super.run(local, p);
 	}
 
 	@Override

@@ -21,7 +21,7 @@ public class EventIterator implements Event{
 			Value vv = v;
 			Value element = this.elements[i].run(local);
 			
-			v = new Value(p -> p.call(element).call(vv));
+			v = p -> p.call(element).call(vv);
 		}
 		
 		return v;

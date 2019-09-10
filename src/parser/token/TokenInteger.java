@@ -80,21 +80,19 @@ public class TokenInteger extends Token{
 	public static BigInteger getInt (Value v) {
 		BooleanArray arr = new BooleanArray();
 		
-		v.call("bits").call("for").call(new Value(p -> {
-			p.call("?").call(new Value(p2 -> {
+		v.call("bits").call("for").call(p -> {
+			p.call("?").call(p2 -> {
 				arr.add(true);
-				
 				return Value.NULL;
-			}));
+			});
 			
-			p.call("!?").call(new Value(p2 -> {
+			p.call("!?").call(p2 ->  {
 				arr.add(false);
-				
 				return Value.NULL;
-			}));
+			});
 			
 			return Value.NULL;
-		}));
+		});
 		
 		return arr.getInt();
 	}

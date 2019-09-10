@@ -96,7 +96,7 @@ public class EventScope implements Event{
 				ValueIdentifier[] idents = Global.global.scope;
 				
 				for(int i = 0; i < idents.length; i++) {
-					if (idents[i].compare(def.name)) {
+					if (idents[i].id == def.name) {
 						def.level = level + 1;
 						def.index = i;
 						break;

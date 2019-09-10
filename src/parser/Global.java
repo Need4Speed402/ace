@@ -19,38 +19,38 @@ public class Global extends Local{
 		
 		StringBuilder b = new StringBuilder ();
 		
-		if (b.length() == 0) e.call("~=").call(Global.Boolean).call("?").call(new Value(p -> {
-			e.call("??").call(new Value(p2 -> {
+		if (b.length() == 0) e.call("~=").call(Global.Boolean).call("?").call(p -> {
+			e.call("??").call(p2 -> {
 				b.append("true");
 				return Value.NULL;
-			})).call("~").call(new Value(p2 -> {
+			}).call("~").call(p2 -> {
 				b.append("false");
 				return Value.NULL;
-			}));
+			});
 			
 			return Value.NULL;
-		}));
+		});
 		
-		if (b.length() == 0) e.call("~=").call(Global.Integer).call("?").call(new Value(p -> {
+		if (b.length() == 0) e.call("~=").call(Global.Integer).call("?").call(p -> {
 			b.append(TokenInteger.getInt(e).toString());
 			
 			return Value.NULL;
-		}));
+		});
 		
-		if (b.length() == 0) e.call("~=").call(Global.String).call("?").call(new Value(p -> {
-			e.call("for").call(new Value(p2 -> {
+		if (b.length() == 0) e.call("~=").call(Global.String).call("?").call(p -> {
+			e.call("for").call(p2 -> {
 				b.append((char) TokenInteger.getInt(p2).intValue());
 				
 				return Value.NULL;
-			}));
+			});
 			
 			return Value.NULL;
-		}));
+		});
 		
-		if (b.length() == 0) e.call("~=").call(Global.Array).call("?").call(new Value(p -> {
+		if (b.length() == 0) e.call("~=").call(Global.Array).call("?").call(p -> {
 			b.append("Array[");
 			
-			e.call("for").call(new Value(p2 -> {
+			e.call("for").call(p2 -> {
 				if (b.length() > 6) {
 					b.append("; ");
 				}
@@ -58,17 +58,17 @@ public class Global extends Local{
 				b.append(getText(p2));
 				
 				return Value.NULL;
-			}));
+			});
 			
 			b.append("]");
 			
 			return Value.NULL;
-		}));
+		});
 		
-		if (b.length() == 0) e.call("~=").call(Global.Iterator).call("?").call(new Value(p -> {
+		if (b.length() == 0) e.call("~=").call(Global.Iterator).call("?").call(p -> {
 			b.append("Iterator[");
 			
-			e.call("for").call(new Value(p2 -> {
+			e.call("for").call(p2 -> {
 				if (b.length() > 9) {
 					b.append("; ");
 				}
@@ -76,22 +76,22 @@ public class Global extends Local{
 				b.append(getText(p2));
 				
 				return Value.NULL;
-			}));
+			});
 			
 			b.append("]");
 			
 			return Value.NULL;
-		}));
+		});
 		
-		if (b.length() == 0) e.call("~=").call(Global.Object).call("?").call(new Value(p -> {
+		if (b.length() == 0) e.call("~=").call(Global.Object).call("?").call(p -> {
 			b.append("Object{}");
 			return Value.NULL;
-		}));
+		});
 		
-		if (b.length() == 0) e.call("~=").call(Global.Class).call("?").call(new Value(p -> {
+		if (b.length() == 0) e.call("~=").call(Global.Class).call("?").call(p -> {
 			b.append("Class{}");
 			return Value.NULL;
-		}));
+		});
 		
 		if (b.length() == 0) {
 			if (e instanceof ValueIdentifier && ((ValueIdentifier) e).getParent() == null) {
@@ -127,25 +127,25 @@ public class Global extends Local{
 	
 	static {
 		global.put("package", new ValuePackage());
-		global.put("console", new Value(p1 -> {
-			if (p1.compare("println")) {
+		global.put("console", p -> {
+			if (Value.compare(p, "println")) {
 				
-				return new Value (p2 -> {System.out.println(getText(p2)); return Value.NULL;});
-			}else if (p1.compare("print")) {
-				return new Value (p2 -> {System.out.print(getText(p2)); return Value.NULL;});
-			}else if (p1.compare("test")) {
+				return p2 -> {System.out.println(getText(p2)); return Value.NULL;};
+			}else if (Value.compare(p, "print")) {
+				return p2 -> {System.out.print(getText(p2)); return Value.NULL;};
+			}else if (Value.compare(p, "test")) {
 				System.out.println("Test print");
 			}
 			
 			return Value.NULL;
-		}));
+		});
 		
 		global.put("Class", Class = Packages.getPackage("Class.ace"));
 		global.put("Object", Object = Packages.getPackage("Object.ace"));
 		
 		global.put("Boolean", Boolean = Packages.getPackage("Boolean.ace"));
-		global.put("true", TRUE = Boolean.call(new Value (v1 -> new Value (v2 -> v1))));
-		global.put("false", FALSE = Boolean.call(new Value (v1 -> new Value (v2 -> v2))));
+		global.put("true", TRUE = Boolean.call(v1 -> v2 -> v1));
+		global.put("false", FALSE = Boolean.call(v1 -> v2 -> v2));
 		
 		global.put("Dynamic", Packages.getPackage("Dynamic.ace"));
 		global.put("Iterator", Iterator = Packages.getPackage("Iterator.ace"));

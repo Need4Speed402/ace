@@ -3,36 +3,40 @@ package unsafe;
 import parser.token.TokenInteger;
 import value.Value;
 
-public class Memory extends Value{
-	public Memory() {
-		super(p1 -> {
-			return new Allocate(new Value[TokenInteger.getInt(p1).intValue()]);
-		});
+public class Memory implements Value{
+	@Override
+	public Value call(Value p) {
+		return new Allocate(new Value[TokenInteger.getInt(p).intValue()]);
 	}
 	
-	public static class Allocate extends Value{
+	public static class Allocate implements Value{
+		private final Value[] memory;
+		
 		public Allocate (Value[] memory) {
-			super(p2 -> {
-				if (p2.compare("get")) {
-					return new Value(p3 -> {
-						int index = TokenInteger.getInt(p3).intValue();
+			this.memory = memory;
+		}
+		
+		@Override
+		public Value call(Value p) {
+			if (Value.compare(p, "get")) {
+				return p2 -> {
+					int index = TokenInteger.getInt(p2).intValue();
+					
+					return memory[index];
+				};
+			}else if (Value.compare(p, "set")) {
+				return p2 -> {
+					int location = TokenInteger.getInt(p2).intValue();
+					
+					return p3 -> {
+						memory[location] = p3;
 						
-						return memory[index];
-					});
-				}else if (p2.compare("set")) {
-					return new Value (p3 -> {
-						int location = TokenInteger.getInt(p3).intValue();
-						
-						return new Value(p4 -> {
-							memory[location] = p4;
-							
-							return Value.NULL;
-						});
-					});
-				}
-				
-				return Value.NULL;
-			});
+						return Value.NULL;
+					};
+				};
+			}
+			
+			return Value.NULL;
 		}
 	}
 	
