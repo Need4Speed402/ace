@@ -94,7 +94,7 @@ public class Global extends Local{
 		});
 		
 		if (b.length() == 0) {
-			if (e instanceof ValueIdentifier && ((ValueIdentifier) e).getParent() == null) {
+			if (e instanceof ValueIdentifier && !((ValueIdentifier) e).hasReference()) {
 				return "Empty identifier: " + ((ValueIdentifier) e).id;
 			}
 			
