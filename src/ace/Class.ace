@@ -28,8 +28,6 @@
 	
 	>id = Identifier ()
 	
-	>id = 10
-	
 	>constructor = {
 		cmp . ~= {class~}
 		cmp . cid {id}
