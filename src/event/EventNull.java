@@ -5,18 +5,17 @@ import java.util.List;
 import parser.Local;
 import value.Value;
 
-public class EventStatic implements Event{
-	private Value value;
-	
-	public EventStatic (Value value) {
-		this.value = value;
-	}
-	
+public class EventNull implements Event{
 	@Override
 	public Value run(Local local) {
-		return this.value;
+		return Value.NULL;
 	}
 	
 	@Override
 	public void indexIdentifiers(EventScope scope, List<EventIdentifier> idnt) {}
+	
+	@Override
+	public String toString() {
+		return "{}";
+	}
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import parser.Global;
 import parser.Local;
 import parser.Node;
+import parser.token.TokenFunction;
 import value.Value;
 import value.ValueIdentifier;
 
@@ -127,6 +128,6 @@ public class EventScope implements Event{
 	
 	@Override
 	public String toString() {
-		return "(" + this.contents.toString() + ")";
+		return "(\n" + TokenFunction.indent(this.contents.toString()) + "\n)";
 	}
 }

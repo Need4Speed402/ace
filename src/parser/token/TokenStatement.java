@@ -6,10 +6,9 @@ import java.util.Arrays;
 
 import event.Event;
 import event.EventCall;
-import event.EventStatic;
+import event.EventNull;
 import parser.Stream;
 import parser.TokenList;
-import value.Value;
 
 public class TokenStatement extends TokenBlock{
 	public static final String operators = "?,~_ @ |&! =<> +- */\\% ^ $#`";
@@ -273,7 +272,7 @@ public class TokenStatement extends TokenBlock{
 		Token[] tokens = this.getTokens();
 		
 		if (tokens.length == 0) {
-			return new EventStatic(Value.NULL);
+			return new EventNull();
 		}else if (tokens.length == 1) {
 			return tokens[0].createEvent();
 		}else {

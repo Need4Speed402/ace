@@ -68,21 +68,12 @@ Class {
 		
 		$vval = Dynamic false
 		
-		$null = Object {
-			:this rest {null}
-			:this null {true}
-		}
-		
 		$loop = {{
 			..empty & .empty ?? {
 				carry = carry ! *last ! *first
 				
 				;;; vval != carry ? {
-					Object {
-						:this first {carry}
-						:this rest {null}
-						:this null {false}
-					}
+					{. carry ()}
 				;;; }
 			} ~ {
 				first = (..first; first)
@@ -95,11 +86,7 @@ Class {
 				
 				$next = loop ..rest .rest
 				
-				Object {
-					:this rest {next}
-					:this first {val}
-					:this null {false}
-				}
+				{. val next}
 			}
 		}}
 		

@@ -19,7 +19,7 @@ public class Global extends Local{
 		
 		StringBuilder b = new StringBuilder ();
 		
-		e.call("~=").call(Global.Boolean).call("?").call(new Value(p -> {
+		if (b.length() == 0) e.call("~=").call(Global.Boolean).call("?").call(new Value(p -> {
 			e.call("??").call(new Value(p2 -> {
 				b.append("true");
 				return Value.NULL;
@@ -31,13 +31,23 @@ public class Global extends Local{
 			return Value.NULL;
 		}));
 		
-		e.call("~=").call(Global.Integer).call("?").call(new Value(p -> {
+		if (b.length() == 0) e.call("~=").call(Global.Integer).call("?").call(new Value(p -> {
 			b.append(TokenInteger.getInt(e).toString());
 			
 			return Value.NULL;
 		}));
 		
-		e.call("~=").call(Global.Iterator).call("?").call(new Value(p -> {
+		if (b.length() == 0) e.call("~=").call(Global.String).call("?").call(new Value(p -> {
+			e.call("for").call(new Value(p2 -> {
+				b.append((char) TokenInteger.getInt(p2).intValue());
+				
+				return Value.NULL;
+			}));
+			
+			return Value.NULL;
+		}));
+		
+		if (b.length() == 0) e.call("~=").call(Global.Iterator).call("?").call(new Value(p -> {
 			b.append("Iterator[");
 			
 			e.call("for").call(new Value(p2 -> {
@@ -52,6 +62,16 @@ public class Global extends Local{
 			
 			b.append("]");
 			
+			return Value.NULL;
+		}));
+		
+		if (b.length() == 0) e.call("~=").call(Global.Object).call("?").call(new Value(p -> {
+			b.append("Object{}");
+			return Value.NULL;
+		}));
+		
+		if (b.length() == 0) e.call("~=").call(Global.Class).call("?").call(new Value(p -> {
+			b.append("Class{}");
 			return Value.NULL;
 		}));
 		
@@ -77,9 +97,11 @@ public class Global extends Local{
 			return b.toString();
 		}*/
 	}
+		
+	public static Value Class = Value.NULL, Object = Value.NULL;
 	
 	public static Value Boolean = Value.NULL, TRUE = Value.NULL, FALSE = Value.NULL;
-	public static Value Integer = Value.NULL, Iterator = Value.NULL, String = Value.NULL;
+	public static Value Integer = Value.NULL, Iterator = Value.NULL, String = Value.NULL, Array = Value.NULL;
 	
 	static {
 		global.put("package", new ValuePackage());
@@ -89,13 +111,15 @@ public class Global extends Local{
 				return new Value (p2 -> {System.out.println(getText(p2)); return Value.NULL;});
 			}else if (p1.compare("print")) {
 				return new Value (p2 -> {System.out.print(getText(p2)); return Value.NULL;});
+			}else if (p1.compare("test")) {
+				System.out.println("Test print");
 			}
 			
 			return Value.NULL;
 		}));
 		
-		global.put("Class", Packages.getPackage("Class.ace"));
-		global.put("Object", Packages.getPackage("Object.ace"));
+		global.put("Class", Class = Packages.getPackage("Class.ace"));
+		global.put("Object", Object = Packages.getPackage("Object.ace"));
 		
 		global.put("Boolean", Boolean = Packages.getPackage("Boolean.ace"));
 		global.put("true", TRUE = Boolean.call(new Value (v1 -> new Value (v2 -> v1))));
@@ -104,11 +128,11 @@ public class Global extends Local{
 		global.put("Dynamic", Packages.getPackage("Dynamic.ace"));
 		global.put("Iterator", Iterator = Packages.getPackage("Iterator.ace"));
 		global.put("Integer", Integer = Packages.getPackage("Integer.ace"));
-		global.put("List", Packages.getPackage("List.ace"));
+		global.put("Array", Array = Packages.getPackage("Array.ace"));
 		
 		//global.put("int2string", new Value (p1 -> TokenString.createString(TokenInteger.getInt(p1).toString())));
 		
-		//global.put("String", String);
+		global.put("String", String = Packages.getPackage("String.ace"));
 	}
 	
 	public final HashMap<String, ValueIdentifier> map = new HashMap<>();

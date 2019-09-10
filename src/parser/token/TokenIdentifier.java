@@ -7,7 +7,7 @@ public class TokenIdentifier extends Token{
 	public final String id;
 	
 	public TokenIdentifier (String key) {
-		this.id = key.intern();
+		this.id = key;
 	}
 	
 	@Override

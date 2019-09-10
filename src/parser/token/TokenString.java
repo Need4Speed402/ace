@@ -7,14 +7,11 @@ import java.util.List;
 
 import event.Event;
 import event.EventCall;
-import event.EventDynamic;
 import event.EventIdentifier;
 import parser.ParserException;
 import parser.Stream;
 import parser.TokenList;
 import parser.unicode.Unicode;
-import unsafe.Memory;
-import value.Value;
 
 public class TokenString extends TokenBlock{
 	public static HashMap<String, String> unicodeNames = Unicode.getLookup();
@@ -24,14 +21,14 @@ public class TokenString extends TokenBlock{
 		super(tokens);
 	}
 	
-	public static Value createStringMemory (String s){
-		Value[] string = new Value[s.length()];
+	public static Event[] createStringElements (String s){
+		Event[] string = new Event[s.length()];
 		
 		for (int ii = 0; ii < string.length; ii++) {
-			string[ii] = TokenInteger.toValue(TokenInteger.fromInt(BigInteger.valueOf(s.charAt(ii))));
+			string[ii] = Event.pipe("Integer", "Iterator", TokenInteger.getEvents(TokenInteger.fromInt(BigInteger.valueOf(s.charAt(ii)))));
 		}
 		
-		return new Memory.Allocate(string);
+		return string;
 	}
 	
 	@Override
@@ -85,7 +82,7 @@ public class TokenString extends TokenBlock{
 		
 		@Override
 		public Event createEvent() {
-			return new EventCall(new EventIdentifier("String"), new EventDynamic(() -> createStringMemory(this.text)));
+			return Event.pipe("String", "Iterator", createStringElements(this.text));
 		}
 		
 		@Override

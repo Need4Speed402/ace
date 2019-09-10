@@ -1,9 +1,6 @@
 package parser.token;
 
 import event.Event;
-import event.EventCall;
-import event.EventIdentifier;
-import event.EventList;
 import parser.Stream;
 
 public class TokenArray extends TokenBlock{
@@ -24,6 +21,6 @@ public class TokenArray extends TokenBlock{
 	
 	@Override
 	public Event createEvent() {
-		return new EventCall(new EventIdentifier("List"), new EventList(this.getEvents()));
+		return Event.pipe("Array", "Iterator", this.getEvents());
 	}
 }

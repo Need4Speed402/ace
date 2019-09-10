@@ -7,10 +7,10 @@ import parser.Node;
 import value.Value;
 import value.ValueIdentifier;
 
-public class EventCompound implements Event{
+public class EventBlock implements Event{
 	public Event[] events;
 	
-	public EventCompound (Event[] events) {
+	public EventBlock (Event[] events) {
 		this.events = events;
 	}
 	

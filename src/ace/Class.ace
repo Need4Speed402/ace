@@ -4,13 +4,13 @@ $Modifiable = package unsafe bootstrap Modifiable
 
 $createNode = {{{
 	$next = Modifiable ...
-	$cb = ..
+	$cb = {{.... .}}
 	
 	{
-		cmp . def {{{.()}}}
+		cmp . defined {{{..()}}}
 		cmp . cmp {{
-			cmp . .... {cb}
-			. ~= .... ? {cb}
+			cmp . .... cb
+			. ~= .... ? cb
 		}}
 		cmp . next {next}
 	}
@@ -33,7 +33,7 @@ $Class = {
 		cmp . cid {id}
 		
 		$node = Modifiable {
-			cmp : def {{{..()}}}
+			cmp : defined {{{.()}}}
 		}
 
 		$default = (
@@ -43,13 +43,14 @@ $Class = {
 						instance
 						
 						$search = {
-							$n = .get
+							$set = .set
+							$node = .get
 							
-							n def {
-								{{....set (createNode n . ..)}}
+							node defined {
+								node cmp ...
+								search (node next)
 							} {
-								n cmp ...
-								search (n next)
+								{{set (createNode node . ..)}}
 							}
 						}
 						
@@ -73,12 +74,14 @@ $Class = {
 			}
 			
 			$search = {
-				. def {
-					default
-				} {
+				$node = .
+				
+				node defined {
 					..cmp ...
 					
 					search (.. next get)
+				} {
+					default
 				}
 			}
 			

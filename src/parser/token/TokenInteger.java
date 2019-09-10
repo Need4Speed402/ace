@@ -5,10 +5,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 
 import event.Event;
-import event.EventCall;
-import event.EventDynamic;
 import event.EventIdentifier;
-import parser.Global;
 import value.Value;
 
 public class TokenInteger extends Token{
@@ -24,9 +21,7 @@ public class TokenInteger extends Token{
 	
 	@Override
 	public Event createEvent() {
-		return new EventCall(new EventIdentifier("Integer"), new EventCall(new EventIdentifier("Iterator"), new EventDynamic(() -> {
-			return TokenInteger.toIterator(this.number);
-		})));
+		return Event.pipe("Integer", "Iterator", TokenInteger.getEvents(this.number));
 	}
 	
 	@Override
@@ -72,89 +67,40 @@ public class TokenInteger extends Token{
 		return bnumber;
 	}
 	
-	public static Value toIterator (boolean[] number) {
-		Value iteratorNull = new Value (null);
+	public static Event[] getEvents (boolean[] number) {
+		Event[] values = new Event[number.length];
 		
-		iteratorNull.function = p -> {
-			if (p.compare("rest")) {
-				return iteratorNull;
-			}else if (p.compare("null")) {
-				return Global.TRUE;
-			}
-			
-			return Value.NULL;
-		};
-		
-		Value v = iteratorNull;
-		
-		for (int i = number.length - 1; i >= 0; i--) {
-			Value bool = number[i] ? Global.TRUE : Global.FALSE;
-			Value vv = v;
-			
-			v = new Value(p -> {
-				if (p.compare("rest")) {
-					return vv;
-				}else if (p.compare("first")) {
-					return bool;
-				}else if (p.compare("null")) {
-					return Global.FALSE;
-				}
-				
-				return Value.NULL;
-			});
+		for (int i = 0; i < values.length; i++) {
+			values[i] = new EventIdentifier(number[i] ? "true" : "false");
 		}
 		
-		return v;
-	}
-	
-	public static Value toValue (boolean[] number) {
-		return Global.Integer.call(toIterator(number));
+		return values;
 	}
 	
 	public static BigInteger getInt (Value v) {
-		ArrayList<Value> arr = new ArrayList<Value>();
+		BooleanArray arr = new BooleanArray();
 		
 		v.call("bits").call("for").call(new Value(p -> {
-			arr.add(p);
+			p.call("?").call(new Value(p2 -> {
+				arr.add(true);
+				
+				return Value.NULL;
+			}));
+			
+			p.call("!?").call(new Value(p2 -> {
+				arr.add(false);
+				
+				return Value.NULL;
+			}));
 			
 			return Value.NULL;
 		}));
 		
-		return getInt(arr.toArray(new Value[arr.size()]));
-	}
-	
-	public static BigInteger getInt (Value[] v) {
-		boolean[] b = new boolean[v.length];
-		
-		for (int i = 0; i < v.length; i++) {
-			final int j = i;
-			
-			v[i].call("?").call(new Value(p1 -> {
-				b[j] = true;
-				
-				return Value.NULL;
-			}));
-		}
-		
-		return getInt(b);
+		return arr.getInt();
 	}
 	
 	public static BigInteger getInt (boolean[] number) {
-		byte[] bytes = new byte[(number.length >> 3) + ((number.length & 0x7) == 0 ? 0 : 1)];
-		
-		for (int i = 0; i < number.length; i++) {
-			if (number[i]) {
-				bytes[bytes.length - 1 - (i >> 3)] |= (1 << (i & 0x7));
-			}
-		}
-		
-		if (number[number.length - 1]) {
-			for (int i = number.length; i < bytes.length * 8; i++) {
-				bytes[bytes.length - 1 - (i >> 3)] |= (1 << (i & 0x7));
-			}
-		}
-		
-		return new BigInteger(bytes);
+		return new BooleanArray(number).getInt();
 	}
 	
 	public static Object parseNumber (String ident) {
@@ -211,6 +157,61 @@ public class TokenInteger extends Token{
 			}
 			
 			return num;
+		}
+	}
+	
+	public static class BooleanArray {
+		private boolean[] array;
+		private int length;
+		
+		public BooleanArray (){
+			array = new boolean[16];
+		}
+		
+		public BooleanArray (boolean[] arr) {
+			this.array = arr;
+			this.length = arr.length;
+		}
+		
+		public int size () {
+			return length;
+		}
+		
+		public void add (boolean b) {
+			if (length == array.length) {
+				boolean[] narray = new boolean[array.length * 2];
+				System.arraycopy(array, 0, narray, 0, length);
+				array = narray;
+			}
+			
+			array[length++] = b;
+		}
+		
+		public boolean[] toArray () {
+			boolean[] array = new boolean[length];
+			System.arraycopy(this.array, 0, array, 0, length);
+			
+			return array;
+		}
+		
+		public boolean get (int i) {
+			if (length == 0) {
+				return false;
+			}else if (i < length) {
+				return array[i];
+			}else {
+				return array[length - 1];
+			}
+		}
+		
+		public BigInteger getInt () {
+			byte[] bytes = new byte[(length >> 3) + ((length & 0x7) == 0 ? 0 : 1)];
+			
+			for (int i = 0; i < bytes.length * 8; i++) {
+				bytes[bytes.length - 1 - (i >> 3)] |= ((get(i) ? 1 : 0) << (i & 0x7));
+			}
+			
+			return new BigInteger(bytes);
 		}
 	}
 }

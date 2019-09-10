@@ -1,35 +1,32 @@
-$null = Object {
-	:this first {{}}
-	:this rest {null}
-	:this null {true}
-}
-
 Class {
 	:this for {{
 		$cb = .
-		$loop = {
-			.null !? {
-				cb .first
-				loop .rest
-			}
-		}
+		$loop = {{
+			$index = .
+			
+			.. {{
+				cb (Object {
+					:this index {index}
+					..
+				})
+				
+				loop . (index + 1)
+			}}
+		}}
 		
-		loop :
+		loop : 0
 	}}
 	
 	:this backing {:}
 	
-	:this first {:first}
-	:this rest {Iterator :rest}
-	:this empty {:null}
+	:this first {:{{..}}}
+	:this rest {Iterator :{{.}}}
+	:this empty {:{{false}}; true}
 	
 	:this zip {{
 		$zip = {{
-			..empty & .empty ? {.empty}
-			
-			Object {
-				:this first {[....first; ...first]}
-				:this rest {zip ....rest ...rest}
+			..empty & .empty !? {
+				{. [...first; ..first] (zip ...rest ..rest)}
 			}
 		}}
 		
@@ -39,13 +36,11 @@ Class {
 	:this + {{
 		$add = .backing
 		$walk = {
-			.null ? {add}
+			. {{
+				{. ... (walk ..)}
+			}}
 			
-			Object {
-				:this first {.first}
-				:this null {false}
-				:this rest {walk .rest}
-			}
+			add
 		}
 		
 		Iterator (walk :)
@@ -55,39 +50,54 @@ Class {
 		$fn = .
 		
 		$walk = {
-			.null ? {.}
-			
-			Object {
-				:this first {fn ..first}
-				:this rest {walk ..rest}
-				:this null {false}
-			}
+			. {{
+				{
+					. (fn ...) (walk ..)
+				}
+			}}
 		}
 		
 		Iterator (walk :) 
 	}}
 	
+	:this filter {{
+		$fn = .
+		
+		$walk = {
+			. {{
+				fn .. ? {
+					{. ... (walk ..)}
+				}
+				
+				walk .
+			}}
+		}
+		
+		Iterator (walk :)
+	}}
+	
 	:this length {
 		$loop = {
-			.null ? {0}
-			
-			1 + (loop .rest)
+			. {{
+				1 + loop .
+			}}
 		}
 		
 		loop :
 	}
 	
+	:this array {
+		Array :this
+	}
+	
 	:this clone {
 		$walk = {
-			.null ? {.}
-			$first = .first
-			$rest = walk .rest
-			
-			Object {
-				:this first {first}
-				:this rest {rest}
-				:this null {false}
-			}
+			. {{
+				$next = walk .
+				$value = ..
+				
+				{. value next}
+			}}
 		}
 		
 		Iterator (walk :)

@@ -1,7 +1,5 @@
 package unsafe;
 
-import java.math.BigInteger;
-
 import parser.token.TokenInteger;
 import value.Value;
 
@@ -15,8 +13,6 @@ public class Memory extends Value{
 	public static class Allocate extends Value{
 		public Allocate (Value[] memory) {
 			super(p2 -> {
-				Value length = TokenInteger.toValue(TokenInteger.fromInt(BigInteger.valueOf(memory.length)));
-				
 				if (p2.compare("get")) {
 					return new Value(p3 -> {
 						int index = TokenInteger.getInt(p3).intValue();
@@ -33,8 +29,6 @@ public class Memory extends Value{
 							return Value.NULL;
 						});
 					});
-				}else if (p2.compare("length")) {
-					return length;
 				}
 				
 				return Value.NULL;

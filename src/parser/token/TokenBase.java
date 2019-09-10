@@ -34,7 +34,6 @@ public class TokenBase extends TokenBlock {
 			
 			if (s.next(";;")) {
 				new TokenStatement(s);
-				
 				continue;
 			}
 			

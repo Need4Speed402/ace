@@ -21,7 +21,7 @@ public class Packages {
 			throw e;
 		}
 		
-		//System.out.println(ast);
+		//System.out.println(ast.createEvent());
 		
 		Event event = new EventScope(ast.createEvent());
 		event.init();

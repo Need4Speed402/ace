@@ -1,9 +1,8 @@
 package parser.token;
 
 import event.Event;
-import event.EventCompound;
-import event.EventStatic;
-import value.Value;
+import event.EventBlock;
+import event.EventNull;
 
 public class TokenBlock extends Token{
 	Token[] tokens;
@@ -54,9 +53,9 @@ public class TokenBlock extends Token{
 		Token[] tokens = this.getTokens();
 		
 		if (tokens.length == 0) {
-			return new EventStatic(Value.NULL);
+			return new EventNull();
 		}else{
-			return new EventCompound(this.getEvents());
+			return new EventBlock(this.getEvents());
 		}
 	}
 }

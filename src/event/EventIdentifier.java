@@ -11,6 +11,8 @@ public class EventIdentifier implements Event{
 	public int location;
 	
 	public EventIdentifier(String name) {
+		name = name.intern();
+		
 		Global.global.define(name);
 		this.name = name;
 	}

@@ -1,20 +1,17 @@
-$makeString = {
-	$chars = .
+Class {
+	$content = (
+		: ~= Iterator ? {
+			Array :
+		}
+		
+		: ~= Array ? {
+			:
+		}
+	)
 	
-	Object {
-		:this toString {
-			:this
-		}
-		
-		:this + {
-			$list = chars + .
-			makeString list
-		}
-		
-		chars
-	}
-}
-
-{
-	makeString (List .)
+	:this + {{
+		String (content + .)
+	}}
+	
+	content
 }

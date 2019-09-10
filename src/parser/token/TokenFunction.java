@@ -4,9 +4,8 @@ import event.Event;
 import event.EventFunction;
 import event.EventHiddenFunction;
 import event.EventModifier;
-import event.EventStatic;
+import event.EventNull;
 import parser.Stream;
-import value.Value;
 
 public class TokenFunction extends TokenBlock {
 	public TokenFunction (Stream s) {
@@ -41,7 +40,7 @@ public class TokenFunction extends TokenBlock {
 	
 	public Event createModifierEvent () {
 		if (this.getTokens().length == 0){
-			return new EventStatic(Value.NULL);
+			return new EventNull();
 		}else {
 			return new EventModifier(super.createEvent());
 		}
@@ -49,7 +48,7 @@ public class TokenFunction extends TokenBlock {
 	
 	public Event createHiddenEvent () {
 		if (this.getTokens().length == 0) {
-			return new EventStatic(Value.NULL);
+			return new EventNull();
 		}else {
 			return new EventHiddenFunction(super.createEvent());
 		}
@@ -58,7 +57,7 @@ public class TokenFunction extends TokenBlock {
 	@Override
 	public Event createEvent() {
 		if (this.getTokens().length == 0){
-			return new EventStatic(Value.NULL);
+			return new EventNull();
 		}else {
 			return new EventFunction(super.createEvent());
 		}

@@ -12,4 +12,31 @@ public interface Event {
 	public default void paramaterHeight (Node<Integer> pHeight, Node<Integer> mHeight) {};
 	
 	public default void init () {}
+	
+	public static Event pipe (Object ... objects) {
+		Event ret = null;
+		
+		for (int i = objects.length - 1; i >= 0; i--) {
+			Object o = objects[i];
+			Event e = null;
+			
+			if (o instanceof String) {
+				e = new EventIdentifier((String) o);
+			}else if (o instanceof Event) {
+				e = (Event) o;
+			}else if (o instanceof Event[]) {
+				e = new EventIterator((Event[]) o);
+			}else {
+				throw new IllegalArgumentException(o.toString() + " must be either a string or an event");
+			}
+			
+			if (ret == null) {
+				ret = e;
+			}else {
+				ret = new EventCall(e, ret);
+			}
+		}
+		
+		return ret;
+	}
 }

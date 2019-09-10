@@ -1,0 +1,94 @@
+$Memory = package unsafe Memory
+
+Class {
+	$length = :length
+	
+	$get = (
+		$backing = Memory length
+		
+		: ~= Iterator ? {
+			console println :first
+			: for {
+				backing set .index .
+			}
+		}
+		
+		backing get
+	)
+	
+	:this first {
+		get 0
+	}
+	
+	:this second {
+		get 1
+	}
+	
+	:this third {
+		get 2
+	}
+	
+	:this last {
+		get (value length - 1)
+	}
+	
+	:this length {
+		length	
+	}
+	
+	:this = {{
+		:this for {
+			. = .. .index
+		}
+	}}
+	
+	:this + {{
+		$mem = Memory (length + .length)
+		
+		length times for {
+			mem set .index (get .index)
+		}
+		
+		.length times for {
+			mem set (.index + length) (.. .index)
+		}
+		
+		Array mem
+	}}
+	
+	:this for {{
+		$cb = .
+		$index = Dynamic 0
+		
+		
+		$loop = {
+			index != length ? {
+				cb (Object {
+					:this index {index}
+					get index
+				})
+				
+				index =+ 1
+				loop ()
+			}
+		}
+		
+		loop ()
+	}}
+	
+	:this (Integer) {
+		get .
+	}
+	
+	(
+		$walk = {
+			$index = .
+			
+			index == length !? {
+				{. (get index) (walk (index + 1))}
+			}
+		}
+		
+		Iterator (walk 0)
+	)
+}

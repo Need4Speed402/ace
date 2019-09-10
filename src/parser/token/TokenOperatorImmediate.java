@@ -28,6 +28,6 @@ public class TokenOperatorImmediate extends Token{
 	
 	@Override
 	public Event createEvent() {
-		return new EventCall(this.token.createEvent(), new EventIdentifier((this.operator + '$').intern()));
+		return new EventCall(this.token.createEvent(), new EventIdentifier(this.operator + '$'));
 	}
 }
