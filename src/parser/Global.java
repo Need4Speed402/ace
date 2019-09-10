@@ -47,12 +47,30 @@ public class Global extends Local{
 			return Value.NULL;
 		}));
 		
+		if (b.length() == 0) e.call("~=").call(Global.Array).call("?").call(new Value(p -> {
+			b.append("Array[");
+			
+			e.call("for").call(new Value(p2 -> {
+				if (b.length() > 6) {
+					b.append("; ");
+				}
+				
+				b.append(getText(p2));
+				
+				return Value.NULL;
+			}));
+			
+			b.append("]");
+			
+			return Value.NULL;
+		}));
+		
 		if (b.length() == 0) e.call("~=").call(Global.Iterator).call("?").call(new Value(p -> {
 			b.append("Iterator[");
 			
 			e.call("for").call(new Value(p2 -> {
 				if (b.length() > 9) {
-					b.append(", ");
+					b.append("; ");
 				}
 				
 				b.append(getText(p2));
@@ -76,6 +94,10 @@ public class Global extends Local{
 		}));
 		
 		if (b.length() == 0) {
+			if (e instanceof ValueIdentifier && !((ValueIdentifier) e).hasReference()) {
+				return "Empty identifier: " + ((ValueIdentifier) e).id;
+			}
+			
 			return "Arbitrary function";
 		}else {
 			return b.toString();

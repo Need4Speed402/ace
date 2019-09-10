@@ -1,5 +1,5 @@
 Class {
-	$[dyn; type] = (
+	>[dyn; type] = (
 		.arg ~= Class ? {
 			[(); ..]
 		}

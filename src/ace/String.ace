@@ -1,5 +1,5 @@
 Class {
-	$content = (
+	>content = (
 		: ~= Iterator ? {
 			Array :
 		}

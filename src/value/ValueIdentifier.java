@@ -13,6 +13,17 @@ public class ValueIdentifier extends Value {
 		this(parent.id, parent, null);
 	}
 	
+	public boolean hasReference () {
+		ValueIdentifier i = this;
+		
+		while (i != null) {
+			if (i.referenced != null) return true;
+			i = i.parent;
+		}
+		
+		return false;
+	}
+	
 	public Value getReference () {
 		ValueIdentifier i = this;
 		
@@ -32,7 +43,7 @@ public class ValueIdentifier extends Value {
 		this.referenced = referenced;
 		
 		this.function = p -> {
-			if (p.compare("$$")){
+			if (p.compare(">$")){
 				return new Value (p2 -> {
 					if (this.referenced == null && p2.compare("=")) {
 						return new Value(p3 -> {

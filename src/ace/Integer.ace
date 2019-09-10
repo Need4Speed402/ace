@@ -1,22 +1,22 @@
 Class {
 	:this bits {:}
 	
-	:this +$ {
+	:this +> {
 		:this
 	}
 	
-	:this -$ {
-		$a = Dynamic true
+	:this -> {
+		>a = Dynamic true
 		
 		Integer (:map {
-			$val = . == *a
+			>val = . == *a
 			a = !. & *a
 			
 			val
 		} clone)
 	}
 	
-	:this ~$ {
+	:this ~> {
 		Integer (:map {!.} clone)
 	}
 	
@@ -27,14 +27,14 @@ Class {
 	}}
 	
 	:this << {{
-		$i = Dynamic .
+		>i = Dynamic .
 		
-		$loop = {
+		>loop = {
 			i == 0 ?? {
 				..
 			} ~ {
 				i -= 1
-				$next = loop ..
+				>next = loop ..
 				
 				{
 					(. ~= next) ? {next}
@@ -47,9 +47,9 @@ Class {
 	}}
 	
 	:this >> {{
-		$i = Dynamic .
+		>i = Dynamic .
 		
-		$loop = {
+		>loop = {
 			i == 0 ?? {
 				..
 			} ~ {
@@ -62,13 +62,13 @@ Class {
 	}}
 	
 	:this + {{
-		$carry = Dynamic false
-		$first = Dynamic false
-		$last = Dynamic false
+		>carry = Dynamic false
+		>first = Dynamic false
+		>last = Dynamic false
 		
-		$vval = Dynamic false
+		>vval = Dynamic false
 		
-		$loop = {{
+		>loop = {{
 			..empty & .empty ?? {
 				carry = carry ! *last ! *first
 				
@@ -79,12 +79,12 @@ Class {
 				first = (..first; first)
 				last = (.first; last)
 				
-				$a = *first ! *last
-				$val = a ! *carry
+				>a = *first ! *last
+				>val = a ! *carry
 				vval = val
 				carry = *carry & a | (*first & *last)
 				
-				$next = loop ..rest .rest
+				>next = loop ..rest .rest
 				
 				{. val next}
 			}
@@ -98,10 +98,10 @@ Class {
 	}}
 	
 	:this == {{
-		$first = Dynamic false
-		$last = Dynamic false
+		>first = Dynamic false
+		>last = Dynamic false
 		
-		$loop = {{
+		>loop = {{
 			..empty & .empty ? {true}
 			
 			first = (..first; first)
@@ -123,21 +123,13 @@ Class {
 	}
 	
 	:this to {{
-		$until = .
+		>until = .
 		
-		$create = {
-			$index = .
+		>create = {
+			>index = .
 			
-			index == until ? {
-				Object {
-					:this null {true}
-				}	
-			}
-			
-			Object {
-				:this first {index}
-				:this rest {create (index + 1)}
-				:this null {false}
+			index == until !? {
+				{. index (create (index + 1))}
 			}
 		}
 		

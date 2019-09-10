@@ -1,19 +1,20 @@
-$Memory = package unsafe Memory
+>Memory = package unsafe Memory
 
 Class {
-	$length = :length
+	>length = :length
 	
-	$get = (
-		$backing = Memory length
-		
+	>get = (
 		: ~= Iterator ? {
-			console println :first
+			>backing = Memory length
+			
 			: for {
 				backing set .index .
 			}
+			
+			backing get
 		}
 		
-		backing get
+		:get
 	)
 	
 	:this first {
@@ -36,14 +37,32 @@ Class {
 		length	
 	}
 	
+	:this >$ {
+		:this map {>.}
+	}
+	
 	:this = {{
 		:this for {
 			. = .. .index
 		}
 	}}
 	
+	:this map {{
+		>cb = .
+		>mem = Memory length
+		
+		length times for {
+			mem set . (cb (get .))
+		}
+		
+		Array Object {
+			:this length {length}
+			mem
+		}
+	}}
+	
 	:this + {{
-		$mem = Memory (length + .length)
+		>mem = Memory (length + .length)
 		
 		length times for {
 			mem set .index (get .index)
@@ -53,19 +72,22 @@ Class {
 			mem set (.index + length) (.. .index)
 		}
 		
-		Array mem
+		Array Object {
+			:this length {length}
+			mem
+		}
 	}}
 	
 	:this for {{
-		$cb = .
-		$index = Dynamic 0
+		>cb = .
+		>index = Dynamic 0
 		
 		
-		$loop = {
+		>loop = {
 			index != length ? {
 				cb (Object {
 					:this index {index}
-					get index
+					{get index .}
 				})
 				
 				index =+ 1
@@ -81,8 +103,8 @@ Class {
 	}
 	
 	(
-		$walk = {
-			$index = .
+		>walk = {
+			>index = .
 			
 			index == length !? {
 				{. (get index) (walk (index + 1))}
