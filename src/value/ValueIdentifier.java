@@ -13,15 +13,15 @@ public class ValueIdentifier extends Value {
 		this(parent.id, parent, null);
 	}
 	
-	public boolean hasReference () {
+	public ValueIdentifier getParent () {
 		ValueIdentifier i = this;
 		
 		while (i != null) {
-			if (i.referenced != null) return true;
+			if (i.referenced != null) return i;
 			i = i.parent;
 		}
 		
-		return false;
+		return null;
 	}
 	
 	public Value getReference () {
@@ -44,16 +44,7 @@ public class ValueIdentifier extends Value {
 		
 		this.function = p -> {
 			if (p.compare(">$")){
-				return new Value (p2 -> {
-					if (this.referenced == null && p2.compare("=")) {
-						return new Value(p3 -> {
-							this.setReference(p3);
-							return Value.NULL;
-						});
-					}else{
-						return this.getReference().call(p2);
-					}
-				});
+				return new IdentifierReference(this);
 			}else{
 				return this.getReference().call(p);
 			}
@@ -76,5 +67,30 @@ public class ValueIdentifier extends Value {
 	@Override
 	public boolean compare(String ident) {
 		return ident == this.id;
+	}
+	
+	public static class IdentifierReference extends Value {
+		public IdentifierReference(ValueIdentifier ref) {
+			super(p -> {
+				if (ref.compare(">$")) {
+					ValueIdentifier parent = ref.getParent();
+					
+					if (parent != null) {
+						return new IdentifierReference(parent);
+					}
+				}
+				
+				if (ref.referenced == null && p.compare("=")) {
+					return new Value(val -> {
+						//TODO: return error when identifier already has value
+						ref.setReference(val);
+						return Value.NULL;
+					});
+				}
+				
+				return ref.referenced.call(p);
+			});
+		}
+		
 	}
 }
