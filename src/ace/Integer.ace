@@ -72,9 +72,9 @@ Class {
 			..empty & .empty ?? {
 				carry = carry ! *last ! *first
 				
-				;;; vval != carry ? {
+				;; vval != carry ? {
 					{. carry ()}
-				;;; }
+				;; }
 			} ~ {
 				first = (..first; first)
 				last = (.first; last)

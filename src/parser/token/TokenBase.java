@@ -27,13 +27,13 @@ public class TokenBase extends TokenBlock {
 			}
 			
 			//comments
-			if (s.next(";;;")) {
-				while (s.hasChr() && !s.isNext('\n')) s.chr();
-				continue;
-			}
-			
 			if (s.next(";;")) {
-				new TokenStatement(s);
+				if (s.isNext(Stream.whitespace)) {
+					while (s.hasChr() && !s.isNext('\n')) s.chr();
+				}else {
+					new TokenStatement(s);
+				}
+				
 				continue;
 			}
 			
