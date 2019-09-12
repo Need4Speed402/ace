@@ -21,7 +21,7 @@ Class {
 		}
 	}}
 	
-	:this !$ {
+	:this `!` {
 		: false true
 	}
 	

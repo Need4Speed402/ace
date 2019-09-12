@@ -61,7 +61,7 @@ public class ValueIdentifier implements Value {
 	
 	@Override
 	public Value call(Value p) {
-		if (Value.compare(p, ">$")){
+		if (Value.compare(p, "`>`")){
 			return new IdentifierReference(this.getFirstParent()) {
 				@Override
 				public Value call(Value p2) {
@@ -107,7 +107,7 @@ public class ValueIdentifier implements Value {
 		public Value call(Value p) {
 			if (this.ref == null) return Value.NULL;
 			
-			if (Value.compare(p, ">$")) {
+			if (Value.compare(p, "`>`")) {
 				ValueIdentifier parent = this.ref.getParent();
 				
 				if (parent != null) {

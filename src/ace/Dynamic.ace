@@ -3,7 +3,7 @@
 Class {
 	>value = Modifiable :
 	
-	:this *$ {
+	:this `*` {
 		value get
 	}
 	
