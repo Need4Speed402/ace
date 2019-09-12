@@ -144,8 +144,8 @@ public class Global extends Local{
 		global.put("Object", Object = Packages.getPackage("Object.ace"));
 		
 		global.put("Boolean", Boolean = Packages.getPackage("Boolean.ace"));
-		global.put("true", TRUE = Boolean.call(v1 -> v2 -> v1));
-		global.put("false", FALSE = Boolean.call(v1 -> v2 -> v2));
+		global.put("true", TRUE = Packages.getPackage("true.ace"));
+		global.put("false", FALSE = Packages.getPackage("false.ace"));
 		
 		global.put("Dynamic", Packages.getPackage("Dynamic.ace"));
 		global.put("Iterator", Iterator = Packages.getPackage("Iterator.ace"));
