@@ -17,6 +17,10 @@ public class TokenList {
 		this.tokens.add(t);
 	}
 	
+	public void clear () {
+		this.tokens.clear();
+	}
+	
 	public Token[] toArray () {
 		Token[] tokens = new Token[this.tokens.size()];
 		

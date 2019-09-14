@@ -6,7 +6,6 @@ import java.util.Arrays;
 
 import event.Event;
 import event.EventCall;
-import event.EventNull;
 import parser.Stream;
 import parser.TokenList;
 
@@ -129,113 +128,143 @@ public class TokenStatement extends TokenBlock{
 		if (tokens.length == 1) return tokens[0];
 		
 		//first stage, check for setter operators
-		for (int i = 1; i < tokens.length - 1; i++) {
+		for (int i = 0; i < tokens.length; i++) {
 			if (isSetter(tokens[i])) {
-				return new Caller(new Caller(stage2(Arrays.copyOfRange(tokens, 0, i)), tokens[i]), stage1(Arrays.copyOfRange(tokens, i + 1, tokens.length)));
+				if (i == 0) {
+					return new Caller(tokens[i], stage1(Arrays.copyOfRange(tokens, i + 1, tokens.length)));
+				}else if (i == tokens.length - 1) {
+					return new Caller(stage2(Arrays.copyOfRange(tokens, 0, i)), tokens[i]);
+				}else {
+					return new Caller(new Caller(stage2(Arrays.copyOfRange(tokens, 0, i)), tokens[i]), stage1(Arrays.copyOfRange(tokens, i + 1, tokens.length)));
+				}
 			}
 		}
 		
 		return stage2(tokens);
 	}
 	
-	public static Token stage2 (Token[] tokens) {
-		if (tokens.length == 1) return tokens[0];
+	public static int comparePrecedence (Token c, Token r) {
+		boolean ctoken = c instanceof TokenIdentifier;
+		boolean rtoken = r instanceof TokenIdentifier;
 		
-		//second stage looks for operator identifiers that don't follow a regular pattern
-		int last = 0;
-		Token c = null;
+		if (!ctoken && !rtoken) return 0;
 		
-		for (int i = 0; i < tokens.length; i++) {
-			if ((i == tokens.length - 1 || i == 0 || isOperator(tokens[i + 1]) || isOperator(tokens[i - 1])) && isOperator(tokens[i])) {
-				if (c == null) {
-					if (last == i) {
-						c = tokens[i];
-					}else {
-						c = new Caller(getCaller(Arrays.copyOfRange(tokens, last, i)), tokens[i]);
-					}
-				}else {
-					if (last == i) {
-						c = new Caller(c, tokens[i]);
-					}else {
-						c = new Caller(new Caller(c, stage3(Arrays.copyOfRange(tokens, last, i))), tokens[i]);
-					}
-				}
-				
-				last = i + 1;
+		if (!ctoken) {
+			String o = ((TokenIdentifier) r).id;
+			
+			if (operators.indexOf(o.charAt(o.length() - 1)) >= 0) {
+				return 1;
+			}else {
+				return 0;
 			}
 		}
 		
-		if (last != 0) {
-			if (last != tokens.length) {
-				c = new Caller(c, stage3(Arrays.copyOfRange(tokens, last, tokens.length)));
+		if (!rtoken) {
+			String o = ((TokenIdentifier) c).id;
+			
+			if (operators.indexOf(o.charAt(o.length() - 1)) >= 0) {
+				return -1;
+			}else {
+				return 0;
+			}
+		}
+		
+		String o1 = ((TokenIdentifier) c).id;
+		String o2 = ((TokenIdentifier) r).id;
+		
+		int i = 0;
+		
+		while (true) {
+			if (i == o1.length() || i == o2.length()) {
+				return 0;
 			}
 			
-			return c;
+			int o1i = operators.indexOf(o1.charAt(o1.length() - 1 - i));
+			int o2i = operators.indexOf(o2.charAt(o2.length() - 1 - i));
+			
+			if (o1i == -1 && o2i == -1) {
+				return 0;
+			}else if (o1i == -1) {
+				return 1;
+			}else if (o2i == -1) {
+				return -1;
+			}else if (operatorValues[o1i] != operatorValues[o2i]) {
+				if (operatorValues[o1i] < operatorValues[o2i]) {
+					return -1;
+				}else {
+					return 1;
+				}
+			}else {
+				i++;
+			}
+		}
+	}
+	
+	public static Token stage2 (Token[] tokens) {
+		if (tokens.length == 1) return tokens[0];
+		
+		tokens = Arrays.copyOf(tokens, tokens.length);
+		
+		for (int i = 1; i < tokens.length; i++) {
+			if (tokens[i] instanceof TokenFunction) {
+				if (tokens[i - 1] instanceof TokenOperator && (i + 1 == tokens.length || tokens[i + 1] instanceof TokenOperator)) {
+					tokens[i] = new HiddenFunction((TokenFunction) tokens[i]);
+				}
+			}
 		}
 		
 		return stage3(tokens);
 	}
 	
-	public static Operator insertOperator (Token c, TokenIdentifier op, Token r) {
-		if (c instanceof Operator) {
-			Operator o = ((Operator) c);
-			String o1 = o.operator.getName();
-			String o2 = op.getName();
-			
-			int i = 0;
-			
-			while (true) {
-				if (i == o1.length() || i == o2.length()) {
-					break;
-				}
-				
-				int o1p = operatorValues[operators.indexOf(o1.charAt(o1.length() - 1 - i))];
-				int o2p = operatorValues[operators.indexOf(o2.charAt(o2.length() - 1 - i))];
-				
-				if (o1p != o2p) {
-					if (o1p < o2p) {
-						return new Operator(o.a, o.operator, insertOperator(o.b, op, r));
-					}
-					
-					break;
-				}else {
-					i++;
-				}
-			}
-		}
-		
-		return new Operator(c, op, r);
-	}
-	
 	public static Token stage3 (Token[] tokens) {
 		if (tokens.length == 1) return tokens[0];
 		
-		//third stage, look for operators that follow the regular pattern
-		Operator c = null;
+		//find lowest precedence
+		Token current = tokens[0];
+		boolean string = true;
 		
-		for (int i = 1; i < tokens.length - 1; i++) {
-			if (isOperator(tokens[i])) {
-				for (int ii = i + 1; ii <= tokens.length; ii++) {
-					if (ii == tokens.length || isOperator(tokens[ii])) {
-						Token b = stage4(Arrays.copyOfRange(tokens, i + 1, ii));
-						
-						if (c == null) {
-							c = new Operator(stage4(Arrays.copyOfRange(tokens, 0, i)), (TokenIdentifier) tokens[i], b);
-						}else {
-							c = insertOperator(c, (TokenIdentifier) tokens[i], b);
-						}
-						
-						i = ii;
-					}
+		for (int i = 0; i < tokens.length; i++) {
+			int cmp = comparePrecedence(current, tokens[i]);
+			
+			if (cmp != 0) {
+				string = false;
+				
+				if (cmp > 0) {
+					current = tokens[i];
 				}
 			}
 		}
 		
-		if (c != null) {
-			return c;
-		}else {
-			return stage4(tokens);
+		if (string) return stage4(tokens);
+		
+		int ii = 0;
+		Token out = null;
+		
+		for (int i = 0; i < tokens.length; i++) {
+			if (comparePrecedence(tokens[i], current) == 0) {
+				if (i == 0) {
+					out = tokens[i];
+				}else {
+					if (ii != i) {
+						if (out == null) {
+							out = stage3(Arrays.copyOfRange(tokens, ii, i));
+						}else {
+							out = new Caller(out, stage3(Arrays.copyOfRange(tokens, ii, i)));
+						}
+					}
+					
+					out = new Caller(out, tokens[i]);
+				}
+				
+				ii = i + 1;
+			}
 		}
+		
+		if (ii != tokens.length) {
+			out = new Caller(out, stage3(Arrays.copyOfRange(tokens, ii, tokens.length)));
+		}
+		
+		return out;
 	}
 	
 	public static Token stage4 (Token[] tokens) {
@@ -271,37 +300,10 @@ public class TokenStatement extends TokenBlock{
 	public Event createEvent() {
 		Token[] tokens = this.getTokens();
 		
-		if (tokens.length == 0) {
-			return new EventNull();
-		}else if (tokens.length == 1) {
+		if (tokens.length == 1) {
 			return tokens[0].createEvent();
 		}else {
 			return getCaller(tokens).createEvent();
-		}
-	}
-	
-	private static class Operator extends Token {
-		Token a, b;
-		TokenIdentifier operator;
-		
-		public Operator (Token a, TokenIdentifier operator, Token b) {
-			this.a = a;
-			this.operator = operator;
-			this.b = b;
-		}
-		
-		@Override
-		public Event createEvent() {
-			if (this.b instanceof TokenFunction) {
-				return new EventCall(new EventCall(this.a.createEvent(), this.operator.createEvent()), ((TokenFunction) this.b).createHiddenEvent());
-			}else {
-				return new EventCall(new EventCall(this.a.createEvent(), this.operator.createEvent()), this.b.createEvent());
-			}
-		}
-		
-		@Override
-		public String toString() {
-			return "(" + this.a + " " + this.operator + " " + this.b + ")";
 		}
 	}
 	
@@ -345,7 +347,25 @@ public class TokenStatement extends TokenBlock{
 		
 		@Override
 		public String toString () {
-			return this.function.toString() + " " + this.param.toString();
+			return "(" + this.function.toString() + " " + this.param.toString() + ")";
+		}
+	}
+	
+	private static class HiddenFunction extends Token {
+		TokenFunction param;
+		
+		public HiddenFunction (TokenFunction param) {
+			this.param = param;
+		}
+		
+		@Override
+		public Event createEvent () {
+			return this.param.createHiddenEvent();
+		}
+		
+		@Override
+		public String toString () {
+			return this.param.toString();
 		}
 	}
 	
