@@ -10,7 +10,7 @@ import parser.Stream;
 import parser.TokenList;
 
 public class TokenStatement extends TokenBlock{
-	public static final String operators = "?,~_ @ |&! =<> +- */\\% ^ $# `";
+	public static final String operators = ".: ?,~_ @ |&! =<> +- */\\% ^ $# `";
 	public static final char[] ops = operators.replaceAll(" ", "").toCharArray();
 	public static final int[] operatorValues;
 	
@@ -426,7 +426,7 @@ public class TokenStatement extends TokenBlock{
 			
 			if (s.isNext(ops)) {
 				StringBuilder operator = new StringBuilder();
-				while (s.isNext(ops)) operator.append(s.chr());
+				while (!s.isNext('.', ':') && s.isNext(ops)) operator.append(s.chr());
 				
 				Token next = readImmeditates(s);
 				
