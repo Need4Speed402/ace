@@ -13,26 +13,6 @@ public class ValueIdentifier implements Value {
 		this(parent.id, parent, null);
 	}
 	
-	public ValueIdentifier getParent () {
-		ValueIdentifier i = this.parent;
-		
-		while (true) {
-			if (i == null) return null;
-			if (i.referenced != null) return i;
-			i = i.parent;
-		}
-	}
-	
-	public ValueIdentifier getFirstParent () {
-		ValueIdentifier i = this;
-		
-		while (true) {
-			if (i == null) return null;
-			if (i.referenced != null) return i.getParent();
-			i = i.parent;
-		}
-	}
-	
 	public boolean hasReference () {
 		ValueIdentifier i = this;
 		
@@ -62,21 +42,19 @@ public class ValueIdentifier implements Value {
 	@Override
 	public Value call(Value p) {
 		if (Value.compare(p, "`>`")){
-			return new IdentifierReference(this.getFirstParent()) {
-				@Override
-				public Value call(Value p2) {
-					if (referenced == null && Value.compare(p2, "=")) {
-						return p3 -> {
-							if (referenced != null) return Value.NULL;
-							
-							setReference(p3);
-							
-							return Value.NULL;
-						};
-					}
-					
-					return super.call(p2);
+			return p2 -> {
+				if (this.referenced != null) {
+					return this.referenced.call(p2);
 				}
+				
+				if (Value.compare(p2, "=")) {
+					return p3 -> {
+						this.setReference(p3);
+						return Value.NULL;
+					};
+				}
+				
+				return Value.NULL;
 			};
 		}else{
 			return this.getReference().call(p);
@@ -94,28 +72,5 @@ public class ValueIdentifier implements Value {
 	@Override
 	public String toString() {
 		return super.toString() + "[" + this.id + "]";
-	}
-	
-	public static class IdentifierReference implements Value {
-		public final ValueIdentifier ref;
-		
-		public IdentifierReference(ValueIdentifier ref) {
-			this.ref = ref;
-		}
-		
-		@Override
-		public Value call(Value p) {
-			if (this.ref == null) return Value.NULL;
-			
-			if (Value.compare(p, "`>`")) {
-				ValueIdentifier parent = this.ref.getParent();
-				
-				if (parent != null) {
-					return new IdentifierReference(parent);
-				}
-			}
-			
-			return this.ref.referenced.call(p);
-		}
 	}
 }
