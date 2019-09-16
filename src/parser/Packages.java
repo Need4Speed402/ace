@@ -10,6 +10,8 @@ import parser.token.TokenBase;
 import value.Value;
 
 public class Packages {
+	public static final boolean PRINT_AST = false;
+	
 	public static Value load (Stream s, String name) {
 		Token ast;
 		
@@ -21,13 +23,16 @@ public class Packages {
 			throw e;
 		}
 		
-		//System.out.println(ast.createEvent());
-		
-		Event event = new EventScope(ast.createEvent());
-		event.init();
-		event.paramaterHeight(new Node<Integer>(0), new Node<Integer>(0));
-		Value v = event.run(Global.global);
-		return v;
+		if (PRINT_AST) {
+			System.out.println(ast);
+			
+			return null;
+		}else {
+			Event event = new EventScope(ast.createEvent());
+			event.init();
+			event.paramaterHeight(new Node<Integer>(0), new Node<Integer>(0));
+			return event.run(Global.global);
+		}
 	}
 	
 	public static Value file (String path) {
