@@ -76,7 +76,7 @@ Binary Integer | 10! | A string of numerical characters that terminates in !
 Octal Integer | 10* | A string of numerical characters that terminates in *
 Float | 1,2,3.1,2,3 | A string of numerical charaters that contains a . somewhere inside floats can also terminate in either: [.!^*] to change base
 Modifier | Class | Any identifier that starts with a upper-case charater will have different precedence rules
-Operator | * | Any identifier that contains any of the characters: [.: ?,~_ @ |&! =<> +- */\\% ^ $# \`] has different precedence rules, and is reffered to as a operator identifier
+Operator | * | Any identifier that contains any of the characters: [.: ?,~_ @ \|&! =<> +- */\\% ^ $# \`] has different precedence rules, and is reffered to as a operator identifier
 Setter Operator | = | Any operator that starts with = and contains no other = charaters will be an identifier that has a Right-to-Left associativity
 Identifier | abc | Any other string of charaters
 Unary operator | >var | Any set of operator characters that precedes an identifier
