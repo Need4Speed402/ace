@@ -83,6 +83,8 @@ Unary operator | >var | Any set of operator characters that precedes an identifi
 Function application | a b | Any whitespace between two valid syntax contructs will call function a with paramater b
 Immediate function application | a(b) | If there is no whitespace between two distinct syntax constructs, a will be called with b with the highest precedence
 Immediate paramater application | .a :b | If a syntax contruct is proceeded with . or : the paramater will be called with the value of that syntax with the highest precedence
+Single line comment | ;; hello | A single line comment dilimiter is ```;; ``` the whitespace is necessary to distingish between a single line comment and a statement comment. The comment will terminate upon a newline
+Statement comment | ;;{} | A statement comment starts with ```;;``` and will parse a statement but not execute it.
 
 ## Functions
 Since the basis of everything in ACE is a function, the syntax to create a function is
