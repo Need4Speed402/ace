@@ -26,18 +26,22 @@ blindly follows C's syntax such as how numerical literals are expressed,
 the idea of an expression vs a statement and using {} () to denote control flow.
 C was designed to compile 1:1 to machine instructions and provided syntax that
 looked more like mathematical equations. Of course computers are more complex
-and provide control flow, i/o and mutability all of which principals that mathematics
-did not consider and should not consider as they are details. C provides
+and provide control flow, i/o and mutability all of which programming languages
+have to handle so pure mathematics notation cannot be used. C provides
 operators to mutate and operate on primitive values, control flow statements
 such as if and while to conditionally run or re-run parts of the program.
 Primitive values such as chars, shorts, ints, longs, floats were added to map
 to values that the processor could directly execute on. All this was added
-and based upon the machine architecture of the time. All of it completely
-arbitrary. C assumes that programmers only need a hand full of data types,
-a few control flow statements and maybe sprinkle in a struct here and there.
-The best programming language for a given task is one that was designed for your
-task or best suited for your task. A 64 bit unsigned integer may be relevant
-today but tomorrow we might need a 128 bit integers.
+and based upon the machine architecture of the time. All of it based on the
+architecture being compiled to. C is a higher level of abstraction on top of
+assembly, which differs from architecture to architecture. Now it is important
+to creating launguages and tools that are platform agnostic even if the tradeoff
+is speed. Unfortunantely, even higher level languages such as JavaScript have
+syntax that is purely defined from lower level details like the IEEE floating point
+number spec that defines all numbers, and most other systax being derived from lower
+level languages where their goals are completely different. ACE was designed from
+the ground up to think logically to help you build abstractions more powerful
+then is possible in all mainstream languages.
 
 ## What ACE tries to do
 ACE is a programming language which tries to abstract even the most basic
@@ -52,3 +56,30 @@ Try to apply it to the general. Suppose my boss comes in and tells me that my
 defined, it is possible to drop in a 128 bit integer to be used without much
 code modification even if the programming language does not support a 128 bit
 value natively.
+
+## Syntax
+ACE's syntax tries to be as simple as possible with the goal of abstractions
+being easily built upon these few but powerful tools.
+
+Name | Example Syntax | Explanation
+---- | ------ | -----------
+Function | {} | Creating a Function, paramater exposed as .
+Modifier Function | Class {} | If a function follows a modifier, the paramater is then exposed as :
+Operator Function | * {} | If a function follows an operator, the paramater of the function is not exposed
+Scope | () | Runs like a iife, creates a new variable scope and can be used to reorder code execution
+Array | [] | Creates a new immutable list of elements by calling Array in the current scope
+String | '' | Creates a simple string, escape character is \`.
+Escaped String | "\`" | Creates a string where the delimiter to get out is \`"
+Integer | 1,2,3 | A string of numerical characters that can optionally be separated by ,
+Hex Integer | 10^ | A string of numerical charaters that terminates in ^
+Binary Integer | 10! | A string of numerical characters that terminates in !
+Octal Integer | 10* | A string of numerical characters that terminates in *
+Float | 1,2,3.1,2,3 | A string of numerical charaters that contains a . somewhere inside floats can also terminate in either: [.!^*] to change base
+Modifier | Class | Any identifier that starts with a upper-case charater will have different precedence rules
+Operator | * | Any identifier that contains any of the characters: [.: ?,~_ @ |&! =<> +- */\\% ^ $# \`] has different precedence rules, and is reffered to as a operator identifier
+Setter Operator | = | Any operator that starts with = and contains no other = charaters will be an identifier that has a Right-to-Left associativity
+Identifier | abc | Any other string of charaters
+Unary operator | >var | Any set of operator characters that precedes an identifier
+Function application | a b | Any whitespace between two valid syntax contructs will call function a with paramater b
+Immediate function application | a(b) | If there is no whitespace between two distinct syntax constructs, a will be called with b with the highest precedence
+Immediate paramater application | .a :b | If a syntax contruct is proceeded with . or : the paramater will be called with the value of that syntax with the highest precedence
