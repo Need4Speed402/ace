@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 import event.Event;
 import event.EventCall;
+import parser.ParserException;
 import parser.Stream;
 import parser.TokenList;
 
@@ -381,6 +382,8 @@ public class TokenStatement extends TokenBlock{
 			
 			tokens.push(TokenStatement.readImmeditates(s));
 		}
+		
+		if (tokens.size() == 0) throw new ParserException("tokens size cannot be 0");
 		
 		return tokens.toArray();
 	}

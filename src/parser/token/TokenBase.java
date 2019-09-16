@@ -44,6 +44,8 @@ public class TokenBase extends TokenBlock {
 				}else {
 					throw new ParserException("illegal location of semicolon");
 				}
+				
+				continue;
 			}
 			
 			if (s.next('\n')) {
@@ -53,6 +55,8 @@ public class TokenBase extends TokenBlock {
 				
 				semiUsed = false;
 				semiLegal = false;
+				
+				continue;
 			}
 			
 			if (s.next(Stream.whitespace)) continue;
@@ -71,6 +75,8 @@ public class TokenBase extends TokenBlock {
 			semiLegal = true;
 			semiUsed = false;
 		}
+		
+		if (semiUsed) throw new ParserException("illegal location of semicolon");
 		
 		return tokens.toArray();
 	}
