@@ -83,3 +83,64 @@ Unary operator | >var | Any set of operator characters that precedes an identifi
 Function application | a b | Any whitespace between two valid syntax contructs will call function a with paramater b
 Immediate function application | a(b) | If there is no whitespace between two distinct syntax constructs, a will be called with b with the highest precedence
 Immediate paramater application | .a :b | If a syntax contruct is proceeded with . or : the paramater will be called with the value of that syntax with the highest precedence
+
+## Functions
+Since the basis of everything in ACE is a function, the syntax to create a function is
+really simple.\
+The syntax uses curly braces ```{ <code> }``` to denote a funciton. Functions always accept
+one paramater and return one paramater. If a function runs to the end of its execuption
+the null function will be returned. Typically, the paramater will be exposed as ```.```.\
+```{}``` is the null function where nothing is done with
+the pramater in implicitly it will return itself. The null function does have a large role in
+the language as it controls code execution.\
+Consider this:
+```
+	{
+		run one
+		run two
+		run three
+	}
+```
+
+There are three statements in this function, and they will be executed in order until one of them does not return null
+suppose ```run one``` gets executed and returns null, ```run two``` will then be run. Suppose that function returns the integer 1.
+Code will stop executing there in the function and 1 will be returned. This is called implicit returns. This is done for two reasons,
+first error handling is trivial. If I had a function that if run succesfully would return null, everything would be dandy and code will
+continue to execute, the suppose there was an error, since there is no try/catch in ACE, errors will have to be
+returned like all regular values, and in the case of the function regularly returning null, the error will be propogated down the call stack
+as if the error was thrown. The second reason why this is done is to solve a problem with this case
+```
+	{
+		>value = 6
+
+		value == 6 ? {
+			'value is 6'
+		}
+
+		'value is not 6'
+	}
+```
+Here is a function with a conditional, first I am setting a local variable called value and initializing it to 6 then comparing the value to 6.
+Ofcorse in this example the conditional will always execute. And in the case of the callback for the conditional, it will return a string.
+If implimit returns did not exist, the code would be very verbose where I would need to place a ```return``` in every concievable spot where I
+would want to return my value, even then, there is no way to conditionally return from a function.\
+The second major feature to functions is the ability to accept information. Typically this paramater is exposed as ```.```.\
+Example: ```>addOne = {. + 1}```. This syntax exists so that it is really convenient to make lamba functions, one of the most
+common code patterns in ACE. ```.``` is also a special case for the compiler where it knows that you want to get the paramater,
+this is why you don't assign a name to the paramater. If it were assigned a name, that paramater would then be exposed as an identifier
+and the whole basis to property access in ACE is to pass identifiers to functions, that function has to know what identifier was passed
+to it, by assiging it to an identifier, that information will be lost. And so this is why ```.``` is used as it is a special case for the compiler.
+Under most circumstances, the paramater will be exposed as ```.``` but is not always the case. If a modifier proceeds the function, the paramater will
+then be exposed as ```:```. It is typical in programming where you are working on two different kinds of data, the data that you want to mutate in
+response to other incoming data. : will store the data you want to mutate and . will be the data that controls the mutation. Consider the case for classes:
+```
+	Class {
+		:this addToArgument {
+			: + .
+		}
+	}
+```
+```:``` will store the class instance, while ```.``` will store any temporary data.\
+Lastly, there is a third case for paramaters. When a function follows an operator, the paramater will not be exposed at all. Consider the second example of this section
+that used the conditional with the callback, that callback is usually defined in-line with the rest of the conditional. Exposing the paramater in this
+case would be useless as the conditional cannot give any useful information to the callback, so to cover this case, the paramater is not exposed if proceeded by an operator.
