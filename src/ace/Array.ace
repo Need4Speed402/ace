@@ -37,7 +37,7 @@ Class {
 		length	
 	}
 	
-	:this >$ {
+	:this `>` {
 		:this map {>.}
 	}
 	
