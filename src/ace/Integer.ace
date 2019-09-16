@@ -1,3 +1,17 @@
+>bitwise = {{{
+	>[a; b; cb] = [...; ..; .]
+	
+	>first = Dynamic false
+	>second = Dynamic false
+	
+	Integer (a zip b map {
+		first = (.first; first)
+		second = (.second; second)
+		
+		cb [*first; *second]
+	} array)
+}}}
+
 Class {
 	:this bits {:}
 	
@@ -13,37 +27,32 @@ Class {
 			a = !. & *a
 			
 			val
-		} clone)
+		} array)
 	}
 	
 	:this `~` {
-		Integer (:map {!.} clone)
+		Integer (:map {!.} array)
 	}
 	
-	:this ! {{
-		Integer ((: / .bits) map {
-			(.first; false) ! (.second; false)
-		})
-	}}
+	:this ! {{bitwise : .bits {.first ! .second}}}
+	:this | {{bitwise : .bits {.first | .second}}}
+	:this & {{bitwise : .bits {.first & .second}}}
 	
 	:this << {{
 		>i = Dynamic .
 		
 		>loop = {
 			i == 0 ?? {
-				..
+				.
 			} ~ {
-				i -= 1
-				>next = loop ..
+				i =- 1
+				>next = loop .
 				
-				{
-					(. ~= next) ? {next}
-					false .
-				}
+				{. false next}
 			}
 		}
 		
-		Integer (loop value)
+		Integer Iterator (loop :backing)
 	}}
 	
 	:this >> {{
@@ -51,14 +60,14 @@ Class {
 		
 		>loop = {
 			i == 0 ?? {
-				..
+				.
 			} ~ {
 				i =- 1
-				loop ..next
+				loop .{{.}}
 			}
 		}
 		
-		Integer (loop value)
+		Integer Iterator (loop :backing; {. false ()})
 	}}
 	
 	:this + {{

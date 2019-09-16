@@ -19,7 +19,7 @@ Class {
 		value set (value get + .)
 	}}
 	
-	:this =+ {{
+	:this =- {{
 		value set (value get - .)
 	}}
 	
