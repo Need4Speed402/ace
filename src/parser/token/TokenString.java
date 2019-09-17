@@ -113,18 +113,34 @@ public class TokenString extends TokenBlock{
 	
 	private static class BreakLocation {
 		public int tokenIndex, index;
+		public StringBuilder b = new StringBuilder();
 		
 		public BreakLocation (int tokenIndex, int index) {
 			this.tokenIndex = tokenIndex;
 			this.index = index;
 		}
+		
+		public void append (char c) {
+			b.append(c);
+		}
+		
+		@Override
+		public String toString() {
+			return b.toString();
+		}
+		
+		public int length () {
+			return b.length();
+		}
+		
+		public char charAt (int i) {
+			return b.charAt(i);
+		}
 	}
 	
 	public static TokenString readString (Stream s, char escape) {
 		TokenList tokens = new TokenList();
-		
 		StringBuilder current = new StringBuilder();
-		
 		List<BreakLocation> breaks = new ArrayList<>();
 		
 		while (true) {
@@ -141,20 +157,22 @@ public class TokenString extends TokenBlock{
 			
 			if (s.next('\r')) continue;
 			
-			if (s.isNext('\n')) {
-				while (s.hasChr()) {
-					if (s.next('\n')) {
-						breaks.add(new BreakLocation(tokens.size(), current.length()));
-						
-						current.append('\n');
-					}
-					if (!s.next(Stream.whitespace)) break;
+			if (s.next('\n')) {
+				BreakLocation br = new BreakLocation(tokens.size(), current.length());
+				breaks.add(br);
+				
+				while (!s.isNext('\n') && s.isNext(Stream.whitespace)) {
+					if (s.next('\r')) continue;
+					br.append(s.chr());
 				}
 				
+				current.append('\n').append(br);
 				continue;
 			}
 			
 			if (s.next('`')) {
+				while (s.next('\r'));
+				
 				if (escape == '"' && s.next('"')) break;
 				else if (s.next('t')) current.append('\t');
 				else if (s.next('n')) current.append('\n');
@@ -245,11 +263,35 @@ public class TokenString extends TokenBlock{
 			BreakLocation first = breaks.get(0);
 			BreakLocation last = breaks.get(breaks.size() - 1);
 			
-			if (first.tokenIndex == 0 && last.tokenIndex == tokens.size() - 1) {
-				String tokenLast = tokens.get(tokens.size() - 1).toString();
+			if (first.tokenIndex == 0 && first.index == 0 && last.tokenIndex == tokens.size() - 1) {
+				int len = 0;
+				if (breaks.size() > 1) main: while (true) {
+					if (breaks.get(0).length() <= len) break;
+					
+					char c = breaks.get(0).charAt(len);
+					
+					for (int i = 1; i < breaks.size() - 1; i++) {
+						if (breaks.get(i).length() <= len || c != breaks.get(i).charAt(len)) break main;
+					}
+					
+					len++;
+				}
 				
-				if (first.index == 0 && last.index == tokenLast.toString().length() - 1) {
-					tokens.set(tokens.size() - 1, new StringSegment(tokenLast.substring(0, tokenLast.length() - 1)));
+				if (last.index == tokens.get(tokens.size() - 1).toString().length() - last.length() - 1) {
+					if (len > 0) for (int i = 0; i < breaks.size() - 1; i++) {
+						BreakLocation br = breaks.get(i);
+						String str = tokens.get(br.tokenIndex).toString();
+						
+						tokens.set(br.tokenIndex, new StringSegment(str.substring(0, br.index + 1) + str.substring(br.index + 1 + len)));
+						
+						for (int ii = i + 1; ii < breaks.size(); ii++) {
+							if (breaks.get(ii).tokenIndex != br.tokenIndex) break;
+							breaks.get(ii).index -= len;
+						}
+					}
+					
+					String tokenLast = tokens.get(tokens.size() - 1).toString();
+					tokens.set(tokens.size() - 1, new StringSegment(tokenLast.substring(0, tokenLast.length() - last.length() - 1)));
 					tokens.set(0, new StringSegment(tokens.get(0).toString().substring(1)));
 				}
 			}
