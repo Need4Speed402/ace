@@ -83,8 +83,8 @@ Unary operator | >var | Any set of operator characters that precedes an identifi
 Function application | a b | Any whitespace between two valid syntax contructs will call function a with paramater b
 Immediate function application | a(b) | If there is no whitespace between two distinct syntax constructs, a will be called with b with the highest precedence
 Immediate paramater application | .a :b | If a syntax contruct is proceeded with . or : the paramater will be called with the value of that syntax with the highest precedence
-Single line comment | ;; hello | A single line comment dilimiter is ```;;;```. Whitespace can also be used in place of the last semicolon. The comment will terminate upon a newline
-Statement comment | ;;{} | A statement comment starts with ```;;``` and will parse a statement but not execute it.
+Single line comment | ;; hello | A single line comment dilimiter is ```;; ```. With whitespace after the semicolons. The comment will terminate upon a newline
+Statement comment | ;;{} | A statement comment starts with ```;;``` and will parse a statement but not execute it. A string literal can be used for multi line comments.
 
 ## Functions
 Since the basis of everything in ACE is a function, the syntax to create a function is
@@ -125,7 +125,8 @@ as if the error was thrown. The second reason why this is done is to solve a pro
 Here is a function with a conditional, first I am setting a local variable called value and initializing it to 6 then comparing the value to 6.
 Ofcorse in this example the conditional will always execute. And in the case of the callback for the conditional, it will return a string.
 If implimit returns did not exist, the code would be very verbose where I would need to place a ```return``` in every concievable spot where I
-would want to return my value, even then, there is no way to conditionally return from a function.\
+would want to return my value, even then, there is no way to conditionally return from a function. One last detail to keep in mind: Identifiers
+will be resolved to their value before the function returns so it's impossible for a function to return an identifier.\
 The second major feature to functions is the ability to accept information. Typically this paramater is exposed as ```.```.\
 Example: ```>addOne = {. + 1}```. This syntax exists so that it is really convenient to make lamba functions, one of the most
 common code patterns in ACE. ```.``` is also a special case for the compiler where it knows that you want to get the paramater,

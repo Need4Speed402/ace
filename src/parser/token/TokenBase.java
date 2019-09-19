@@ -27,8 +27,9 @@ public class TokenBase extends TokenBlock {
 			}
 			
 			//comments
-			if (s.next(";;")) {
-				if (s.isNext(Stream.whitespace) || s.isNext(';')) {
+			if (!s.isNext(";;}", ";;)", ";;]", ";;;") && s.next(";;")) {
+				if (!s.hasChr()) break;
+				if (s.isNext(Stream.whitespace)) {
 					while (s.hasChr() && !s.isNext('\n')) s.chr();
 				}else{
 					new TokenStatement(s);
