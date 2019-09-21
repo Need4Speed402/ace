@@ -4,7 +4,7 @@ import event.Event;
 import event.EventCall;
 import event.EventIdentifier;
 
-public class TokenOperatorImmediate extends Token{
+public class TokenOperatorImmediate extends Token implements Modifier{
 	private final Token token;
 	private final String operator;
 	
@@ -17,7 +17,7 @@ public class TokenOperatorImmediate extends Token{
 		return operator;
 	}
 	
-	public Token getToken() {
+	public Token getContent() {
 		return token;
 	}
 	

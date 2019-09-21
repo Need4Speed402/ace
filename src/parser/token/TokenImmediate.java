@@ -3,7 +3,7 @@ package parser.token;
 import event.Event;
 import event.EventCall;
 
-public class TokenImmediate extends Token{
+public class TokenImmediate extends Token implements Modifier{
 	private final Token first, second;
 	
 	public TokenImmediate(Token first, Token second) {
@@ -11,12 +11,8 @@ public class TokenImmediate extends Token{
 		this.second = second;
 	}
 	
-	public Token getFirst() {
+	public Token getContent() {
 		return first;
-	}
-	
-	public Token getSecond() {
-		return second;
 	}
 
 	@Override

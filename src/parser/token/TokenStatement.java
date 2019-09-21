@@ -49,14 +49,8 @@ public class TokenStatement extends TokenBlock{
 	}
 	
 	public static boolean isModifier (Token t) {
-		if (t instanceof TokenImmediate) {
-			return isModifier(((TokenImmediate) t).getFirst());
-		}else if (t instanceof TokenOperatorImmediate) {
-			return isModifier(((TokenOperatorImmediate) t).getToken());
-		}else if (t instanceof TokenImmediateArgument) {
-			return isModifier(((TokenImmediateArgument) t).getContent());
-		}else if (t instanceof TokenImmediateArgumentModifier) {
-			return isModifier(((TokenImmediateArgumentModifier) t).getContent());
+		if (t instanceof Modifier) {
+			return isModifier(((Modifier) t).getContent());
 		}else if (t instanceof TokenIdentifier) {
 			String s = ((TokenIdentifier) t).getName();
 			

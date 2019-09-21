@@ -4,7 +4,7 @@ import event.Event;
 import event.EventCall;
 import event.EventMFunc;
 
-public class TokenImmediateArgumentModifier extends Token{
+public class TokenImmediateArgumentModifier extends Token implements Modifier{
 	private final int level;
 	private final Token content;
 	
