@@ -1,20 +1,16 @@
+>Modifiable = package unsafe bootstrap Modifiable
+
 Class {
 	:this for {{
 		>cb = .
-		>loop = {{
-			>index = .
-			
-			.. {{
-				cb (Object {
-					:this index {index}
-					{... .}
-				})
-				
-				loop . (index + 1)
+		>loop = {
+			. {{
+				cb {... .}
+				loop .
 			}}
-		}}
+		}
 		
-		loop : 0
+		loop :
 	}}
 	
 	:this backing {:}
@@ -22,6 +18,29 @@ Class {
 	:this first {:{{..}}}
 	:this rest {Iterator :{{.}}}
 	:this empty {:{{false}}; true}
+	
+	:this last {
+		>loop = {
+			. {{
+				loop .
+				..
+			}}
+		}
+		
+		loop :
+	}
+	
+	:this reverse {
+		>current = Modifiable ()
+		
+		:this for {
+			>cur = current get
+			
+			current set {. .. (cur)}
+		}
+		
+		Iterator (current get)
+	}
 	
 	:this zip {{
 		>zip = {{

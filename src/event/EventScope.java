@@ -13,7 +13,7 @@ import value.ValueIdentifier;
 public class EventScope implements Event{
 	protected Event contents;
 	
-	public static long mem;
+	public static long mem, scopes;
 	
 	private EventScope parent;
 	public final Definition[] definitions;
@@ -53,21 +53,20 @@ public class EventScope implements Event{
 	
 	@Override
 	public Value run(Local local) {
-		return this.run(local, null);
+		return this.run(local, Value.NULL);
 	}
 	
 	public Value run(Local local, Value paramater) {
 		ValueIdentifier[] idents = new ValueIdentifier[this.definitions.length];
 		mem += this.definitions.length;
-		
-		Local l = new Local(local, idents, paramater);
+		scopes += 1;
 		
 		for (int i = 0; i < this.definitions.length; i++) {
 			Definition def = this.definitions[i];
-			idents[i] = new ValueIdentifier(l.getParent(def.level).scope[def.index]);
+			idents[i] = new ValueIdentifier(local.getParent(def.level).scope[def.index]);
 		}
 		
-		return this.contents.run(l);
+		return this.contents.run(new Local(local, idents, paramater));
 	}
 	
 	@Override
@@ -81,7 +80,7 @@ public class EventScope implements Event{
 					Definition check = parent.definitions[i];
 					
 					if (check.name == def.name) {
-						def.level = level + 1;
+						def.level = level;
 						def.index = i;
 						break main;
 					}
@@ -97,7 +96,7 @@ public class EventScope implements Event{
 				
 				for(int i = 0; i < idents.length; i++) {
 					if (idents[i].id == def.name) {
-						def.level = level + 1;
+						def.level = level;
 						def.index = i;
 						break;
 					}

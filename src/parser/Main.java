@@ -10,6 +10,6 @@ public class Main {
 		path = new File(args[0]).getParentFile();
 		Packages.file(args[0]);
 		
-		System.out.println("\nmem: " + EventScope.mem);
+		System.out.println("\nmem: " + EventScope.scopes + ":" + EventScope.mem);
 	}
 }

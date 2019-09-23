@@ -6,9 +6,12 @@ Class {
 	>get = (
 		: ~= Iterator ? {
 			>backing = Memory length
+			>index = Dynamic 0
 			
 			: for {
-				backing set .index .
+				backing set index .
+				
+				index =+ 1
 			}
 			
 			backing get
@@ -34,7 +37,7 @@ Class {
 	}
 	
 	:this length {
-		length	
+		length
 	}
 	
 	:this `>` {
@@ -62,7 +65,8 @@ Class {
 	}}
 	
 	:this + {{
-		>mem = Memory (length + .length)
+		>newLength = length + .length
+		>mem = Memory newLength
 		
 		length times for {
 			mem set .index (get .index)
@@ -73,7 +77,7 @@ Class {
 		}
 		
 		Array Object {
-			:this length {length}
+			:this length {newLength}
 			mem
 		}
 	}}

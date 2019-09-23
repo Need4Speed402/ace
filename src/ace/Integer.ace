@@ -1,16 +1,77 @@
 >bitwise = {{{
-	>[a; b; cb] = [...; ..; .]
+	>fn = .
 	
 	>first = Dynamic false
 	>second = Dynamic false
+	>strip = Dynamic false
+	>stripActive = Dynamic true
 	
-	Integer (a zip b map {
-		first = (.first; first)
-		second = (.second; second)
+	>callfn = {
+		fn (Object {
+			>first = *first
+			>second = *second
+			
+			:this first {first}
+			:this second {second}
+		})
+	}
+	
+	>loop = {{
+		>end = ..empty & .empty
 		
-		cb [*first; *second]
-	} array)
+		end ? {
+			strip = callfn()
+			
+			{. (strip) ()}
+		}
+		
+		end !? {
+			first = (..first; first)
+			second = (.first; second)
+			>value = callfn()
+			>next = loop ..rest .rest
+			
+			stripActive = stripActive & (value == strip)
+			
+			stripActive ? {
+				{. (value) ()}
+			}
+			
+			{. (value) (next)}
+		}
+	}}
+	
+	Integer Iterator (loop ... ..)
 }}}
+
+>compare = {{
+	>first = Dynamic false
+	>second = Dynamic false
+
+	>loop = {{
+		>a = ..rest
+		>b = .rest
+		
+		first = (..first; first)
+		second = (.first; second)
+		
+		(a empty) & (b empty) ?? {
+			!first & second ? {1}
+			first & !second ? {-1}
+		} ~ {
+			>first = *first
+			>second = *second
+			
+			loop a b
+
+			!first & second ? {-1}
+			first & !second ? {1}
+		}
+	}}
+	
+	loop .. .
+	0
+}}
 
 Class {
 	:this bits {:}
@@ -27,16 +88,23 @@ Class {
 			a = !. & *a
 			
 			val
-		} array)
+		} clone)
 	}
 	
 	:this `~` {
-		Integer (:map {!.} array)
+		Integer (:map {!.} clone)
 	}
 	
 	:this ! {{bitwise : .bits {.first ! .second}}}
 	:this | {{bitwise : .bits {.first | .second}}}
 	:this & {{bitwise : .bits {.first & .second}}}
+	
+	:this odd {:first}
+	:this even { !(:this odd) }
+	:this negative { :last }
+	:this positive { -:this bits last }
+	:this zero {:first == false & :rest empty}
+	:this abs {:this negative ? {-:this}; :this}
 	
 	:this << {{
 		>i = Dynamic .
@@ -72,59 +140,112 @@ Class {
 	
 	:this + {{
 		>carry = Dynamic false
-		>first = Dynamic false
-		>last = Dynamic false
 		
-		>vval = Dynamic false
-		
-		>loop = {{
-			..empty & .empty ?? {
-				carry = carry ! *last ! *first
-				
-				;; vval != carry ? {
-					{. carry ()}
-				;; }
-			} ~ {
-				first = (..first; first)
-				last = (.first; last)
-				
-				>a = *first ! *last
-				>val = a ! *carry
-				vval = val
-				carry = *carry & a | (*first & *last)
-				
-				>next = loop ..rest .rest
-				
-				{. val next}
-			}
-		}}
-		
-		Integer Iterator (loop : .bits)
+		bitwise : .bits {
+			>a = .first ! .second
+			>val = a ! *carry
+			carry = *carry & a | (.first & .second)
+			
+			val
+		}
 	}}
 	
 	:this - {{
 		:this + -.
 	}}
 	
+	:this * {{
+		;; calculates the product of x and y
+		>x = Dynamic :this
+		>y = Dynamic .
+		
+		y negative ? {
+			x = -x
+			y = -y
+		}
+		
+		>val = Dynamic 0
+		>index = Dynamic 0
+		
+		y bits for {
+			. ? {
+				val =+ x << index	
+			}
+			
+			index =+ 1
+		}
+		
+		*val
+	}}
+	
+	:this // {{
+		>x = Dynamic :this
+		>y = Dynamic .
+		
+		>sign = x negative ! y negative
+		
+		x = x abs
+		y = y abs
+		
+		>index = Dynamic (y bits length)
+		>quotient = Dynamic 0
+		
+		y bits reverse for {
+			index =- 1
+			
+			>uu = y << index
+			;;console println uu
+			
+			console println [x; uu; compare (uu bits) (x bits)]
+			uu <= x ? {
+				x =- uu
+				quotient = quotient | (1 << index)
+			}
+		}
+		
+		sign ? {
+			-quotient
+		}
+		
+		*quotient
+	}}
+	
+	:this square {:this * :this}
+	:this cube {:this * :this * :this}
+	
+	:this ^ {{
+		. == 0 ? {1}
+		. == 1 ? {:this}
+		
+		. even ?? {
+			:this square ^ (. >> 1)
+		} ~ {
+			:this * :this square ^ (. >> 1)
+		}
+	}}
+	
+	:this < {{
+		compare : .bits == -1
+	}}
+	
+	:this > {{
+		compare : .bits == 1
+	}}
+	
+	:this <= {{
+		 compare : .bits != 1
+	}}
+	
+	:this >= {{
+		compare : .bits != -1
+	}}
+	
 	:this == {{
-		>first = Dynamic false
-		>last = Dynamic false
-		
-		>loop = {{
-			..empty & .empty ? {true}
-			
-			first = (..first; first)
-			last = (.first; last)
-			
-			first != last ? {false}
-			loop ..rest .rest
-		}}
-		
-		loop : .bits
+		compare : .bits zero
 	}}
 	
 	:this != {{
-		!(:this == .)
+		!(compare : .bits zero)
 	}}
 	
 	:this times {

@@ -11,6 +11,8 @@ public class EventCall implements Event{
 	private Event argument;
 	
 	public EventCall (Event function, Event argument) {
+		if (function == null || argument == null) throw new NullPointerException();
+		
 		this.function = function;
 		this.argument = argument;
 	}

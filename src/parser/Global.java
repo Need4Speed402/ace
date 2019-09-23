@@ -11,7 +11,7 @@ public class Global extends Local{
 	public final static Global global = new Global();
 	
 	public Global () {
-		super((Local) null, new ValueIdentifier[0], null);
+		super((Local) null, new ValueIdentifier[0], Value.NULL);
 	}
 	
 	public static String getText (Value e) {
@@ -20,10 +20,12 @@ public class Global extends Local{
 		StringBuilder b = new StringBuilder ();
 		
 		if (b.length() == 0) e.call("~=").call(Global.Boolean).call("?").call(p -> {
-			e.call("??").call(p2 -> {
+			e.call("?").call(p2 -> {
 				b.append("true");
 				return Value.NULL;
-			}).call("~").call(p2 -> {
+			});
+			
+			e.call("!?").call(p2 -> {
 				b.append("false");
 				return Value.NULL;
 			});

@@ -22,6 +22,10 @@ public class Memory implements Value{
 				return p2 -> {
 					int index = TokenInteger.getInt(p2).intValue();
 					
+					if (memory[index] == null) {
+						return Value.NULL;
+					}
+					
 					return memory[index];
 				};
 			}else if (Value.compare(p, "set")) {

@@ -8,7 +8,7 @@ import value.Value;
 
 public class EventIdentifier implements Event{
 	public final String name;
-	public int location;
+	public int location = -1;
 	
 	public EventIdentifier(String name) {
 		name = name.intern();
