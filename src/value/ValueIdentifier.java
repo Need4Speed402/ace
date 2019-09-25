@@ -13,6 +13,12 @@ public class ValueIdentifier implements Value {
 		this(parent.id, parent, null);
 	}
 	
+	private ValueIdentifier(String id, ValueIdentifier parent, Value referenced) {
+		this.id = id;
+		this.parent = parent;
+		this.referenced = referenced;
+	}
+	
 	public boolean hasReference () {
 		ValueIdentifier i = this;
 		
@@ -31,12 +37,6 @@ public class ValueIdentifier implements Value {
 			if (i.referenced != null) return i.referenced;
 			i = i.parent;
 		}
-	}
-	
-	private ValueIdentifier(String id, ValueIdentifier parent, Value referenced) {
-		this.id = id;
-		this.parent = parent;
-		this.referenced = referenced;
 	}
 	
 	@Override

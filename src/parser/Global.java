@@ -137,6 +137,8 @@ public class Global extends Local{
 				return p2 -> {System.out.print(getText(p2)); return Value.NULL;};
 			}else if (Value.compare(p, "test")) {
 				System.out.println("Test print");
+			}else if (Value.compare(p, "trace")){
+				Thread.dumpStack();
 			}
 			
 			return Value.NULL;

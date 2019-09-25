@@ -151,7 +151,19 @@ Class {
 	}}
 	
 	:this - {{
-		:this + -.
+		>aa = Dynamic true
+		>carry = Dynamic false
+				
+		bitwise : .bits {
+			>second = .second == *aa
+			aa = !.second & *aa
+			
+			>a = .first ! second
+			>val = a ! *carry
+			carry = *carry & a | (.first & second)
+			
+			val
+		}
 	}}
 	
 	:this * {{
@@ -178,7 +190,7 @@ Class {
 		*val
 	}}
 	
-	:this // {{
+	:this /% {{
 		>x = Dynamic :this
 		>y = Dynamic .
 		
@@ -194,9 +206,7 @@ Class {
 			index =- 1
 			
 			>uu = y << index
-			;;console println uu
 			
-			console println [x; uu; compare (uu bits) (x bits)]
 			uu <= x ? {
 				x =- uu
 				quotient = quotient | (1 << index)
@@ -207,8 +217,11 @@ Class {
 			-quotient
 		}
 		
-		*quotient
+		[*quotient; *x]
 	}}
+	
+	:this // {{ (:this /% .) 0 }}
+	:this % {{ (:this /% .) 1 }}
 	
 	:this square {:this * :this}
 	:this cube {:this * :this * :this}

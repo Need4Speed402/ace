@@ -38,6 +38,11 @@ public class EventIterator implements Event{
 	}
 	
 	@Override
+	public void init() {
+		for (Event e : this.elements) e.init();
+	}
+	
+	@Override
 	public String toString() {
 		StringBuilder b = new StringBuilder();
 		b.append("[");
