@@ -54,26 +54,19 @@ public class TokenStatement extends TokenBlock{
 		}else if (t instanceof TokenIdentifier) {
 			String s = ((TokenIdentifier) t).getName();
 			
-			if (s.length() == 0) return false;
-			
-			char c = s.charAt(0);
-			
-			if (Character.toLowerCase(c) == Character.toUpperCase(c)) {
-				return false;
-			}else if (Character.toUpperCase(c) == c) {
-				for (int i = 1; i < s.length(); i++) {
-					if (TokenStatement.operators.indexOf(s.charAt(i)) >= 0) {
-						return false;
-					}
+			if (Stream.uppercase.indexOf(s.charAt(0)) >= 0) for (int i = 1; i < s.length(); i++) {
+				if (TokenStatement.operators.indexOf(s.charAt(i)) >= 0) {
+					continue;
 				}
 				
-				return true;
-			}else {
-				return false;
+				if (Stream.uppercase.indexOf(s.charAt(i)) == -1) {
+					System.out.println(s);
+					return true;
+				}
 			}
-		}else {
-			return false;
 		}
+		
+		return false;
 	}
 	
 	public static boolean isSetter (Token t) {

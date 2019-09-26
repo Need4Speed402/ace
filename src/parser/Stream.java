@@ -7,6 +7,8 @@ import java.nio.charset.Charset;
 
 public class Stream {
 	public static final char[] whitespace = " \r\n\t".toCharArray();
+	public static final String uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	
 	public static final Charset charset = Charset.forName("UTF-8");
 	
 	private final String code;
