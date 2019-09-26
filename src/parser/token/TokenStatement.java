@@ -60,7 +60,6 @@ public class TokenStatement extends TokenBlock{
 				}
 				
 				if (Stream.uppercase.indexOf(s.charAt(i)) == -1) {
-					System.out.println(s);
 					return true;
 				}
 			}
