@@ -81,14 +81,7 @@ Class {
 	}
 	
 	:this `-` {
-		>a = Dynamic true
-		
-		Integer (:map {
-			>val = . == *a
-			a = !. & *a
-			
-			val
-		} clone)
+		0 - :this
 	}
 	
 	:this `~` {
@@ -104,7 +97,7 @@ Class {
 	:this negative { :last }
 	:this positive { -:this bits last }
 	:this zero {:first == false & :rest empty}
-	:this abs {:this negative ? {-:this}; :this}
+	:this abs {:last ? {-:this}; :this}
 	
 	:this << {{
 		>i = Dynamic .
@@ -181,7 +174,7 @@ Class {
 		
 		y bits for {
 			. ? {
-				val =+ x << index	
+				val =+ x << index
 			}
 			
 			index =+ 1
@@ -199,14 +192,24 @@ Class {
 		x = x abs
 		y = y abs
 		
-		>index = Dynamic (y bits length)
+		>index = Dynamic (x bits length)
 		>quotient = Dynamic 0
 		
-		y bits reverse for {
+		>while = {{
+			>loop = {
+				...() ? {
+					.. ()
+					loop ()
+				}
+			}
+			
+			loop ()
+		}}
+		
+		while {index > 0} {
 			index =- 1
 			
 			>uu = y << index
-			
 			uu <= x ? {
 				x =- uu
 				quotient = quotient | (1 << index)
@@ -214,7 +217,7 @@ Class {
 		}
 		
 		sign ? {
-			-quotient
+			[-quotient; *x]
 		}
 		
 		[*quotient; *x]
