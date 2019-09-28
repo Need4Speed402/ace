@@ -33,8 +33,8 @@ public class EventIterator implements Event{
 	}
 	
 	@Override
-	public void paramaterHeight(Node<Integer> pHeight, Node<Integer> mHeight) {
-		for (Event e : this.elements) e.paramaterHeight(pHeight, mHeight);
+	public void paramaterHeight(Node<Integer>[] nodes) {
+		for (Event e : this.elements) e.paramaterHeight(nodes);
 	}
 	
 	@Override

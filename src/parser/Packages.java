@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.file.Files;
 
 import event.Event;
+import event.EventParamater;
 import parser.token.Token;
 import parser.token.TokenScope;
 import value.Value;
@@ -29,7 +30,7 @@ public class Packages {
 		}else {
 			Event event = ast.createEvent();
 			event.init();
-			event.paramaterHeight(new Node<Integer>(0), new Node<Integer>(0));
+			event.paramaterHeight(EventParamater.createNodeList());
 			return event.run(Global.global);
 		}
 	}

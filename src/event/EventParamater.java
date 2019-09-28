@@ -25,12 +25,9 @@ public class EventParamater implements Event{
 	}
 	
 	@Override
-	public void paramaterHeight(Node<Integer> pHeight, Node<Integer> mHeight) {
-		if (type == MODIFIER) {
-			this.height = mHeight.get(0) - mHeight.get(this.level + 1);
-		}else if (type == PARAMATER) {
-			this.height = pHeight.get(0) - pHeight.get(this.level + 1);
-		}
+	public void paramaterHeight(Node<Integer>[] nodes) {
+		Node<Integer> node = nodes[this.type.ordinal()];
+		this.height = node.get(0) - node.get(this.level + 1);
 	}
 	
 	@Override
@@ -39,7 +36,7 @@ public class EventParamater implements Event{
 	@Override
 	public String toString() {
 		StringBuilder b = new StringBuilder();
-		for (int i = 0; i <= this.level; i++) b.append('.');
+		for (int i = 0; i <= this.height; i++) b.append('.');
 		return b.toString();
 	}
 	
@@ -52,4 +49,15 @@ public class EventParamater implements Event{
 	public static Type NONE = Type.NONE;
 	public static Type MODIFIER = Type.MODIFIER;
 	public static Type PARAMATER = Type.PARAMATER;
+	
+	public static Node<Integer>[] createNodeList (){
+		@SuppressWarnings("unchecked")
+		Node<Integer>[] nodes = new Node[Type.values().length];
+		
+		for (int i = 0; i < nodes.length; i++) {
+			nodes[i] = new Node<Integer>(0);
+		}
+		
+		return nodes;
+	}
 }

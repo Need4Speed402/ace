@@ -9,7 +9,7 @@ import value.Value;
 public interface Event {
 	public Value run (Local local);
 	public void indexIdentifiers(EventFunction scope, List<EventIdentifier> idnt);
-	public default void paramaterHeight (Node<Integer> pHeight, Node<Integer> mHeight) {};
+	public default void paramaterHeight (Node<Integer>[] nodes) {};
 	
 	public default void init () {}
 	

@@ -35,9 +35,9 @@ public class EventCall implements Event{
 	}
 	
 	@Override
-	public void paramaterHeight(Node<Integer> pHeight, Node<Integer> mHeight) {
-		this.function.paramaterHeight(pHeight, mHeight);
-		this.argument.paramaterHeight(pHeight, mHeight);
+	public void paramaterHeight(Node<Integer>[] nodes) {
+		this.function.paramaterHeight(nodes);
+		this.argument.paramaterHeight(nodes);
 	}
 	
 	@Override

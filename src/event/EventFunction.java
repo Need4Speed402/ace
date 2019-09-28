@@ -132,19 +132,20 @@ public class EventFunction implements Event{
 	}
 	
 	@Override
-	public void paramaterHeight(Node<Integer> pHeight, Node<Integer> mHeight) {
-		Node<Integer>
-			np = pHeight.replace(pHeight.get(0) + 1),
-			nm = mHeight.replace(mHeight.get(0) + 1);
+	public void paramaterHeight(Node<Integer>[] nodes) {
+		@SuppressWarnings("unchecked")
+		Node<Integer>[] nn = new Node[nodes.length];
 		
-		if (this.type == EventParamater.MODIFIER) {
-			nm = nm.add(mHeight.get(0) + 1);
-		}else if (this.type == EventParamater.PARAMATER) {
-			np = np.add(pHeight.get(0) + 1);
+		for (int i = 0; i < nodes.length; i++) {
+			if (i == this.type.ordinal()) {
+				nn[i] = nodes[i].replace(nodes[i].get(0) + 1).add(nodes[i].get(0) + 1);
+			}else {
+				nn[i] = nodes[i].replace(nodes[i].get(0) + 1);
+			}
 		}
 		
 		for (Event e : this.contents) {
-			e.paramaterHeight(np, nm);
+			e.paramaterHeight(nn);
 		}
 	}
 	
