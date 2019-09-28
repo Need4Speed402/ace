@@ -5,7 +5,7 @@ import parser.Stream;
 
 public class TokenArray extends TokenBlock{
 	public TokenArray(Stream s) {
-		super(TokenBase.readBlock(s, ']'));
+		super(readBlock(s, ']'));
 	}
 	
 	@Override
@@ -21,6 +21,6 @@ public class TokenArray extends TokenBlock{
 	
 	@Override
 	public Event createEvent() {
-		return Event.pipe("Array", "Iterator", this.getEvents());
+		return Event.pipe("Array", "Iterator", this.createEvents());
 	}
 }

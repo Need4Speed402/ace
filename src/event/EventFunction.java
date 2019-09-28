@@ -14,18 +14,18 @@ import value.ValueIdentifier;
 public class EventFunction implements Event{
 	public static long mem, scopes;
 	
-	private final Event contents;
+	private final Event[] contents;
 	private final EventParamater.Type type;
 	
 	private EventFunction parent;
 	public final Definition[] definitions;
 	
-	public EventFunction (Event contents, EventParamater.Type type) {
+	public EventFunction (Event[] contents, EventParamater.Type type) {
 		this.contents = contents;
 		this.type = type;
 		
 		ArrayList<EventIdentifier> idnt = new ArrayList<>();
-		this.contents.indexIdentifiers(this, idnt);
+		for (Event e : this.contents) e.indexIdentifiers(this, idnt);
 		
 		ArrayList<Definition> definitions = new ArrayList<>();
 		
@@ -69,7 +69,19 @@ public class EventFunction implements Event{
 			idents[i] = new ValueIdentifier(local.getParent(def.level).scope[def.index]);
 		}
 		
-		return this.contents.run(new Local(local, idents, paramater));
+		Local scope = new Local(local, idents, paramater);
+		
+		for (int i = 0; i < this.contents.length; i++) {
+			Value v = this.contents[i].run(scope);
+			
+			if (v instanceof ValueIdentifier) {
+				v = ((ValueIdentifier) v).getReference();
+			}
+			
+			if (v != Value.NULL) return v;
+		}
+		
+		return Value.NULL;
 	}
 	
 	@Override
@@ -107,7 +119,7 @@ public class EventFunction implements Event{
 			}
 		}
 		
-		this.contents.init();
+		for (Event e : this.contents) e.init();
 	}
 	
 	@Override
@@ -117,12 +129,18 @@ public class EventFunction implements Event{
 	
 	@Override
 	public void paramaterHeight(Node<Integer> pHeight, Node<Integer> mHeight) {
-		if (this.type == EventParamater.NONE) {
-			this.contents.paramaterHeight(pHeight.replace(pHeight.get(0) + 1), mHeight.replace(mHeight.get(0) + 1));
-		}else if (this.type == EventParamater.MODIFIER) {
-			this.contents.paramaterHeight(pHeight.replace(pHeight.get(0) + 1), mHeight.replace(mHeight.get(0) + 1).add(mHeight.get(0) + 1));
+		Node<Integer>
+			np = pHeight.replace(pHeight.get(0) + 1),
+			nm = mHeight.replace(mHeight.get(0) + 1);
+		
+		if (this.type == EventParamater.MODIFIER) {
+			nm = nm.add(mHeight.get(0) + 1);
 		}else if (this.type == EventParamater.PARAMATER) {
-			this.contents.paramaterHeight(pHeight.replace(pHeight.get(0) + 1).add(pHeight.get(0) + 1), mHeight.replace(mHeight.get(0) + 1));
+			np = np.add(pHeight.get(0) + 1);
+		}
+		
+		for (Event e : this.contents) {
+			e.paramaterHeight(np, nm);
 		}
 	}
 	
@@ -136,10 +154,20 @@ public class EventFunction implements Event{
 	
 	@Override
 	public String toString() {
-		return "{\n" + TokenFunction.indent(this.contents.toString()) + "\n}";
+		StringBuilder b = new StringBuilder ();
+		b.append("{\n");
+		
+		for (int i = 0; i < this.contents.length; i++) {
+			b.append('\t' + TokenFunction.indent(this.contents[i].toString()));
+			
+			if (i + 1 < this.contents.length) b.append('\n');
+		}
+		
+		b.append("\n}");
+		return b.toString();
 	}
 	
-	public static Event createScope (Event contents) {
-		return new EventCall(new EventFunction(contents, EventParamater.NONE), new EventBlock(new Event[] {}));
+	public static Event createScope (Event[] contents) {
+		return new EventCall(new EventFunction(contents, EventParamater.NONE), new EventFunction(new Event[] {}, EventParamater.NONE));
 	}
 }

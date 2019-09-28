@@ -6,7 +6,11 @@ import parser.Stream;
 
 public class TokenScope extends TokenBlock{
 	public TokenScope (Stream s) {
-		super(TokenBase.readBlock(s, ')'));
+		super(readBlock(s, ')'));
+	}
+	
+	private TokenScope (Token[] tokens) {
+		super(tokens);
 	}
 	
 	@Override
@@ -22,6 +26,10 @@ public class TokenScope extends TokenBlock{
 	
 	@Override
 	public Event createEvent() {
-		return EventFunction.createScope(super.createEvent());
+		return EventFunction.createScope(this.createEvents());
+	}
+	
+	public static Token createBase (Stream s) {
+		return new TokenScope(readBlock(s, '\0'));
 	}
 }

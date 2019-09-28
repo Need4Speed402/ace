@@ -7,7 +7,7 @@ import parser.Stream;
 
 public class TokenFunction extends TokenBlock {
 	public TokenFunction (Stream s) {
-		super(TokenBase.readBlock(s, '}'));
+		super(readBlock(s, '}'));
 	}
 	
 	public static String indent (String s) {
@@ -50,6 +50,6 @@ public class TokenFunction extends TokenBlock {
 	}
 	
 	private Event createEvent(EventParamater.Type type) {
-		return new EventFunction(super.createEvent(), type);
+		return new EventFunction(this.createEvents(), type);
 	}
 }

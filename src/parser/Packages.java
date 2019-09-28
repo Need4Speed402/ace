@@ -4,9 +4,8 @@ import java.io.File;
 import java.nio.file.Files;
 
 import event.Event;
-import event.EventFunction;
 import parser.token.Token;
-import parser.token.TokenBase;
+import parser.token.TokenScope;
 import value.Value;
 
 public class Packages {
@@ -16,7 +15,7 @@ public class Packages {
 		Token ast;
 		
 		try {
-			ast = new TokenBase(s);
+			ast = TokenScope.createBase(s);
 		}catch (ParserException e) {
 			System.out.println(name + ":" + (s.getLine() + 1) + ":" + (s.getCol() + 1) + ": " + e.getMessage());
 			
@@ -28,7 +27,7 @@ public class Packages {
 			
 			return null;
 		}else {
-			Event event = EventFunction.createScope(ast.createEvent());
+			Event event = ast.createEvent();
 			event.init();
 			event.paramaterHeight(new Node<Integer>(0), new Node<Integer>(0));
 			return event.run(Global.global);
