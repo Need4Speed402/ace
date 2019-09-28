@@ -6,13 +6,13 @@ import parser.Local;
 import parser.Node;
 import value.Value;
 
-public class EventParamater implements Event{
+public class EventParameter implements Event{
 	private final int level;
 	private final Type type;
 	
 	private int height;
 	
-	public EventParamater(int level, Type type) {
+	public EventParameter(int level, Type type) {
 		if (type == NONE) throw new IllegalArgumentException("Type cannot be null because by definition none isn't a paramater");
 		
 		this.level = level;
@@ -43,12 +43,12 @@ public class EventParamater implements Event{
 	public enum Type {
 		NONE,
 		MODIFIER,
-		PARAMATER
+		PARAMETER
 	}
 	
 	public static Type NONE = Type.NONE;
 	public static Type MODIFIER = Type.MODIFIER;
-	public static Type PARAMATER = Type.PARAMATER;
+	public static Type PARAMETER = Type.PARAMETER;
 	
 	public static Node<Integer>[] createNodeList (){
 		@SuppressWarnings("unchecked")

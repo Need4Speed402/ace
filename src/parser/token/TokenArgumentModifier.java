@@ -1,7 +1,7 @@
 package parser.token;
 
 import event.Event;
-import event.EventParamater;
+import event.EventParameter;
 
 public class TokenArgumentModifier extends Token{
 	private int level;
@@ -12,7 +12,7 @@ public class TokenArgumentModifier extends Token{
 	
 	@Override
 	public Event createEvent() {
-		return new EventParamater(this.level, EventParamater.MODIFIER);
+		return new EventParameter(this.level, EventParameter.MODIFIER);
 	}
 	
 	@Override

@@ -2,7 +2,7 @@ package parser.token;
 
 import event.Event;
 import event.EventCall;
-import event.EventParamater;
+import event.EventParameter;
 
 public class TokenImmediateArgument extends Token implements Modifier{
 	private final int level;
@@ -15,7 +15,7 @@ public class TokenImmediateArgument extends Token implements Modifier{
 	
 	@Override
 	public Event createEvent() {
-		return new EventCall(new EventParamater(level, EventParamater.PARAMATER), content.createEvent());
+		return new EventCall(new EventParameter(level, EventParameter.PARAMETER), content.createEvent());
 	}
 	
 	public Token getContent() {

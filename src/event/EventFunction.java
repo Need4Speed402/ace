@@ -15,12 +15,12 @@ public class EventFunction implements Event{
 	public static long mem, scopes;
 	
 	private final Event[] contents;
-	private final EventParamater.Type type;
+	private final EventParameter.Type type;
 	
 	private EventFunction parent;
 	public final Definition[] definitions;
 	
-	public EventFunction (Event[] contents, EventParamater.Type type) {
+	public EventFunction (Event[] contents, EventParameter.Type type) {
 		this.contents = contents;
 		this.type = type;
 		
@@ -174,9 +174,9 @@ public class EventFunction implements Event{
 	
 	public static Event createScope (Event[] contents) {
 		if (contents.length == 0) {
-			return new EventFunction(new Event[] {}, EventParamater.NONE);
+			return new EventFunction(new Event[] {}, EventParameter.NONE);
 		}else {
-			return new EventCall(new EventFunction(contents, EventParamater.NONE), new EventFunction(new Event[] {}, EventParamater.NONE));
+			return new EventCall(new EventFunction(contents, EventParameter.NONE), new EventFunction(new Event[] {}, EventParameter.NONE));
 		}
 	}
 }
