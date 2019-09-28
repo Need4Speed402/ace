@@ -56,7 +56,11 @@ public class EventFunction implements Event{
 	
 	@Override
 	public Value run(Local local) {
-		return new ValueFunction(this, local);
+		if (this.contents.length == 0) {
+			return Value.NULL;
+		}else {
+			return new ValueFunction(this, local);
+		}
 	}
 	
 	public Value run(Local local, Value paramater) {
@@ -158,7 +162,7 @@ public class EventFunction implements Event{
 		b.append("{\n");
 		
 		for (int i = 0; i < this.contents.length; i++) {
-			b.append('\t' + TokenFunction.indent(this.contents[i].toString()));
+			b.append(TokenFunction.indent(this.contents[i].toString()));
 			
 			if (i + 1 < this.contents.length) b.append('\n');
 		}
@@ -168,6 +172,10 @@ public class EventFunction implements Event{
 	}
 	
 	public static Event createScope (Event[] contents) {
-		return new EventCall(new EventFunction(contents, EventParamater.NONE), new EventFunction(new Event[] {}, EventParamater.NONE));
+		if (contents.length == 0) {
+			return new EventFunction(new Event[] {}, EventParamater.NONE);
+		}else {
+			return new EventCall(new EventFunction(contents, EventParamater.NONE), new EventFunction(new Event[] {}, EventParamater.NONE));
+		}
 	}
 }
