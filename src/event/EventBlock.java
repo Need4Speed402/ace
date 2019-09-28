@@ -37,7 +37,7 @@ public class EventBlock implements Event{
 	}
 
 	@Override
-	public void indexIdentifiers(EventScope scope, List<EventIdentifier> idnt) {
+	public void indexIdentifiers(EventFunction scope, List<EventIdentifier> idnt) {
 		for (int i = 0; i < this.events.length; i++) {
 			this.events[i].indexIdentifiers(scope, idnt);
 		}

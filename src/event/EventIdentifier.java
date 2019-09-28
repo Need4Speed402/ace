@@ -23,7 +23,7 @@ public class EventIdentifier implements Event{
 	}
 	
 	@Override
-	public void indexIdentifiers(EventScope scope, List<EventIdentifier> idnt) {
+	public void indexIdentifiers(EventFunction scope, List<EventIdentifier> idnt) {
 		idnt.add(this);
 	}
 	

@@ -8,7 +8,7 @@ import value.Value;
 
 public interface Event {
 	public Value run (Local local);
-	public void indexIdentifiers(EventScope scope, List<EventIdentifier> idnt);
+	public void indexIdentifiers(EventFunction scope, List<EventIdentifier> idnt);
 	public default void paramaterHeight (Node<Integer> pHeight, Node<Integer> mHeight) {};
 	
 	public default void init () {}

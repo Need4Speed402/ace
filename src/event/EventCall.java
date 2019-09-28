@@ -29,7 +29,7 @@ public class EventCall implements Event{
 	}
 	
 	@Override
-	public void indexIdentifiers(EventScope scope, List<EventIdentifier> idnt) {
+	public void indexIdentifiers(EventFunction scope, List<EventIdentifier> idnt) {
 		this.function.indexIdentifiers(scope, idnt);
 		this.argument.indexIdentifiers(scope, idnt);
 	}

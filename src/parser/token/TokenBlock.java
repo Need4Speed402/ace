@@ -2,7 +2,6 @@ package parser.token;
 
 import event.Event;
 import event.EventBlock;
-import event.EventNull;
 
 public class TokenBlock extends Token{
 	Token[] tokens;
@@ -50,12 +49,6 @@ public class TokenBlock extends Token{
 	
 	@Override
 	public Event createEvent() {
-		Token[] tokens = this.getTokens();
-		
-		if (tokens.length == 0) {
-			return new EventNull();
-		}else{
-			return new EventBlock(this.getEvents());
-		}
+		return new EventBlock(this.getEvents());
 	}
 }

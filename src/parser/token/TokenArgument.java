@@ -1,7 +1,7 @@
 package parser.token;
 
 import event.Event;
-import event.EventPFunc;
+import event.EventParamater;
 
 public class TokenArgument extends Token{
 	private int level;
@@ -12,7 +12,7 @@ public class TokenArgument extends Token{
 	
 	@Override
 	public Event createEvent() {
-		return new EventPFunc(this.level);
+		return new EventParamater(this.level, EventParamater.PARAMATER);
 	}
 	
 	@Override

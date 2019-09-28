@@ -2,9 +2,7 @@ package parser.token;
 
 import event.Event;
 import event.EventFunction;
-import event.EventHiddenFunction;
-import event.EventModifier;
-import event.EventNull;
+import event.EventParamater;
 import parser.Stream;
 
 public class TokenFunction extends TokenBlock {
@@ -39,27 +37,19 @@ public class TokenFunction extends TokenBlock {
 	}
 	
 	public Event createModifierEvent () {
-		if (this.getTokens().length == 0){
-			return new EventNull();
-		}else {
-			return new EventModifier(super.createEvent());
-		}
+		return this.createEvent(EventParamater.MODIFIER);
 	}
 	
 	public Event createHiddenEvent () {
-		if (this.getTokens().length == 0) {
-			return new EventNull();
-		}else {
-			return new EventHiddenFunction(super.createEvent());
-		}
+		return this.createEvent(EventParamater.NONE);
 	}
 	
 	@Override
 	public Event createEvent() {
-		if (this.getTokens().length == 0){
-			return new EventNull();
-		}else {
-			return new EventFunction(super.createEvent());
-		}
+		return this.createEvent(EventParamater.PARAMATER);
+	}
+	
+	private Event createEvent(EventParamater.Type type) {
+		return new EventFunction(super.createEvent(), type);
 	}
 }
