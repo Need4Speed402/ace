@@ -2,13 +2,14 @@ package node;
 
 import java.util.List;
 
-import parser.Local;
 import parser.LinkedNode;
+import parser.Local;
 import value.Value;
 
 public interface Node {
-	public Value run (Local local);
-	public void indexIdentifiers(NodeFunction scope, List<NodeIdentifier> idnt);
+	public Value run (Local local, LinkedNode<Value> parameters);
+	
+	public void indexIdentifiers(NodeScope scope, List<NodeIdentifier> idnt);
 	public default void paramaterHeight (LinkedNode<Integer>[] nodes) {};
 	
 	public default void init () {}
@@ -25,7 +26,12 @@ public interface Node {
 			}else if (o instanceof Node) {
 				e = (Node) o;
 			}else if (o instanceof Node[]) {
-				e = new NodeIterator((Node[]) o);
+				Node[] nodes = (Node[]) o;
+				e = new NodeBlock(new Node[] {});
+				
+				for (int ii = nodes.length - 1; ii >= 0; ii--) {
+					e = new NodeFunction(new NodeCall(new NodeCall(new NodeParameter(0, NodeParameter.NONE), nodes[ii]), e), NodeParameter.NONE);
+				}
 			}else {
 				throw new IllegalArgumentException(o.toString() + " must be either a string or an event");
 			}

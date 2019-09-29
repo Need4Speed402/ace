@@ -18,8 +18,8 @@ public class NodeCall implements Node{
 	}
 	
 	@Override
-	public Value run(Local local) {
-		return function.run(local).call(argument.run(local));
+	public Value run(Local local, LinkedNode<Value> parameters) {
+		return function.run(local, parameters).call(argument.run(local, parameters));
 	}
 	
 	@Override
@@ -29,7 +29,7 @@ public class NodeCall implements Node{
 	}
 	
 	@Override
-	public void indexIdentifiers(NodeFunction scope, List<NodeIdentifier> idnt) {
+	public void indexIdentifiers(NodeScope scope, List<NodeIdentifier> idnt) {
 		this.function.indexIdentifiers(scope, idnt);
 		this.argument.indexIdentifiers(scope, idnt);
 	}

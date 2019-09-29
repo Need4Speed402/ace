@@ -1,7 +1,8 @@
 package parser.token;
 
 import node.Node;
-import node.NodeFunction;
+import node.NodeBlock;
+import node.NodeScope;
 import parser.Stream;
 
 public class TokenScope extends TokenBlock{
@@ -26,7 +27,13 @@ public class TokenScope extends TokenBlock{
 	
 	@Override
 	public Node createEvent() {
-		return NodeFunction.createScope(this.createEvents());
+		Node[] nodes = this.createNodes();
+		
+		if (nodes.length == 0) {
+			return new NodeBlock(nodes);
+		}else {
+			return new NodeScope(new NodeBlock(nodes));
+		}
 	}
 	
 	public static Token createBase (Stream s) {

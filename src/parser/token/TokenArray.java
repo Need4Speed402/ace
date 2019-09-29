@@ -21,6 +21,6 @@ public class TokenArray extends TokenBlock{
 	
 	@Override
 	public Node createEvent() {
-		return Node.pipe("Array", "Iterator", this.createEvents());
+		return Node.pipe("Array", "Iterator", this.createNodes());
 	}
 }

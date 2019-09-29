@@ -39,14 +39,14 @@ public abstract class TokenBlock extends Token{
 		return b.toString();
 	}
 	
-	public Node[] createEvents () {
-		Node[] events = new Node[tokens.length];
+	public Node[] createNodes () {
+		Node[] nodes = new Node[tokens.length];
 		
 		for (int i = 0; i < tokens.length; i++) {
-			events[i] = tokens[i].createEvent();
+			nodes[i] = tokens[i].createEvent();
 		}
 		
-		return events;
+		return nodes;
 	}
 	
 	public static Token[] readBlock (Stream s, char terminator) {

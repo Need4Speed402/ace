@@ -2,7 +2,9 @@ package parser.token;
 
 import node.Node;
 import node.NodeFunction;
+import node.NodeBlock;
 import node.NodeParameter;
+import node.NodeScope;
 import parser.Stream;
 
 public class TokenFunction extends TokenBlock {
@@ -50,6 +52,12 @@ public class TokenFunction extends TokenBlock {
 	}
 	
 	private Node createEvent(NodeParameter.Type type) {
-		return new NodeFunction(this.createEvents(), type);
+		Node[] nodes = this.createNodes();
+		
+		if (nodes.length == 0) {
+			return new NodeBlock(nodes);
+		}else {
+			return new NodeFunction(new NodeScope(new NodeBlock(nodes)), type);
+		}
 	}
 }

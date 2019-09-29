@@ -27,10 +27,8 @@ public class LinkedNode<K> {
 	}
 	
 	public K get (int level) {
-		if (level == 0) {
-			return this.value;
-		}else {
-			return this.previous.get(level - 1);
-		}
+		LinkedNode<K> current = this;
+		while (level-- > 0) current = current.previous;
+		return current.value;
 	}
 }

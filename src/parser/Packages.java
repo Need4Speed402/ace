@@ -11,7 +11,7 @@ import value.Value;
 
 public class Packages {
 	public static final boolean PRINT_AST = false;
-	public static final boolean PRINT_EVENTS = true;
+	public static final boolean PRINT_EVENTS = false;
 	
 	public static Value load (Stream s, String name) {
 		Token ast;
@@ -37,7 +37,7 @@ public class Packages {
 				System.out.println(event);
 				return null;
 			}else {
-				return event.run(Global.global);
+				return event.run(Global.global, new LinkedNode<Value>(Value.NULL));
 			}
 		}
 	}

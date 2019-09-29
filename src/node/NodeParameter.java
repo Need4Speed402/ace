@@ -13,15 +13,13 @@ public class NodeParameter implements Node{
 	private int height;
 	
 	public NodeParameter(int level, Type type) {
-		if (type == NONE) throw new IllegalArgumentException("Type cannot be null because by definition none isn't a paramater");
-		
 		this.level = level;
 		this.type = type;
 	}
 	
 	@Override
-	public Value run(Local local) {
-		return local.getParent(this.height).paramater;
+	public Value run(Local local, LinkedNode<Value> parameters) {
+		return parameters.get(this.height);
 	}
 	
 	@Override
@@ -31,7 +29,7 @@ public class NodeParameter implements Node{
 	}
 	
 	@Override
-	public void indexIdentifiers(NodeFunction scope, List<NodeIdentifier> idnt) {}
+	public void indexIdentifiers(NodeScope scope, List<NodeIdentifier> idnt) {}
 	
 	@Override
 	public String toString() {
