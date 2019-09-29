@@ -1,26 +1,26 @@
 package parser;
 
-public class Node<K> {
+public class LinkedNode<K> {
 	public final K value;
-	public final Node<K> previous;
+	public final LinkedNode<K> previous;
 	
-	public Node (K value) {
+	public LinkedNode (K value) {
 		this.value = value;
 		this.previous = null;
 	}
 	
-	private Node (K value, Node<K> previous) {
+	private LinkedNode (K value, LinkedNode<K> previous) {
 		this.value = value;
 		this.previous = previous;
 	}
 	
-	public Node<K> add (K value){
-		return new Node<K>(value, this);
+	public LinkedNode<K> add (K value){
+		return new LinkedNode<K>(value, this);
 	}
 	
-	public Node<K> replace (K value){
+	public LinkedNode<K> replace (K value){
 		if (this.previous == null) {
-			return new Node<K>(value);
+			return new LinkedNode<K>(value);
 		}else {
 			return this.previous.add(value);
 		}

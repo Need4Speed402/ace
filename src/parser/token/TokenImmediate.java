@@ -1,7 +1,7 @@
 package parser.token;
 
-import event.Event;
-import event.EventCall;
+import node.Node;
+import node.NodeCall;
 
 public class TokenImmediate extends Token implements Modifier{
 	private final Token first, second;
@@ -16,8 +16,8 @@ public class TokenImmediate extends Token implements Modifier{
 	}
 
 	@Override
-	public Event createEvent() {
-		return new EventCall(this.first.createEvent(), this.second.createEvent());
+	public Node createEvent() {
+		return new NodeCall(this.first.createEvent(), this.second.createEvent());
 	}
 
 	@Override

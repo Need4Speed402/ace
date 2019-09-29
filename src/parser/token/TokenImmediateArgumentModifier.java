@@ -1,8 +1,8 @@
 package parser.token;
 
-import event.Event;
-import event.EventCall;
-import event.EventParameter;
+import node.Node;
+import node.NodeCall;
+import node.NodeParameter;
 
 public class TokenImmediateArgumentModifier extends Token implements Modifier{
 	private final int level;
@@ -14,8 +14,8 @@ public class TokenImmediateArgumentModifier extends Token implements Modifier{
 	}
 	
 	@Override
-	public Event createEvent() {
-		return new EventCall(new EventParameter(level, EventParameter.MODIFIER), content.createEvent());
+	public Node createEvent() {
+		return new NodeCall(new NodeParameter(level, NodeParameter.MODIFIER), content.createEvent());
 	}
 	
 	public Token getContent() {

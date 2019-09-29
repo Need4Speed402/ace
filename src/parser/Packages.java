@@ -3,14 +3,15 @@ package parser;
 import java.io.File;
 import java.nio.file.Files;
 
-import event.Event;
-import event.EventParameter;
+import node.Node;
+import node.NodeParameter;
 import parser.token.Token;
 import parser.token.TokenScope;
 import value.Value;
 
 public class Packages {
 	public static final boolean PRINT_AST = false;
+	public static final boolean PRINT_EVENTS = true;
 	
 	public static Value load (Stream s, String name) {
 		Token ast;
@@ -28,10 +29,16 @@ public class Packages {
 			
 			return null;
 		}else {
-			Event event = ast.createEvent();
+			Node event = ast.createEvent();
 			event.init();
-			event.paramaterHeight(EventParameter.createNodeList());
-			return event.run(Global.global);
+			event.paramaterHeight(NodeParameter.createNodeList());
+			
+			if (PRINT_EVENTS) {
+				System.out.println(event);
+				return null;
+			}else {
+				return event.run(Global.global);
+			}
 		}
 	}
 	

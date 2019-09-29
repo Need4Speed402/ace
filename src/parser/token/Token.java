@@ -1,7 +1,7 @@
 package parser.token;
 
-import event.Event;
+import node.Node;
 
 public abstract class Token {
-	public abstract Event createEvent ();
+	public abstract Node createEvent ();
 }

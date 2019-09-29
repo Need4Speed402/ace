@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
-import event.Event;
-import event.EventIdentifier;
+import node.Node;
+import node.NodeIdentifier;
 import value.Value;
 
 public class TokenInteger extends Token{
@@ -20,8 +20,8 @@ public class TokenInteger extends Token{
 	}
 	
 	@Override
-	public Event createEvent() {
-		return Event.pipe("Integer", "Iterator", TokenInteger.getEvents(this.number));
+	public Node createEvent() {
+		return Node.pipe("Integer", "Iterator", TokenInteger.getEvents(this.number));
 	}
 	
 	@Override
@@ -67,11 +67,11 @@ public class TokenInteger extends Token{
 		return bnumber;
 	}
 	
-	public static Event[] getEvents (boolean[] number) {
-		Event[] values = new Event[number.length];
+	public static Node[] getEvents (boolean[] number) {
+		Node[] values = new Node[number.length];
 		
 		for (int i = 0; i < values.length; i++) {
-			values[i] = new EventIdentifier(number[i] ? "true" : "false");
+			values[i] = new NodeIdentifier(number[i] ? "true" : "false");
 		}
 		
 		return values;

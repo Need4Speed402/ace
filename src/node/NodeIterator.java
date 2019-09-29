@@ -1,15 +1,15 @@
-package event;
+package node;
 
 import java.util.List;
 
 import parser.Local;
-import parser.Node;
+import parser.LinkedNode;
 import value.Value;
 
-public class EventIterator implements Event{
-	private final Event[] elements;
+public class NodeIterator implements Node{
+	private final Node[] elements;
 	
-	public EventIterator(Event[] elements) {
+	public NodeIterator(Node[] elements) {
 		this.elements = elements;
 	}
 
@@ -28,18 +28,18 @@ public class EventIterator implements Event{
 	}
 
 	@Override
-	public void indexIdentifiers(EventFunction scope, List<EventIdentifier> idnt) {
-		for (Event e : this.elements) e.indexIdentifiers(scope, idnt);
+	public void indexIdentifiers(NodeFunction scope, List<NodeIdentifier> idnt) {
+		for (Node e : this.elements) e.indexIdentifiers(scope, idnt);
 	}
 	
 	@Override
-	public void paramaterHeight(Node<Integer>[] nodes) {
-		for (Event e : this.elements) e.paramaterHeight(nodes);
+	public void paramaterHeight(LinkedNode<Integer>[] nodes) {
+		for (Node e : this.elements) e.paramaterHeight(nodes);
 	}
 	
 	@Override
 	public void init() {
-		for (Event e : this.elements) e.init();
+		for (Node e : this.elements) e.init();
 	}
 	
 	@Override

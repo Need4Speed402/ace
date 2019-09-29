@@ -1,7 +1,7 @@
 package parser.token;
 
-import event.Event;
-import event.EventFunction;
+import node.Node;
+import node.NodeFunction;
 import parser.Stream;
 
 public class TokenScope extends TokenBlock{
@@ -25,8 +25,8 @@ public class TokenScope extends TokenBlock{
 	}
 	
 	@Override
-	public Event createEvent() {
-		return EventFunction.createScope(this.createEvents());
+	public Node createEvent() {
+		return NodeFunction.createScope(this.createEvents());
 	}
 	
 	public static Token createBase (Stream s) {

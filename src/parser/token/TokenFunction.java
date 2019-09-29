@@ -1,8 +1,8 @@
 package parser.token;
 
-import event.Event;
-import event.EventFunction;
-import event.EventParameter;
+import node.Node;
+import node.NodeFunction;
+import node.NodeParameter;
 import parser.Stream;
 
 public class TokenFunction extends TokenBlock {
@@ -36,20 +36,20 @@ public class TokenFunction extends TokenBlock {
 		}
 	}
 	
-	public Event createModifierEvent () {
-		return this.createEvent(EventParameter.MODIFIER);
+	public Node createModifierEvent () {
+		return this.createEvent(NodeParameter.MODIFIER);
 	}
 	
-	public Event createHiddenEvent () {
-		return this.createEvent(EventParameter.NONE);
+	public Node createHiddenEvent () {
+		return this.createEvent(NodeParameter.NONE);
 	}
 	
 	@Override
-	public Event createEvent() {
-		return this.createEvent(EventParameter.PARAMETER);
+	public Node createEvent() {
+		return this.createEvent(NodeParameter.PARAMETER);
 	}
 	
-	private Event createEvent(EventParameter.Type type) {
-		return new EventFunction(this.createEvents(), type);
+	private Node createEvent(NodeParameter.Type type) {
+		return new NodeFunction(this.createEvents(), type);
 	}
 }

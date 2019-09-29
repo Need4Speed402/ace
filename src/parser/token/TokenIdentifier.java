@@ -1,7 +1,7 @@
 package parser.token;
 
-import event.Event;
-import event.EventIdentifier;
+import node.Node;
+import node.NodeIdentifier;
 
 public class TokenIdentifier extends Token{
 	public final String id;
@@ -22,7 +22,7 @@ public class TokenIdentifier extends Token{
 	}
 	
 	@Override
-	public Event createEvent() {
-		return new EventIdentifier(this.id);
+	public Node createEvent() {
+		return new NodeIdentifier(this.id);
 	}
 }

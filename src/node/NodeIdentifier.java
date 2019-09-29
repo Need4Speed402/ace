@@ -1,4 +1,4 @@
-package event;
+package node;
 
 import java.util.List;
 
@@ -6,11 +6,11 @@ import parser.Global;
 import parser.Local;
 import value.Value;
 
-public class EventIdentifier implements Event{
+public class NodeIdentifier implements Node{
 	public final String name;
 	public int location = -1;
 	
-	public EventIdentifier(String name) {
+	public NodeIdentifier(String name) {
 		name = name.intern();
 		
 		Global.global.define(name);
@@ -23,7 +23,7 @@ public class EventIdentifier implements Event{
 	}
 	
 	@Override
-	public void indexIdentifiers(EventFunction scope, List<EventIdentifier> idnt) {
+	public void indexIdentifiers(NodeFunction scope, List<NodeIdentifier> idnt) {
 		idnt.add(this);
 	}
 	

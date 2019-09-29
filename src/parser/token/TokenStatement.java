@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-import event.Event;
-import event.EventCall;
+import node.Node;
+import node.NodeCall;
 import parser.ParserException;
 import parser.Stream;
 import parser.TokenList;
@@ -284,7 +284,7 @@ public class TokenStatement extends TokenBlock{
 	}
 	
 	@Override
-	public Event createEvent() {
+	public Node createEvent() {
 		Token[] tokens = this.getTokens();
 		
 		if (tokens.length == 1) {
@@ -304,11 +304,11 @@ public class TokenStatement extends TokenBlock{
 		}
 		
 		@Override
-		public Event createEvent() {
+		public Node createEvent() {
 			if (this.function instanceof TokenFunction) {
-				return new EventCall(this.modifier.createEvent(), ((TokenFunction) this.function).createModifierEvent());
+				return new NodeCall(this.modifier.createEvent(), ((TokenFunction) this.function).createModifierEvent());
 			}else {
-				return new EventCall(this.modifier.createEvent(), this.function.createEvent());
+				return new NodeCall(this.modifier.createEvent(), this.function.createEvent());
 			}
 		}
 		
@@ -328,8 +328,8 @@ public class TokenStatement extends TokenBlock{
 		}
 		
 		@Override
-		public Event createEvent () {
-			return new EventCall(this.function.createEvent(), this.param.createEvent());
+		public Node createEvent () {
+			return new NodeCall(this.function.createEvent(), this.param.createEvent());
 		}
 		
 		@Override
@@ -346,7 +346,7 @@ public class TokenStatement extends TokenBlock{
 		}
 		
 		@Override
-		public Event createEvent () {
+		public Node createEvent () {
 			return this.param.createHiddenEvent();
 		}
 		

@@ -1,16 +1,16 @@
-package event;
+package node;
 
 import java.util.List;
 
 import parser.Local;
-import parser.Node;
+import parser.LinkedNode;
 import value.Value;
 
-public class EventCall implements Event{
-	private Event function;
-	private Event argument;
+public class NodeCall implements Node{
+	private Node function;
+	private Node argument;
 	
-	public EventCall (Event function, Event argument) {
+	public NodeCall (Node function, Node argument) {
 		if (function == null || argument == null) throw new NullPointerException();
 		
 		this.function = function;
@@ -29,13 +29,13 @@ public class EventCall implements Event{
 	}
 	
 	@Override
-	public void indexIdentifiers(EventFunction scope, List<EventIdentifier> idnt) {
+	public void indexIdentifiers(NodeFunction scope, List<NodeIdentifier> idnt) {
 		this.function.indexIdentifiers(scope, idnt);
 		this.argument.indexIdentifiers(scope, idnt);
 	}
 	
 	@Override
-	public void paramaterHeight(Node<Integer>[] nodes) {
+	public void paramaterHeight(LinkedNode<Integer>[] nodes) {
 		this.function.paramaterHeight(nodes);
 		this.argument.paramaterHeight(nodes);
 	}

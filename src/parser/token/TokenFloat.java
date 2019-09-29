@@ -2,7 +2,7 @@ package parser.token;
 
 import java.math.BigDecimal;
 
-import event.Event;
+import node.Node;
 
 public class TokenFloat extends Token{
 	BigDecimal decimal;
@@ -12,7 +12,7 @@ public class TokenFloat extends Token{
 	}
 
 	@Override
-	public Event createEvent() {
+	public Node createEvent() {
 		throw new RuntimeException("not implemented");
 	}
 	

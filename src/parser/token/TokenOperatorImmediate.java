@@ -1,8 +1,8 @@
 package parser.token;
 
-import event.Event;
-import event.EventCall;
-import event.EventIdentifier;
+import node.Node;
+import node.NodeCall;
+import node.NodeIdentifier;
 
 public class TokenOperatorImmediate extends Token implements Modifier{
 	private final Token token;
@@ -27,7 +27,7 @@ public class TokenOperatorImmediate extends Token implements Modifier{
 	}
 	
 	@Override
-	public Event createEvent() {
-		return new EventCall(this.token.createEvent(), new EventIdentifier('`' + this.operator + '`'));
+	public Node createEvent() {
+		return new NodeCall(this.token.createEvent(), new NodeIdentifier('`' + this.operator + '`'));
 	}
 }

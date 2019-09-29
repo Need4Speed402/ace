@@ -1,36 +1,36 @@
-package event;
+package node;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import parser.Global;
 import parser.Local;
-import parser.Node;
+import parser.LinkedNode;
 import parser.token.TokenFunction;
 import value.Value;
 import value.ValueFunction;
 import value.ValueIdentifier;
 
-public class EventFunction implements Event{
+public class NodeFunction implements Node{
 	public static long mem, scopes;
 	
-	private final Event[] contents;
-	private final EventParameter.Type type;
+	private final Node[] contents;
+	private final NodeParameter.Type type;
 	
-	private EventFunction parent;
+	private NodeFunction parent;
 	public final Definition[] definitions;
 	
-	public EventFunction (Event[] contents, EventParameter.Type type) {
+	public NodeFunction (Node[] contents, NodeParameter.Type type) {
 		this.contents = contents;
 		this.type = type;
 		
-		ArrayList<EventIdentifier> idnt = new ArrayList<>();
-		for (Event e : this.contents) e.indexIdentifiers(this, idnt);
+		ArrayList<NodeIdentifier> idnt = new ArrayList<>();
+		for (Node e : this.contents) e.indexIdentifiers(this, idnt);
 		
 		ArrayList<Definition> definitions = new ArrayList<>();
 		
 		for (int i = 0; i < idnt.size(); i++) {
-			EventIdentifier ident = idnt.get(i);
+			NodeIdentifier ident = idnt.get(i);
 			int found = -1;
 			
 			//remove duplicates
@@ -91,7 +91,7 @@ public class EventFunction implements Event{
 	@Override
 	public void init() {
 		for (Definition def : this.definitions) {
-			EventFunction parent = this.parent;
+			NodeFunction parent = this.parent;
 			int level = 0;
 			
 			main:while (parent != null) {
@@ -123,18 +123,18 @@ public class EventFunction implements Event{
 			}
 		}
 		
-		for (Event e : this.contents) e.init();
+		for (Node e : this.contents) e.init();
 	}
 	
 	@Override
-	public void indexIdentifiers(EventFunction scope, List<EventIdentifier> idnt) {
+	public void indexIdentifiers(NodeFunction scope, List<NodeIdentifier> idnt) {
 		this.parent = scope;
 	}
 	
 	@Override
-	public void paramaterHeight(Node<Integer>[] nodes) {
+	public void paramaterHeight(LinkedNode<Integer>[] nodes) {
 		@SuppressWarnings("unchecked")
-		Node<Integer>[] nn = new Node[nodes.length];
+		LinkedNode<Integer>[] nn = new LinkedNode[nodes.length];
 		
 		for (int i = 0; i < nodes.length; i++) {
 			if (i == this.type.ordinal()) {
@@ -144,7 +144,7 @@ public class EventFunction implements Event{
 			}
 		}
 		
-		for (Event e : this.contents) {
+		for (Node e : this.contents) {
 			e.paramaterHeight(nn);
 		}
 	}
@@ -172,11 +172,11 @@ public class EventFunction implements Event{
 		return b.toString();
 	}
 	
-	public static Event createScope (Event[] contents) {
+	public static Node createScope (Node[] contents) {
 		if (contents.length == 0) {
-			return new EventFunction(new Event[] {}, EventParameter.NONE);
+			return new NodeFunction(new Node[] {}, NodeParameter.NONE);
 		}else {
-			return new EventCall(new EventFunction(contents, EventParameter.NONE), new EventFunction(new Event[] {}, EventParameter.NONE));
+			return new NodeCall(new NodeFunction(contents, NodeParameter.NONE), new NodeFunction(new Node[] {}, NodeParameter.NONE));
 		}
 	}
 }

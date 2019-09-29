@@ -1,18 +1,18 @@
-package event;
+package node;
 
 import java.util.List;
 
 import parser.Local;
-import parser.Node;
+import parser.LinkedNode;
 import value.Value;
 
-public class EventParameter implements Event{
+public class NodeParameter implements Node{
 	private final int level;
 	private final Type type;
 	
 	private int height;
 	
-	public EventParameter(int level, Type type) {
+	public NodeParameter(int level, Type type) {
 		if (type == NONE) throw new IllegalArgumentException("Type cannot be null because by definition none isn't a paramater");
 		
 		this.level = level;
@@ -25,13 +25,13 @@ public class EventParameter implements Event{
 	}
 	
 	@Override
-	public void paramaterHeight(Node<Integer>[] nodes) {
-		Node<Integer> node = nodes[this.type.ordinal()];
+	public void paramaterHeight(LinkedNode<Integer>[] nodes) {
+		LinkedNode<Integer> node = nodes[this.type.ordinal()];
 		this.height = node.get(0) - node.get(this.level + 1);
 	}
 	
 	@Override
-	public void indexIdentifiers(EventFunction scope, List<EventIdentifier> idnt) {}
+	public void indexIdentifiers(NodeFunction scope, List<NodeIdentifier> idnt) {}
 	
 	@Override
 	public String toString() {
@@ -50,12 +50,12 @@ public class EventParameter implements Event{
 	public static Type MODIFIER = Type.MODIFIER;
 	public static Type PARAMETER = Type.PARAMETER;
 	
-	public static Node<Integer>[] createNodeList (){
+	public static LinkedNode<Integer>[] createNodeList (){
 		@SuppressWarnings("unchecked")
-		Node<Integer>[] nodes = new Node[Type.values().length];
+		LinkedNode<Integer>[] nodes = new LinkedNode[Type.values().length];
 		
 		for (int i = 0; i < nodes.length; i++) {
-			nodes[i] = new Node<Integer>(0);
+			nodes[i] = new LinkedNode<Integer>(0);
 		}
 		
 		return nodes;

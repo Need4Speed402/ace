@@ -1,6 +1,6 @@
 package parser.token;
 
-import event.Event;
+import node.Node;
 import parser.ParserException;
 import parser.Stream;
 import parser.TokenList;
@@ -39,8 +39,8 @@ public abstract class TokenBlock extends Token{
 		return b.toString();
 	}
 	
-	public Event[] createEvents () {
-		Event[] events = new Event[tokens.length];
+	public Node[] createEvents () {
+		Node[] events = new Node[tokens.length];
 		
 		for (int i = 0; i < tokens.length; i++) {
 			events[i] = tokens[i].createEvent();

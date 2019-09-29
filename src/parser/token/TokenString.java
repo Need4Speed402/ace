@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import event.Event;
-import event.EventCall;
-import event.EventIdentifier;
+import node.Node;
+import node.NodeCall;
+import node.NodeIdentifier;
 import parser.ParserException;
 import parser.Stream;
 import parser.TokenList;
@@ -21,25 +21,25 @@ public class TokenString extends TokenBlock{
 		super(tokens);
 	}
 	
-	public static Event[] createStringElements (String s){
-		Event[] string = new Event[s.length()];
+	public static Node[] createStringElements (String s){
+		Node[] string = new Node[s.length()];
 		
 		for (int ii = 0; ii < string.length; ii++) {
-			string[ii] = Event.pipe("Integer", "Iterator", TokenInteger.getEvents(TokenInteger.fromInt(BigInteger.valueOf(s.charAt(ii)))));
+			string[ii] = Node.pipe("Integer", "Iterator", TokenInteger.getEvents(TokenInteger.fromInt(BigInteger.valueOf(s.charAt(ii)))));
 		}
 		
 		return string;
 	}
 	
 	@Override
-	public Event createEvent() {
-		Event stack = null;
+	public Node createEvent() {
+		Node stack = null;
 		
 		for (Token t : this.getTokens()) {
 			if (stack == null) {
 				stack = t.createEvent();
 			}else {
-				stack = new EventCall(new EventCall(stack, new EventIdentifier("+")), t.createEvent());
+				stack = new NodeCall(new NodeCall(stack, new NodeIdentifier("+")), t.createEvent());
 			}
 		}
 		
@@ -81,8 +81,8 @@ public class TokenString extends TokenBlock{
 		}
 		
 		@Override
-		public Event createEvent() {
-			return Event.pipe("String", "Iterator", createStringElements(this.text));
+		public Node createEvent() {
+			return Node.pipe("String", "Iterator", createStringElements(this.text));
 		}
 		
 		@Override
