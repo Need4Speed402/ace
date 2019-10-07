@@ -6,7 +6,7 @@ import parser.Stream;
 import parser.TokenList;
 
 public abstract class TokenBlock extends Token{
-	Token[] tokens;
+	private Token[] tokens;
 	
 	public TokenBlock (Token[] tokens) {
 		this.tokens = tokens;

@@ -5,7 +5,7 @@ import node.NodeBlock;
 import node.NodeScope;
 import parser.Stream;
 
-public class TokenScope extends TokenBlock{
+public class TokenScope extends TokenBlock implements Modifier{
 	public TokenScope (Stream s) {
 		super(readBlock(s, ')'));
 	}
@@ -32,5 +32,14 @@ public class TokenScope extends TokenBlock{
 	
 	public static Token createBase (Stream s) {
 		return new TokenScope(readBlock(s, '\0'));
+	}
+	
+	@Override
+	public boolean isModifier() {
+		Token[] tokens = this.getTokens();
+		if (tokens.length != 1) return false;
+		if (!(tokens[0] instanceof TokenStatement)) return false;
+		
+		return ((TokenStatement) tokens[0]).isModifier();
 	}
 }

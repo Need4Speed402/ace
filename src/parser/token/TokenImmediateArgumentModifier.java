@@ -17,10 +17,6 @@ public class TokenImmediateArgumentModifier extends Token implements Modifier{
 	public Node createEvent() {
 		return new NodeCall(new NodeParameter(level, NodeParameter.MODIFIER), content.createEvent());
 	}
-	
-	public Token getContent() {
-		return content;
-	}
 
 	@Override
 	public String toString() {
@@ -29,5 +25,10 @@ public class TokenImmediateArgumentModifier extends Token implements Modifier{
 		for (int i = 0; i <= this.level; i++) b.append(':');
 		
 		return b.toString() + this.content.toString();
+	}
+	
+	@Override
+	public boolean isModifier() {
+		return this.content instanceof Modifier && ((Modifier) this.content).isModifier();
 	}
 }

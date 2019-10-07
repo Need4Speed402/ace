@@ -10,7 +10,7 @@ import parser.ParserException;
 import parser.Stream;
 import parser.TokenList;
 
-public class TokenStatement extends TokenBlock{
+public class TokenStatement extends TokenBlock implements Modifier{
 	public static final String operators = ".: ?,~_ @ |&! =<> +- */\\% ^ $# `";
 	public static final char[] ops = operators.replaceAll(" ", "").toCharArray();
 	public static final int[] operatorValues;
@@ -44,28 +44,17 @@ public class TokenStatement extends TokenBlock{
 		}
 	}
 	
-	public static boolean isOperator (Token t) {
-		return t instanceof TokenOperator;
+	@Override
+	public boolean isModifier() {
+		Token[] tokens = this.getTokens();
+		if (tokens.length <= 1) return false;
+		Token last = tokens[tokens.length - 1];
+		
+		return last instanceof Modifier && ((Modifier) last).isModifier();
 	}
 	
-	public static boolean isModifier (Token t) {
-		if (t instanceof Modifier) {
-			return isModifier(((Modifier) t).getContent());
-		}else if (t instanceof TokenIdentifier) {
-			String s = ((TokenIdentifier) t).getName();
-			
-			if (Stream.uppercase.indexOf(s.charAt(0)) >= 0) for (int i = 1; i < s.length(); i++) {
-				if (TokenStatement.operators.indexOf(s.charAt(i)) >= 0) {
-					continue;
-				}
-				
-				if (Stream.uppercase.indexOf(s.charAt(i)) == -1) {
-					return true;
-				}
-			}
-		}
-		
-		return false;
+	public static boolean isOperator (Token t) {
+		return t instanceof TokenOperator;
 	}
 	
 	public static boolean isSetter (Token t) {
@@ -85,30 +74,6 @@ public class TokenStatement extends TokenBlock{
 		}else {
 			return false;
 		}
-	}
-	
-	public static Token linear (Token[] tokens) {
-		Token t = tokens[0];
-		
-		for (int i = 1; i < tokens.length; i++) {
-			t = new Caller(t, tokens[i]);
-		}
-			
-		return t;
-	}
-	
-	public static Token linearModified (Token[] tokens) {
-		Token t = tokens[0];
-		
-		for (int i = 1; i < tokens.length; i++) {
-			if (i == tokens.length - 1) {
-				t = new ModifierCaller(t, tokens[i]);
-			}else {
-				t = new Caller(t, tokens[i]);
-			}
-		}
-			
-		return t;
 	}
 	
 	public static Token stage1 (Token[] tokens) {
@@ -259,24 +224,23 @@ public class TokenStatement extends TokenBlock{
 		
 		//fourth stage, look for modifiers
 		for (int i = tokens.length - 2; i >= 0; i--) {
-			if (isModifier(tokens[i])) {
-				int ii;
-				for (ii = i - 1; ii >= 0; ii--) if (isModifier(tokens[ii])) break;
+			if (tokens[i] instanceof Modifier && ((Modifier) tokens[i]).isModifier()) {
+				Token[] nt = new Token[tokens.length - 1];
+				System.arraycopy(tokens, 0, nt, 0, i);
+				nt[i] = new ModifierCaller(tokens[i], tokens[i + 1]);
+				System.arraycopy(tokens, i + 2, nt, i + 1, tokens.length - i - 2);
 				
-				if (ii == -1) {
-					return linearModified(tokens);
-				}else {
-					Token[] nt = new Token[tokens.length - (i - ii)];
-					System.arraycopy(tokens, 0, nt, 0, ii + 1);
-					nt[ii + 1] = linearModified(Arrays.copyOfRange(tokens, ii + 1, i + 2));
-					System.arraycopy(tokens, i + 2, nt, ii + 2, tokens.length - i - 2);
-					
-					return stage4(nt);
-				}
+				tokens = nt;
 			}
 		}
 		
-		return linear(tokens);
+		Token t = tokens[0];
+		
+		for (int i = 1; i < tokens.length; i++) {
+			t = new Caller(t, tokens[i]);
+		}
+			
+		return t;
 	}
 	
 	public static Token getCaller (Token[] tokens) {

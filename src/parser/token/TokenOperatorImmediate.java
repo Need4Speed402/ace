@@ -17,10 +17,6 @@ public class TokenOperatorImmediate extends Token implements Modifier{
 		return operator;
 	}
 	
-	public Token getContent() {
-		return token;
-	}
-	
 	@Override
 	public String toString() {
 		return this.operator + this.token.toString();
@@ -29,5 +25,10 @@ public class TokenOperatorImmediate extends Token implements Modifier{
 	@Override
 	public Node createEvent() {
 		return new NodeCall(this.token.createEvent(), new NodeIdentifier('`' + this.operator + '`'));
+	}
+	
+	@Override
+	public boolean isModifier() {
+		return this.token instanceof Modifier && ((Modifier) this.token).isModifier();
 	}
 }

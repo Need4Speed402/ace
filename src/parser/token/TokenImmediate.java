@@ -11,10 +11,6 @@ public class TokenImmediate extends Token implements Modifier{
 		this.second = second;
 	}
 	
-	public Token getContent() {
-		return first;
-	}
-
 	@Override
 	public Node createEvent() {
 		return new NodeCall(this.first.createEvent(), this.second.createEvent());
@@ -23,5 +19,10 @@ public class TokenImmediate extends Token implements Modifier{
 	@Override
 	public String toString() {
 		return this.first.toString() + this.second.toString();
+	}
+	
+	@Override
+	public boolean isModifier() {
+		return this.first instanceof Modifier && ((Modifier) this.first).isModifier();
 	}
 }
