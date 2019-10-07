@@ -1,0 +1,20 @@
+>console = package unsafe Console
+
+Object {
+	:this print {{
+		>str = (
+			. ~= Class ? {'Class{}'}
+			;;. ~= Object ? {'Object{}'}
+			
+			.toString
+			'null'
+		)
+		
+		str for (console put)
+	}}
+	
+	:this println {{
+		:this print .
+		console put ('`n' 0)
+	}}
+}
