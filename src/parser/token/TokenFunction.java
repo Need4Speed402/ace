@@ -55,7 +55,7 @@ public class TokenFunction extends TokenBlock {
 		Node[] nodes = this.createNodes();
 		
 		if (nodes.length == 0) {
-			return new NodeBlock(nodes);
+			return new NodeScope(new NodeBlock(nodes));
 		}else {
 			return new NodeFunction(new NodeScope(new NodeBlock(nodes)), type);
 		}

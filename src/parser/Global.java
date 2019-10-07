@@ -11,7 +11,7 @@ public class Global extends Local{
 	public final static Global global = new Global();
 	
 	public Global () {
-		super((Local) null, new ValueIdentifier[0]);
+		super(null, new ValueIdentifier[0]);
 	}
 	
 	public static String getText (Value e) {

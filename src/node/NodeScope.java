@@ -123,6 +123,12 @@ public class NodeScope implements Node{
 	
 	@Override
 	public String toString() {
-		return '(' + TokenFunction.indent(this.contents.toString()) + ')';
+		String contents = this.contents.toString();
+		
+		if (contents.isEmpty()){
+			return "()";
+		}else{
+			return "(\n" + TokenFunction.indent(contents) + "\n)";
+		}
 	}
 }

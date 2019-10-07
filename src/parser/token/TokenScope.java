@@ -27,13 +27,7 @@ public class TokenScope extends TokenBlock{
 	
 	@Override
 	public Node createEvent() {
-		Node[] nodes = this.createNodes();
-		
-		if (nodes.length == 0) {
-			return new NodeBlock(nodes);
-		}else {
-			return new NodeScope(new NodeBlock(nodes));
-		}
+		return new NodeScope(new NodeBlock(this.createNodes()));
 	}
 	
 	public static Token createBase (Stream s) {

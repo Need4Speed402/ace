@@ -27,7 +27,7 @@ public interface Node {
 				e = (Node) o;
 			}else if (o instanceof Node[]) {
 				Node[] nodes = (Node[]) o;
-				e = new NodeBlock(new Node[] {});
+				e = new NodeScope(new NodeBlock(new Node[] {}));
 				
 				for (int ii = nodes.length - 1; ii >= 0; ii--) {
 					e = new NodeFunction(new NodeCall(new NodeCall(new NodeParameter(0, NodeParameter.NONE), nodes[ii]), e), NodeParameter.NONE);
