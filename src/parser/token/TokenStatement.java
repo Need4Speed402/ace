@@ -53,35 +53,12 @@ public class TokenStatement extends TokenBlock implements Modifier{
 		return last instanceof Modifier && ((Modifier) last).isModifier();
 	}
 	
-	public static boolean isOperator (Token t) {
-		return t instanceof TokenOperator;
-	}
-	
-	public static boolean isSetter (Token t) {
-		if (t instanceof TokenOperator) {
-			String s = ((TokenOperator) t).getName();
-			
-			if (s.length() == 0) return false;
-			if (s.charAt(0) != '=') return false;
-			
-			for (int i = 1; i < s.length(); i++) {
-				char c = s.charAt(i);
-				
-				if (c == '=') return false;
-			}
-			
-			return true;
-		}else {
-			return false;
-		}
-	}
-	
 	public static Token stage1 (Token[] tokens) {
 		if (tokens.length == 1) return tokens[0];
 		
 		//first stage, check for setter operators
 		for (int i = 0; i < tokens.length; i++) {
-			if (isSetter(tokens[i])) {
+			if (tokens[i] instanceof TokenOperator && ((TokenOperator) tokens[i]).isSetter()) {
 				if (i == 0) {
 					return new Caller(tokens[i], stage1(Arrays.copyOfRange(tokens, i + 1, tokens.length)));
 				}else if (i == tokens.length - 1) {
