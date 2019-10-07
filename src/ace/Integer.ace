@@ -283,6 +283,23 @@ Class {
 	}}
 	
 	:this toString {
-		int2string :this
+		:this == 0 ? {'0'}
+		
+		>chars = '0123456789'
+		>value = :this abs
+		
+		>loop = {
+			. != 0 ? {
+				>[div; rem] = . /% 10
+				>rest = loop div
+				
+				{. (chars rem) rest}
+			}
+		}
+		
+		>str = String (Iterator (loop :this) reverse)
+		
+		:this negative ? {'-' + str}
+		str
 	}
 }

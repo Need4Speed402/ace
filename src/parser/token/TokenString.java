@@ -25,7 +25,7 @@ public class TokenString extends TokenBlock{
 		Node[] string = new Node[s.length()];
 		
 		for (int ii = 0; ii < string.length; ii++) {
-			string[ii] = Node.pipe("Integer", "Iterator", TokenInteger.getEvents(TokenInteger.fromInt(BigInteger.valueOf(s.charAt(ii)))));
+			string[ii] = Node.pipe("Integer", "Iterator", new TokenInteger.BooleanArray(s.charAt(ii)).toNodes());
 		}
 		
 		return string;

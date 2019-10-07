@@ -69,11 +69,11 @@ Class {
 		>mem = Memory newLength
 		
 		length times for {
-			mem set .index (get .index)
+			mem set . (get .)
 		}
 		
 		.length times for {
-			mem set (.index + length) (.. .index)
+			mem set (. + length) (.. .)
 		}
 		
 		Array Object {
@@ -84,23 +84,36 @@ Class {
 	
 	:this for {{
 		>cb = .
-		>index = Dynamic 0
-		
 		
 		>loop = {
-			index != length ? {
+			>index = .
+			
+			index < length ? {
 				cb (Object {
 					:this index {index}
 					{get index .}
 				})
 				
-				index =+ 1
-				loop ()
+				loop (. + 1)
 			}
 		}
 		
-		loop ()
+		loop 0
 	}}
+	
+	:this toString {
+		>str = Dynamic '['
+		
+		:this for {
+			str =+ .toString
+			
+			.index < (length - 1) ? {
+				str =+ '; '
+			}
+		}
+		
+		str + ']'
+	}
 	
 	:this (Integer) {
 		get .

@@ -9,9 +9,17 @@ Class {
 		}
 	)
 	
+	:this reverse {{
+		String (content reverse)
+	}}
+	
 	:this + {{
 		String (content + .)
 	}}
+	
+	:this toString {
+		:this
+	}
 	
 	content
 }

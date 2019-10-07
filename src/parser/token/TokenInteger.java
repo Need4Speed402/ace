@@ -2,79 +2,30 @@ package parser.token;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
 
 import node.Node;
 import node.NodeIdentifier;
 import value.Value;
 
 public class TokenInteger extends Token{
-	private final boolean[] number;
+	private final BooleanArray number;
 	
 	public TokenInteger (boolean[] number) {
-		this.number = number;
+		this.number = new BooleanArray(number);
 	}
 	
 	public TokenInteger (BigInteger number) {
-		this.number = TokenInteger.fromInt(number);
+		this.number = new BooleanArray(number);
 	}
 	
 	@Override
 	public Node createEvent() {
-		return Node.pipe("Integer", "Iterator", TokenInteger.getEvents(this.number));
+		return Node.pipe("Integer", "Iterator", this.number.toNodes());
 	}
 	
 	@Override
 	public String toString() {
-		return TokenInteger.getInt(this.number).toString();
-	}
-	
-	public static boolean[] fromInt (BigInteger number) {
-		byte[] bytes = number.toByteArray();
-		ArrayList<Boolean> vals = new ArrayList<Boolean>();
-		
-		boolean negative = number.signum() == -1;
-		
-		int num = 0;
-		for (int i = 0; i < bytes.length * 8; i++) {
-			boolean bit = (bytes[bytes.length - 1 - (i >> 3)] & (1 << (i & 0x7))) == 0 ? false : true;
-			
-			if (negative) {
-				if (bit) {
-					num++;
-				}else {
-					while (num > 0) {num--; vals.add(true);};
-					vals.add(false);
-				}
-			}else {
-				if (!bit) {
-					num++;
-				}else {
-					while (num > 0) {num--; vals.add(false);};
-					vals.add(true);
-				}
-			}
-		}
-		
-		if (!negative) {
-			vals.add(false);
-		}else {
-			vals.add(true);
-		}
-	
-		boolean[] bnumber = new boolean[vals.size()];
-		for (int i = 0; i < vals.size(); i++) bnumber[i] = vals.get(i);
-		return bnumber;
-	}
-	
-	public static Node[] getEvents (boolean[] number) {
-		Node[] values = new Node[number.length];
-		
-		for (int i = 0; i < values.length; i++) {
-			values[i] = new NodeIdentifier(number[i] ? "true" : "false");
-		}
-		
-		return values;
+		return this.number.toString();
 	}
 	
 	public static BigInteger getInt (Value v) {
@@ -95,10 +46,6 @@ public class TokenInteger extends Token{
 		});
 		
 		return arr.getInt();
-	}
-	
-	public static BigInteger getInt (boolean[] number) {
-		return new BooleanArray(number).getInt();
 	}
 	
 	public static Object parseNumber (String ident) {
@@ -163,12 +110,47 @@ public class TokenInteger extends Token{
 		private int length;
 		
 		public BooleanArray (){
-			array = new boolean[16];
+			this.array = new boolean[16];
+			this.length = 0;
 		}
 		
 		public BooleanArray (boolean[] arr) {
 			this.array = arr;
 			this.length = arr.length;
+		}
+		
+		public BooleanArray (long l) {
+			this(BigInteger.valueOf(l));
+		}
+		
+		public BooleanArray (BigInteger number) {
+			this();
+			
+			byte[] bytes = number.toByteArray();
+			boolean negative = number.signum() == -1;
+			
+			int num = 0;
+			for (int i = 0; i < bytes.length * 8; i++) {
+				boolean bit = (bytes[bytes.length - 1 - (i >> 3)] & (1 << (i & 0x7))) == 0 ? false : true;
+				
+				if (negative) {
+					if (bit) {
+						num++;
+					}else {
+						while (num > 0) {num--; this.add(true);};
+						this.add(false);
+					}
+				}else {
+					if (!bit) {
+						num++;
+					}else {
+						while (num > 0) {num--; this.add(false);};
+						this.add(true);
+					}
+				}
+			}
+			
+			this.add(negative);
 		}
 		
 		public int size () {
@@ -192,6 +174,16 @@ public class TokenInteger extends Token{
 			return array;
 		}
 		
+		public Node[] toNodes () {
+			Node[] values = new Node[this.length];
+			
+			for (int i = 0; i < values.length; i++) {
+				values[i] = new NodeIdentifier(this.array[i] ? "true" : "false");
+			}
+			
+			return values;
+		}
+		
 		public boolean get (int i) {
 			if (length == 0) {
 				return false;
@@ -205,11 +197,21 @@ public class TokenInteger extends Token{
 		public BigInteger getInt () {
 			byte[] bytes = new byte[(length >> 3) + ((length & 0x7) == 0 ? 0 : 1)];
 			
-			for (int i = 0; i < bytes.length * 8; i++) {
-				bytes[bytes.length - 1 - (i >> 3)] |= ((get(i) ? 1 : 0) << (i & 0x7));
+			if (bytes.length == 0) {
+				System.out.println("Warning num 0 len");
+				return BigInteger.ZERO;
+			}else {
+				for (int i = 0; i < bytes.length * 8; i++) {
+					bytes[bytes.length - 1 - (i >> 3)] |= ((get(i) ? 1 : 0) << (i & 0x7));
+				}
+				
+				return new BigInteger(bytes);
 			}
-			
-			return new BigInteger(bytes);
+		}
+		
+		@Override
+		public String toString() {
+			return this.getInt().toString();
 		}
 	}
 }
