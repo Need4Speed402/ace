@@ -1,4 +1,4 @@
->Memory = package unsafe Memory
+>Memory = unsafe Memory
 
 Class {
 	>length = :length

@@ -1,4 +1,4 @@
->Modifiable = package unsafe bootstrap Modifiable
+>Modifiable = unsafe bootstrap Modifiable
 
 Class {
 	:this for {{

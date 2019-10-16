@@ -1,4 +1,4 @@
->console = package unsafe Console
+>console = unsafe Console
 
 Object {
 	:this print {{

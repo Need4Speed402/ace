@@ -7,13 +7,13 @@
 	>stripActive = Dynamic true
 	
 	>callfn = {
-		fn (Object {
+		fn Object {
 			>first = *first
 			>second = *second
 			
 			:this first {first}
 			:this second {second}
-		})
+		}
 	}
 	
 	>loop = {{

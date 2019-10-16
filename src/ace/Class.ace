@@ -1,25 +1,35 @@
->Identifier = package unsafe ID
->cmp = package unsafe bootstrap IdentCompare
->Modifiable = package unsafe bootstrap Modifiable
+>Identifier = unsafe ID
+>cmp = unsafe bootstrap IdentCompare
+>isIdentifier = unsafe bootstrap IdentDiscover
+>Modifiable = unsafe bootstrap Modifiable
 
 >createNode = {{{
 	>next = Modifiable ...
 	>cb = {{.... .}}
 	
 	{
+		>cmpFunc = (
+			(isIdentifier) .. {
+				(cmp) . ... cb
+			} {
+				. ~= ... ? cb
+			}
+		)
+		
 		cmp . defined {{{..()}}}
-		cmp . cmp {{
-			(cmp) . .... cb
-			. ~= .... ? cb
-		}}
+		cmp . cmp {cmpFunc}
 		cmp . next {next}
 	}
 }}}
 
+>asbool = {
+	. true false
+}
+
 >classcid = Identifier ()
 
 >class~ = {
-	classcid .cid | (Object cid .cid)
+	asbool (classcid .cid) | asbool (Object cid .cid)
 }
 
 >Class = {
@@ -27,6 +37,7 @@
 	(cmp) . cid {classcid}
 	
 	>id = Identifier ()
+	>instance = {}
 	
 	>constructor = {
 		cmp . ~= {class~}
@@ -63,7 +74,7 @@
 			
 			{
 				(cmp) . ~= {{
-					Object cid .cid
+					asbool (Object cid .cid)
 				}}
 			}
 		)
@@ -77,16 +88,16 @@
 				>node = .
 				
 				node defined {
-					..cmp ...
+					node cmp ...
 					
-					search (.. next get)
+					search (node next get)
 				} {
 					default
 				}
 			}
 			
 			(cmp) . ~= {{
-				id .cid ? {true}
+				asbool (id .cid) ? {true}
 				search (node get) .. .
 			}}
 			
