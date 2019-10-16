@@ -1,29 +1,30 @@
->Modifiable = unsafe bootstrap Modifiable
-
 Class {
-	>value = Modifiable :
+	>value = :
+	
+	>set = >value =
+	>get = {value}
 	
 	:this `*` {
-		value get
+		get()
 	}
 	
 	:this = {{
 		(. ~= Dynamic) ?? {
-			value set *.
+			set *.
 	 	} ~ {
-	 		value set (.)
+	 		set (.)
 		}
 	}}
 	
 	:this =+ {{
-		value set (value get + .)
+		set (get() + .)
 	}}
 	
 	:this =- {{
-		value set (value get - .)
+		set (get() - .)
 	}}
 	
 	{
-		value get .
+		get() .
 	}
 }

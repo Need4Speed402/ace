@@ -1,7 +1,16 @@
 >Identifier = unsafe ID
 >cmp = unsafe bootstrap IdentCompare
 >isIdentifier = unsafe bootstrap IdentDiscover
->Modifiable = unsafe bootstrap Modifiable
+
+>Modifiable = {
+	>set = >value =
+	set .
+	
+	{
+		(cmp) . set {set}
+		(cmp) . get {value}
+	}
+}
 
 >createNode = {{{
 	>next = Modifiable ...
