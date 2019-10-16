@@ -39,14 +39,12 @@ public class ValueIdentifier implements Value {
 	
 	@Override
 	public Value call(Value p) {
-		if (Value.compare(p, "`>`")){
+		if (Value.compare(p, "`<`")) {
+			return this.getReference();
+		}else if (Value.compare(p, "`>`")){
 			return p2 -> {
 				if (Value.compare(p2, "=")) return p3 -> {
-					if (p3 instanceof ValueIdentifier) {
-						this.referenced = ((ValueIdentifier) p3).getReference();
-					}else {
-						this.referenced = p3;
-					}
+					this.referenced = p3;
 					
 					return Value.NULL;
 				};

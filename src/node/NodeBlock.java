@@ -19,7 +19,8 @@ public class NodeBlock implements Node{
 		for (int i = 0; i < this.contents.length; i++) {
 			Value v = this.contents[i].run(local, parameters);
 			
-			if (v instanceof ValueIdentifier) v = ((ValueIdentifier) v).getReference();
+			while (v instanceof ValueIdentifier) v = ((ValueIdentifier) v).getReference();
+			
 			if (v != Value.NULL) return v;
 		}
 		
