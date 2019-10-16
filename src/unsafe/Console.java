@@ -14,6 +14,11 @@ public class Console implements Value{
 			};
 		}else if (Value.compare(v, "test")) {
 			System.out.println("Test print");
+		}else if (Value.compare(v, "print")) {
+			return p -> {
+				System.out.println(p.toString() + (p == Value.NULL ? "[null]" : ""));
+				return Value.NULL;
+			};
 		}
 		
 		return Value.NULL;

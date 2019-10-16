@@ -3,7 +3,6 @@ package node;
 import java.util.ArrayList;
 import java.util.List;
 
-import parser.Global;
 import parser.LinkedNode;
 import parser.Local;
 import parser.token.TokenFunction;
@@ -66,7 +65,7 @@ public class NodeScope implements Node{
 	}
 	
 	@Override
-	public void init() {
+	public void init(Local global) {
 		for (Definition def : this.definitions) {
 			NodeScope parent = this.parent;
 			int level = 0;
@@ -88,7 +87,7 @@ public class NodeScope implements Node{
 			
 			//look in global scope
 			if (def.level < 0) {
-				ValueIdentifier[] idents = Global.global.scope;
+				ValueIdentifier[] idents = global.scope;
 				
 				for(int i = 0; i < idents.length; i++) {
 					if (idents[i].id == def.name) {
@@ -100,12 +99,16 @@ public class NodeScope implements Node{
 			}
 		}
 		
-		this.contents.init();
+		this.contents.init(global);
 	}
 	
 	@Override
 	public void indexIdentifiers(NodeScope scope, List<NodeIdentifier> idnt) {
-		this.parent = scope;
+		if (scope == null) {
+			this.contents.indexIdentifiers(scope, idnt);
+		}else{
+			this.parent = scope;
+		}
 	}
 	
 	@Override

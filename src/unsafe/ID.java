@@ -1,6 +1,5 @@
 package unsafe;
 
-import parser.Global;
 import value.Value;
 
 public class ID implements Value{
@@ -13,7 +12,7 @@ public class ID implements Value{
 	public static class IDValue implements Value {
 		@Override
 		public Value call(Value p) {
-			return p == this ? Global.TRUE : Global.FALSE;
+			return p == this ? p1 -> p2 -> p1 : p1 -> p2 -> p2;
 		}
 	}
 }

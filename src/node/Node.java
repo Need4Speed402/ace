@@ -12,7 +12,7 @@ public interface Node {
 	public void indexIdentifiers(NodeScope scope, List<NodeIdentifier> idnt);
 	public default void paramaterHeight (LinkedNode<Integer>[] nodes) {};
 	
-	public default void init () {}
+	public void init (Local global);
 	
 	public static Node pipe (Object ... objects) {
 		Node ret = null;

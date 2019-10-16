@@ -23,9 +23,9 @@ public class NodeCall implements Node{
 	}
 	
 	@Override
-	public void init() {
-		this.function.init();
-		this.argument.init();
+	public void init(Local global) {
+		this.function.init(global);
+		this.argument.init(global);
 	}
 	
 	@Override

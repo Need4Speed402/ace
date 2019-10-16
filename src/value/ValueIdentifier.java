@@ -5,8 +5,8 @@ public class ValueIdentifier implements Value {
 	private Value referenced;
 	private final ValueIdentifier parent;
 	
-	public ValueIdentifier (String id) {
-		this(id, null, null);
+	public ValueIdentifier (String id, Value referenced) {
+		this(id, null, referenced);
 	}
 	
 	public ValueIdentifier(ValueIdentifier parent) {
@@ -23,7 +23,6 @@ public class ValueIdentifier implements Value {
 		ValueIdentifier i = this;
 		
 		while (true) {
-			if (i == null) return false;
 			if (i.referenced != null) return true;
 			i = i.parent;
 		}
@@ -33,7 +32,6 @@ public class ValueIdentifier implements Value {
 		ValueIdentifier i = this;
 		
 		while (true) {
-			if (i == null) return Value.NULL;
 			if (i.referenced != null) return i.referenced;
 			i = i.parent;
 		}
@@ -43,30 +41,21 @@ public class ValueIdentifier implements Value {
 	public Value call(Value p) {
 		if (Value.compare(p, "`>`")){
 			return p2 -> {
-				if (this.referenced != null) {
-					return this.referenced.call(p2);
-				}
+				if (Value.compare(p2, "=")) return p3 -> {
+					if (p3 instanceof ValueIdentifier) {
+						this.referenced = ((ValueIdentifier) p3).getReference();
+					}else {
+						this.referenced = p3;
+					}
+					
+					return Value.NULL;
+				};
 				
-				if (Value.compare(p2, "=")) {
-					return p3 -> {
-						this.setReference(p3);
-						return Value.NULL;
-					};
-				}
-				
-				return Value.NULL;
+				return this.referenced.call(p2);
 			};
 		}else{
 			return this.getReference().call(p);
 		}
-	}
-	
-	public void setReference (Value v) {
-		if (v instanceof ValueIdentifier) {
-			v = ((ValueIdentifier) v).getReference();
-		}
-		
-		this.referenced = v;
 	}
 	
 	@Override

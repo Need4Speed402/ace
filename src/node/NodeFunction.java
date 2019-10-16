@@ -26,8 +26,8 @@ public class NodeFunction implements Node{
 	}
 	
 	@Override
-	public void init() {
-		this.contents.init();
+	public void init(Local global) {
+		this.contents.init(global);
 	}
 	
 	@Override

@@ -2,7 +2,6 @@ package node;
 
 import java.util.List;
 
-import parser.Global;
 import parser.LinkedNode;
 import parser.Local;
 import value.Value;
@@ -12,15 +11,15 @@ public class NodeIdentifier implements Node{
 	public int location = -1;
 	
 	public NodeIdentifier(String name) {
-		name = name.intern();
-		
-		Global.global.define(name);
-		this.name = name;
+		this.name = name.intern();
 	}
 	
 	@Override
+	public void init(Local global) {}
+	
+	@Override
 	public Value run(Local local, LinkedNode<Value> parameters) {
-		return local.scope[location];
+		return local.scope[this.location];
 	}
 	
 	@Override

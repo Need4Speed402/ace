@@ -18,6 +18,9 @@ public class NodeParameter implements Node{
 	}
 	
 	@Override
+	public void init(Local global) {}
+	
+	@Override
 	public Value run(Local local, LinkedNode<Value> parameters) {
 		return parameters.get(this.height);
 	}
