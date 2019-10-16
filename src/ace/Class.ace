@@ -1,6 +1,6 @@
 >Identifier = unsafe ID
->cmp = unsafe bootstrap IdentCompare
->isIdentifier = unsafe bootstrap IdentDiscover
+>cmp = unsafe identifier IdentCompare
+>isIdentifier = unsafe identifier IdentDiscover
 
 >Modifiable = {
 	>set = >value =
