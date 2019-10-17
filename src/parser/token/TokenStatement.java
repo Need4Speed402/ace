@@ -307,7 +307,7 @@ public class TokenStatement extends TokenBlock implements Modifier{
 			if (s.isNext(")]}".toCharArray())) break;
 			if (s.next(Stream.whitespace)) continue;
 			
-			tokens.push(TokenStatement.readImmeditates(s));
+			tokens.push(TokenStatement.readImmediates(s));
 		}
 		
 		if (tokens.size() == 0) throw new ParserException("tokens size cannot be 0");
@@ -315,15 +315,34 @@ public class TokenStatement extends TokenBlock implements Modifier{
 		return tokens.toArray();
 	}
 	
-	private static Token combine (Token a, Token b) {
-		if (b == null) {
-			return a;
+	public static Token readRemaining (Token last, Stream s) {
+		if (s.next(':')) {
+			Token next = readImmediates(s);
+			
+			if (next == null) {
+				while (s.next(Stream.whitespace));
+				next = readImmediates(s);
+				
+				if (next == null) throw new ParserException("Incomplete function definition");
+				
+				return new TokenNamedFunction(last, next);
+			}else {
+				next = new TokenImmediate(last, next);
+			}
+			
+			return next;
 		}else {
-			return new TokenImmediate(a, b);
+			Token next = readImmediates(s);
+			
+			if (next == null) {
+				return last;
+			}else {
+				return new TokenImmediate(last, next);
+			}
 		}
 	}
 	
-	public static Token readImmeditates (Stream s) {
+	public static Token readImmediates (Stream s) {
 		while (s.hasChr()) {
 			if (s.isNext(Stream.whitespace)) break;
 			if (s.isNext(";)]}".toCharArray())) break;
@@ -332,7 +351,7 @@ public class TokenStatement extends TokenBlock implements Modifier{
 				int count = 0;
 				while (s.next(':')) count++;
 				
-				Token next = readImmeditates(s);
+				Token next = readImmediates(s);
 				
 				if (next == null) {
 					return new TokenArgumentModifier(count);
@@ -345,7 +364,7 @@ public class TokenStatement extends TokenBlock implements Modifier{
 				int count = 0;
 				while (s.next('.')) count++;
 				
-				Token next = readImmeditates(s);
+				Token next = readImmediates(s);
 				
 				if (next == null) {
 					return new TokenArgument(count);
@@ -358,7 +377,7 @@ public class TokenStatement extends TokenBlock implements Modifier{
 				StringBuilder operator = new StringBuilder();
 				while (!s.isNext('.', ':') && s.isNext(ops)) operator.append(s.chr());
 				
-				Token next = readImmeditates(s);
+				Token next = readImmediates(s);
 				
 				if (next == null) {
 					return new TokenOperator(operator.toString());
@@ -367,27 +386,27 @@ public class TokenStatement extends TokenBlock implements Modifier{
 				}
 			}
 			
-			if (s.next('(')) return combine(new TokenScope(s), readImmeditates(s));
-			if (s.next('{')) return combine(new TokenFunction(s), readImmeditates(s));
-			if (s.next('[')) return combine(new TokenArray(s), readImmeditates(s));
-			if (s.next('"')) return combine(TokenString.readEscapedString(s), readImmeditates(s));
-			if (s.next('\'')) return combine (TokenString.readString(s), readImmeditates(s));
+			if (s.next('(')) return readRemaining(new TokenScope(s), s);
+			if (s.next('{')) return readRemaining(new TokenFunction(s), s);
+			if (s.next('[')) return readRemaining(new TokenArray(s), s);
+			if (s.next('"')) return readRemaining(TokenString.readEscapedString(s), s);
+			if (s.next('\'')) return readRemaining(TokenString.readString(s), s);
 			
 			{
 				StringBuilder ident = new StringBuilder();
 				
-				while (s.hasChr() && !s.isNext(Stream.whitespace) && !s.isNext("()[]{}'\";".toCharArray())) ident.append(s.chr());
+				while (s.hasChr() && !s.isNext(Stream.whitespace) && !s.isNext("()[]{}'\";:".toCharArray())) ident.append(s.chr());
 				
 				Object number = TokenInteger.parseNumber(ident.toString());
 				
 				if (number != null) {
 					if (number instanceof BigInteger) {
-						return combine(new TokenInteger((BigInteger) number), readImmeditates(s));
+						return readRemaining(new TokenInteger((BigInteger) number), s);
 					}else if (number instanceof BigDecimal) {
-						return combine(new TokenFloat((BigDecimal) number), readImmeditates(s));
+						return readRemaining(new TokenFloat((BigDecimal) number), s);
 					}
 				}else{
-					return combine(new TokenIdentifier(ident.toString()), readImmeditates(s));
+					return readRemaining(new TokenIdentifier(ident.toString()), s);
 				}
 			}
 		}

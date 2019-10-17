@@ -1,5 +1,3 @@
->Modifiable = unsafe bootstrap Modifiable
-
 Class {
 	:this for {{
 		>cb = .
@@ -31,15 +29,15 @@ Class {
 	}
 	
 	:this reverse {
-		>current = Modifiable ()
+		>current = Dynamic ()
 		
 		:this for {
-			>cur = current get
+			>cur = *current
 			
-			current set {. .. (cur)}
+			current =\ {. .. (cur)}
 		}
 		
-		Iterator (current get)
+		Iterator *current
 	}
 	
 	:this zip {{

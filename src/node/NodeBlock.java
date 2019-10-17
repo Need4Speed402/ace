@@ -10,7 +10,7 @@ import value.ValueIdentifier;
 public class NodeBlock implements Node{
 	private final Node[] contents;
 	
-	public NodeBlock(Node[] contents) {
+	public NodeBlock(Node ... contents) {
 		this.contents = contents;
 	}
 	

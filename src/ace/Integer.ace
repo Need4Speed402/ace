@@ -293,7 +293,7 @@ Class {
 				>[div; rem] = . /% 10
 				>rest = loop div
 				
-				{. (chars rem) rest}
+				{. (chars rem) (rest)}
 			}
 		}
 		

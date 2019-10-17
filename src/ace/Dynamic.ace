@@ -1,11 +1,9 @@
 Class {
 	>value = :
-	
 	>set = >value =
-	>get = {value}
 	
 	:this `*` {
-		get()
+		<value
 	}
 	
 	:this = {{
@@ -16,15 +14,19 @@ Class {
 		}
 	}}
 	
+	:this =\ {{
+		set .
+	}}
+	
 	:this =+ {{
-		set (get() + .)
+		set (<value + .)
 	}}
 	
 	:this =- {{
-		set (get() - .)
+		set (<value - .)
 	}}
 	
 	{
-		get() .
+		<value .
 	}
 }

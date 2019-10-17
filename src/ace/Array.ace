@@ -119,6 +119,18 @@ Class {
 		get .
 	}
 	
+	:this iterator {
+		>walk = {
+			>index = .
+			
+			index == length !? {
+				{. (get index) (walk (index + 1))}
+			}
+		}
+		
+		Iterator (walk 0)
+	}
+	
 	(
 		>walk = {
 			>index = .
