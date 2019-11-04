@@ -11,7 +11,7 @@ import parser.Stream;
 import parser.TokenList;
 
 public class TokenStatement extends TokenBlock implements Modifier{
-	public static final String operators = ".: ?,~_ @ |&! =<> +- */\\% ^ $# `";
+	public static final String operators = "= ?.,_ @ |&! ~:<> +- */\\% ^ $# `";
 	public static final char[] ops = operators.replaceAll(" ", "").toCharArray();
 	public static final int[] operatorValues;
 	
@@ -51,25 +51,6 @@ public class TokenStatement extends TokenBlock implements Modifier{
 		Token last = tokens[tokens.length - 1];
 		
 		return last instanceof Modifier && ((Modifier) last).isModifier();
-	}
-	
-	public static Token stage1 (Token[] tokens) {
-		if (tokens.length == 1) return tokens[0];
-		
-		//first stage, check for setter operators
-		for (int i = 0; i < tokens.length; i++) {
-			if (tokens[i] instanceof TokenOperator && ((TokenOperator) tokens[i]).isSetter()) {
-				if (i == 0) {
-					return new Caller(tokens[i], stage1(Arrays.copyOfRange(tokens, i + 1, tokens.length)));
-				}else if (i == tokens.length - 1) {
-					return new Caller(stage2(Arrays.copyOfRange(tokens, 0, i)), tokens[i]);
-				}else {
-					return new Caller(new Caller(stage2(Arrays.copyOfRange(tokens, 0, i)), tokens[i]), stage1(Arrays.copyOfRange(tokens, i + 1, tokens.length)));
-				}
-			}
-		}
-		
-		return stage2(tokens);
 	}
 	
 	public static int comparePrecedence (Token c, Token r) {
@@ -129,23 +110,7 @@ public class TokenStatement extends TokenBlock implements Modifier{
 		}
 	}
 	
-	public static Token stage2 (Token[] tokens) {
-		if (tokens.length == 1) return tokens[0];
-		
-		tokens = Arrays.copyOf(tokens, tokens.length);
-		
-		for (int i = 1; i < tokens.length; i++) {
-			if (tokens[i] instanceof TokenFunction) {
-				if (tokens[i - 1] instanceof TokenOperator && (i + 1 == tokens.length || tokens[i + 1] instanceof TokenOperator)) {
-					tokens[i] = new HiddenFunction((TokenFunction) tokens[i]);
-				}
-			}
-		}
-		
-		return stage3(tokens);
-	}
-	
-	public static Token stage3 (Token[] tokens) {
+	public static Token operatorPrecedence (Token[] tokens) {
 		if (tokens.length == 1) return tokens[0];
 		
 		//find lowest precedence
@@ -164,11 +129,12 @@ public class TokenStatement extends TokenBlock implements Modifier{
 			}
 		}
 		
-		if (string) return stage4(tokens);
+		if (string) return modifierPrecedence(tokens);
 		
 		int ii = 0;
 		Token out = null;
 		
+		//splits token list at lowest precedence operator
 		for (int i = 0; i < tokens.length; i++) {
 			if (comparePrecedence(tokens[i], current) == 0) {
 				if (i == 0) {
@@ -176,9 +142,9 @@ public class TokenStatement extends TokenBlock implements Modifier{
 				}else {
 					if (ii != i) {
 						if (out == null) {
-							out = stage3(Arrays.copyOfRange(tokens, ii, i));
+							out = operatorPrecedence(Arrays.copyOfRange(tokens, ii, i));
 						}else {
-							out = new Caller(out, stage3(Arrays.copyOfRange(tokens, ii, i)));
+							out = new Caller(out, operatorPrecedence(Arrays.copyOfRange(tokens, ii, i)));
 						}
 					}
 					
@@ -190,21 +156,25 @@ public class TokenStatement extends TokenBlock implements Modifier{
 		}
 		
 		if (ii != tokens.length) {
-			out = new Caller(out, stage3(Arrays.copyOfRange(tokens, ii, tokens.length)));
+			out = new Caller(out, operatorPrecedence(Arrays.copyOfRange(tokens, ii, tokens.length)));
 		}
 		
 		return out;
 	}
 	
-	public static Token stage4 (Token[] tokens) {
-		if (tokens.length == 1) return tokens[0];
-		
-		//fourth stage, look for modifiers
+	public static Token modifierPrecedence (Token[] tokens) {
 		for (int i = tokens.length - 2; i >= 0; i--) {
-			if (tokens[i] instanceof Modifier && ((Modifier) tokens[i]).isModifier()) {
+			if (tokens[i] instanceof TokenEnvironmentDefinition) {
 				Token[] nt = new Token[tokens.length - 1];
 				System.arraycopy(tokens, 0, nt, 0, i);
-				nt[i] = new ModifierCaller(tokens[i], tokens[i + 1]);
+				nt[i] = new Caller(((TokenEnvironmentDefinition) tokens[i]).getParamater(), new TokenEnvironment(tokens[i + 1]));
+				System.arraycopy(tokens, i + 2, nt, i + 1, tokens.length - i - 2);
+				
+				tokens = nt;
+			}else if (tokens[i] instanceof Modifier && ((Modifier) tokens[i]).isModifier()) {
+				Token[] nt = new Token[tokens.length - 1];
+				System.arraycopy(tokens, 0, nt, 0, i);
+				nt[i] = new Caller(tokens[i], tokens[i + 1]);
 				System.arraycopy(tokens, i + 2, nt, i + 1, tokens.length - i - 2);
 				
 				tokens = nt;
@@ -221,7 +191,7 @@ public class TokenStatement extends TokenBlock implements Modifier{
 	}
 	
 	public static Token getCaller (Token[] tokens) {
-		return stage1(tokens);
+		return operatorPrecedence(tokens);
 	}
 	
 	@Override
@@ -232,30 +202,6 @@ public class TokenStatement extends TokenBlock implements Modifier{
 			return tokens[0].createEvent();
 		}else {
 			return getCaller(tokens).createEvent();
-		}
-	}
-	
-	private static class ModifierCaller extends Token {
-		Token modifier;
-		Token function;
-		
-		public ModifierCaller (Token modifier, Token function) {
-			this.modifier = modifier;
-			this.function = function;
-		}
-		
-		@Override
-		public Node createEvent() {
-			if (this.function instanceof TokenFunction) {
-				return new NodeCall(this.modifier.createEvent(), ((TokenFunction) this.function).createModifierEvent());
-			}else {
-				return new NodeCall(this.modifier.createEvent(), this.function.createEvent());
-			}
-		}
-		
-		@Override
-		public String toString() {
-			return "(" + this.modifier.toString() + " " + this.function.toString() + ")";
 		}
 	}
 	
@@ -279,24 +225,6 @@ public class TokenStatement extends TokenBlock implements Modifier{
 		}
 	}
 	
-	private static class HiddenFunction extends Token {
-		TokenFunction param;
-		
-		public HiddenFunction (TokenFunction param) {
-			this.param = param;
-		}
-		
-		@Override
-		public Node createEvent () {
-			return this.param.createHiddenEvent();
-		}
-		
-		@Override
-		public String toString () {
-			return this.param.toString();
-		}
-	}
-	
 	public static Token[] readStatement (Stream s) {
 		TokenList tokens = new TokenList();
 		
@@ -315,103 +243,72 @@ public class TokenStatement extends TokenBlock implements Modifier{
 		return tokens.toArray();
 	}
 	
-	public static Token readRemaining (Token last, Stream s) {
-		if (s.next(':')) {
-			Token next = readImmediates(s);
+	public static Token readImmediate (Stream s) {
+		if (!s.hasChr() || s.isNext(Stream.whitespace)) return null;
+		
+		if (s.isNext(ops)) {
+			StringBuilder operator = new StringBuilder();
+			while (s.isNext(ops)) operator.append(s.chr());
+			
+			Token next = readImmediate(s);
 			
 			if (next == null) {
-				while (s.next(Stream.whitespace));
-				next = readImmediates(s);
-				
-				if (next == null) throw new ParserException("Incomplete function definition");
-				
-				return new TokenNamedFunction(last, next);
+				return new TokenOperator(operator.toString());
 			}else {
-				next = new TokenImmediate(last, next);
+				return new TokenOperatorImmediate(operator.toString(), next);
+			}
+		}
+		
+		if (s.next('(')) return new TokenScope(s);
+		if (s.next('{')) return new TokenEnvironment(s);
+		if (s.next('[')) return new TokenArray(s);
+		if (s.next('"')) return TokenString.readEscapedString(s);
+		if (s.next('\'')) return TokenString.readString(s);
+		
+		{
+			StringBuilder ident = new StringBuilder();
+			
+			while (s.hasChr() && !s.isNext(Stream.whitespace) && !s.isNext("()[]{}'\";:".toCharArray())) ident.append(s.chr());
+			
+			Object number = TokenInteger.parseNumber(ident.toString());
+			
+			if (number != null && number instanceof BigInteger) {
+				return new TokenInteger((BigInteger) number);
 			}
 			
-			return next;
-		}else {
-			Token next = readImmediates(s);
-			
-			if (next == null) {
-				return last;
-			}else {
-				return new TokenImmediate(last, next);
+			if (number != null && number instanceof BigDecimal) {
+				return new TokenFloat((BigDecimal) number);
 			}
+			
+			return new TokenIdentifier(ident.toString());
 		}
 	}
 	
 	public static Token readImmediates (Stream s) {
+		TokenList tokens = new TokenList();
+		boolean env = false;
+		
 		while (s.hasChr()) {
+			Token next = readImmediate(s);
+			
+			tokens.push(next);
+			
+			if (s.next(':') && (!s.hasChr() || s.isNext(Stream.whitespace))) {
+				env = true;
+				break;
+			}
+			
 			if (s.isNext(Stream.whitespace)) break;
 			if (s.isNext(";)]}".toCharArray())) break;
-			
-			if (s.next(':')) {
-				int count = 0;
-				while (s.next(':')) count++;
-				
-				Token next = readImmediates(s);
-				
-				if (next == null) {
-					return new TokenArgumentModifier(count);
-				}else {
-					return new TokenImmediateArgumentModifier(count, next);
-				}
-			}
-			
-			if (s.next('.')) {
-				int count = 0;
-				while (s.next('.')) count++;
-				
-				Token next = readImmediates(s);
-				
-				if (next == null) {
-					return new TokenArgument(count);
-				}else {
-					return new TokenImmediateArgument(count, next);
-				}
-			}
-			
-			if (s.isNext(ops)) {
-				StringBuilder operator = new StringBuilder();
-				while (!s.isNext('.', ':') && s.isNext(ops)) operator.append(s.chr());
-				
-				Token next = readImmediates(s);
-				
-				if (next == null) {
-					return new TokenOperator(operator.toString());
-				}else {
-					return new TokenOperatorImmediate(operator.toString(), next);
-				}
-			}
-			
-			if (s.next('(')) return readRemaining(new TokenScope(s), s);
-			if (s.next('{')) return readRemaining(new TokenFunction(s), s);
-			if (s.next('[')) return readRemaining(new TokenArray(s), s);
-			if (s.next('"')) return readRemaining(TokenString.readEscapedString(s), s);
-			if (s.next('\'')) return readRemaining(TokenString.readString(s), s);
-			
-			{
-				StringBuilder ident = new StringBuilder();
-				
-				while (s.hasChr() && !s.isNext(Stream.whitespace) && !s.isNext("()[]{}'\";:".toCharArray())) ident.append(s.chr());
-				
-				Object number = TokenInteger.parseNumber(ident.toString());
-				
-				if (number != null) {
-					if (number instanceof BigInteger) {
-						return readRemaining(new TokenInteger((BigInteger) number), s);
-					}else if (number instanceof BigDecimal) {
-						return readRemaining(new TokenFloat((BigDecimal) number), s);
-					}
-				}else{
-					return readRemaining(new TokenIdentifier(ident.toString()), s);
-				}
-			}
 		}
 		
-		return null;
+		Token ret = tokens.get(0);
+		
+		for (int i = 1; i < tokens.size(); i++) {
+			ret = new TokenImmediate(ret, tokens.get(i));
+		}
+		
+		return env ? new TokenEnvironmentDefinition(ret) : ret;
 	}
 }
  

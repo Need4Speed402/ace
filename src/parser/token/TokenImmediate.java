@@ -18,7 +18,7 @@ public class TokenImmediate extends Token implements Modifier{
 
 	@Override
 	public String toString() {
-		return this.first.toString() + this.second.toString();
+		return "(" + this.first.toString() + ":" + this.second.toString() + ")";
 	}
 	
 	@Override

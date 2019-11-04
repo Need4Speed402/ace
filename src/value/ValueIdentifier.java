@@ -2,58 +2,20 @@ package value;
 
 public class ValueIdentifier implements Value {
 	public final String id;
-	private Value referenced;
-	private final ValueIdentifier parent;
+	private final Value environment;
 	
-	public ValueIdentifier (String id, Value referenced) {
-		this(id, null, referenced);
-	}
-	
-	public ValueIdentifier(ValueIdentifier parent) {
-		this(parent.id, parent, null);
-	}
-	
-	private ValueIdentifier(String id, ValueIdentifier parent, Value referenced) {
+	public ValueIdentifier (String id, Value environment) {
 		this.id = id;
-		this.parent = parent;
-		this.referenced = referenced;
+		this.environment = environment;
 	}
 	
-	public boolean hasReference () {
-		ValueIdentifier i = this;
-		
-		while (true) {
-			if (i.referenced != null) return true;
-			i = i.parent;
-		}
-	}
-	
-	public Value getReference () {
-		ValueIdentifier i = this;
-		
-		while (true) {
-			if (i.referenced != null) return i.referenced;
-			i = i.parent;
-		}
+	public Value getReference (){
+		return this.environment.call(new ValueIdentifier(this.id, Value.NULL));
 	}
 	
 	@Override
 	public Value call(Value p) {
-		if (Value.compare(p, "`<`")) {
-			return this.getReference();
-		}else if (Value.compare(p, "`>`")){
-			return p2 -> {
-				if (Value.compare(p2, "=")) return p3 -> {
-					this.referenced = p3;
-					
-					return Value.NULL;
-				};
-				
-				return this.referenced.call(p2);
-			};
-		}else{
-			return this.getReference().call(p);
-		}
+		return this.getReference().call(p);
 	}
 	
 	@Override

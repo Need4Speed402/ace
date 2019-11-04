@@ -1,15 +1,18 @@
 package parser.token;
 
 import node.Node;
-import node.NodeFunction;
 import node.NodeBlock;
-import node.NodeParameter;
+import node.NodeEnvironment;
 import node.NodeScope;
 import parser.Stream;
 
-public class TokenFunction extends TokenBlock {
-	public TokenFunction (Stream s) {
+public class TokenEnvironment extends TokenBlock {
+	public TokenEnvironment (Stream s) {
 		super(readBlock(s, '}'));
+	}
+	
+	public TokenEnvironment (Token ... contents) {
+		super(contents);
 	}
 	
 	public static String indent (String s) {
@@ -38,26 +41,14 @@ public class TokenFunction extends TokenBlock {
 		}
 	}
 	
-	public Node createModifierEvent () {
-		return this.createEvent(NodeParameter.MODIFIER);
-	}
-	
-	public Node createHiddenEvent () {
-		return this.createEvent(NodeParameter.NONE);
-	}
-	
 	@Override
 	public Node createEvent() {
-		return this.createEvent(NodeParameter.PARAMETER);
-	}
-	
-	private Node createEvent(NodeParameter.Type type) {
 		Node[] nodes = this.createNodes();
 		
 		if (nodes.length == 0) {
 			return new NodeScope(new NodeBlock(nodes));
 		}else {
-			return new NodeFunction(new NodeScope(new NodeBlock(nodes)), type);
+			return new NodeEnvironment(new NodeBlock(nodes));
 		}
 	}
 }

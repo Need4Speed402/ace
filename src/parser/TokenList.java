@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import parser.token.Token;
-import parser.token.TokenImmediate;
 
 public class TokenList {
 	private final List<Token> tokens;
@@ -39,17 +38,15 @@ public class TokenList {
 		return this.tokens.get(i);
 	}
 	
-	public void set (int i, Token t) {
-		this.tokens.set(i, t);
+	public Token first () {
+		return this.tokens.get(0);
 	}
 	
-	public Token createImmediateString () {
-		Token t = this.tokens.get(this.tokens.size() - 1);
-		
-		for (int i = this.tokens.size() - 2; i >= 0; i--) {
-			t = new TokenImmediate(this.tokens.get(i), t);
-		}
-		
-		return t;
+	public Token last () {
+		return this.tokens.get(this.tokens.size() - 1);
+	}
+	
+	public void set (int i, Token t) {
+		this.tokens.set(i, t);
 	}
 }

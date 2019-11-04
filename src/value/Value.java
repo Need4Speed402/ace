@@ -3,12 +3,7 @@ package value;
 import parser.resolver.Resolver;
 
 public interface Value {
-	public static final Value NULL = new Value() {
-		@Override
-		public Value call(Value v) {
-			return Value.NULL;
-		}
-	};
+	public static final Value NULL = p -> Value.NULL;
 	
 	public Value call (Value v);
 	

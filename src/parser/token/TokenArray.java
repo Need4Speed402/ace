@@ -15,7 +15,7 @@ public class TokenArray extends TokenBlock{
 		}else if (this.getTokens().length == 1) {
 			return "[" + this.getTokens()[0].toString() + "]";
 		}else {
-			return "[\n" + TokenFunction.indent(TokenBlock.toString(this, '\n')) + "\n]";
+			return "[\n" + TokenEnvironment.indent(TokenBlock.toString(this, '\n')) + "\n]";
 		}
 	}
 	

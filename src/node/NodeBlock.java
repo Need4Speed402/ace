@@ -1,9 +1,5 @@
 package node;
 
-import java.util.List;
-
-import parser.LinkedNode;
-import parser.Local;
 import value.Value;
 import value.ValueIdentifier;
 
@@ -15,9 +11,9 @@ public class NodeBlock implements Node{
 	}
 	
 	@Override
-	public Value run(Local local, LinkedNode<Value> parameters) {
+	public Value run(Value environment) {
 		for (int i = 0; i < this.contents.length; i++) {
-			Value v = this.contents[i].run(local, parameters);
+			Value v = this.contents[i].run(environment);
 			
 			while (v instanceof ValueIdentifier) v = ((ValueIdentifier) v).getReference();
 			
@@ -25,21 +21,6 @@ public class NodeBlock implements Node{
 		}
 		
 		return Value.NULL;
-	}
-
-	@Override
-	public void indexIdentifiers(NodeScope scope, List<NodeIdentifier> idnt) {
-		for (Node e : this.contents) e.indexIdentifiers(scope, idnt);
-	}
-	
-	@Override
-	public void init(Local global) {
-		for (Node e : this.contents) e.init(global);
-	}
-	
-	@Override
-	public void paramaterHeight(LinkedNode<Integer>[] nodes) {
-		for (Node e : this.contents) e.paramaterHeight(nodes);
 	}
 	
 	@Override

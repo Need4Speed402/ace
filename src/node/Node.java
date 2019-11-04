@@ -1,18 +1,9 @@
 package node;
 
-import java.util.List;
-
-import parser.LinkedNode;
-import parser.Local;
 import value.Value;
 
 public interface Node {
-	public Value run (Local local, LinkedNode<Value> parameters);
-	
-	public void indexIdentifiers(NodeScope scope, List<NodeIdentifier> idnt);
-	public default void paramaterHeight (LinkedNode<Integer>[] nodes) {};
-	
-	public void init (Local global);
+	public Value run (Value environment);
 	
 	public static Node pipe (Object ... objects) {
 		Node ret = null;
@@ -30,7 +21,7 @@ public interface Node {
 				e = new NodeScope(new NodeBlock(new Node[] {}));
 				
 				for (int ii = nodes.length - 1; ii >= 0; ii--) {
-					e = new NodeFunction(new NodeCall(new NodeCall(new NodeParameter(0, NodeParameter.NONE), nodes[ii]), e), NodeParameter.NONE);
+					e = new NodeEnvironment(new NodeCall(new NodeCall(new NodeIdentifier("()"), nodes[ii]), e));
 				}
 			}else {
 				throw new IllegalArgumentException(o.toString() + " must be either a string or an event");

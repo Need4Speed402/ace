@@ -3,7 +3,7 @@ package unsafe;
 import parser.token.TokenInteger;
 import value.Value;
 
-public class Console implements Value{
+public class console implements Value{
 
 	@Override
 	public Value call(Value v) {
@@ -14,6 +14,8 @@ public class Console implements Value{
 			};
 		}else if (Value.compare(v, "test")) {
 			System.out.println("Test print");
+		}else if (Value.compare(v, "test2")) {
+			System.out.println("Test print 2");
 		}else if (Value.compare(v, "print")) {
 			return p -> {
 				System.out.println(p.toString() + (p == Value.NULL ? "[null]" : ""));

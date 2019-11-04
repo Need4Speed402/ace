@@ -1,9 +1,5 @@
 package node;
 
-import java.util.List;
-
-import parser.Local;
-import parser.LinkedNode;
 import value.Value;
 
 public class NodeCall implements Node{
@@ -18,26 +14,8 @@ public class NodeCall implements Node{
 	}
 	
 	@Override
-	public Value run(Local local, LinkedNode<Value> parameters) {
-		return function.run(local, parameters).call(argument.run(local, parameters));
-	}
-	
-	@Override
-	public void init(Local global) {
-		this.function.init(global);
-		this.argument.init(global);
-	}
-	
-	@Override
-	public void indexIdentifiers(NodeScope scope, List<NodeIdentifier> idnt) {
-		this.function.indexIdentifiers(scope, idnt);
-		this.argument.indexIdentifiers(scope, idnt);
-	}
-	
-	@Override
-	public void paramaterHeight(LinkedNode<Integer>[] nodes) {
-		this.function.paramaterHeight(nodes);
-		this.argument.paramaterHeight(nodes);
+	public Value run(Value environment) {
+		return function.run(environment).call(argument.run(environment));
 	}
 	
 	@Override
