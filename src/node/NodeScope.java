@@ -25,7 +25,12 @@ public class NodeScope implements Node{
 						return p2 -> {
 							if (Value.compare(p2, "=")) {
 								return p3 -> {
-									memory.put(name, p3);
+									if (p3 instanceof ValueIdentifier) {
+										memory.put(name, ((ValueIdentifier) p3).getReference());
+									}else {
+										memory.put(name, p3);
+									}
+									
 									return Value.NULL;
 								};
 							}else if (Value.compare(p2, "*")) {

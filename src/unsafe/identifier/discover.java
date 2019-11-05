@@ -3,7 +3,7 @@ package unsafe.identifier;
 import value.Value;
 import value.ValueIdentifier;
 
-public class IdentDiscover implements Value{
+public class discover implements Value{
 
 	@Override
 	public Value call(Value v) {

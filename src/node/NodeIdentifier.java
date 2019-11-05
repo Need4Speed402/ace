@@ -5,7 +5,6 @@ import value.ValueIdentifier;
 
 public class NodeIdentifier implements Node{
 	public final String name;
-	public int location = -1;
 	
 	public NodeIdentifier(String name) {
 		this.name = name.intern();
@@ -18,6 +17,6 @@ public class NodeIdentifier implements Node{
 	
 	@Override
 	public String toString() {
-		return name;
+		return this.name;
 	}
 }

@@ -18,4 +18,11 @@ public interface Value {
 		
 		return false;
 	}
+	
+	public static boolean compare (Value v1, Value v2) {
+		return
+			v1 instanceof ValueIdentifier &&
+			v2 instanceof ValueIdentifier &&
+			((ValueIdentifier) v1).id == ((ValueIdentifier) v2).id;
+	}
 }
