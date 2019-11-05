@@ -1,7 +1,7 @@
 package parser.token;
 
 import node.Node;
-import node.NodeBlock;
+import node.NodeScope;
 
 public class TokenEnvironmentDefinition extends Token{
 	private final Token paramater;
@@ -16,7 +16,7 @@ public class TokenEnvironmentDefinition extends Token{
 	
 	@Override
 	public Node createEvent() {
-		return new NodeBlock();
+		return new NodeScope();
 	}
 	
 	@Override

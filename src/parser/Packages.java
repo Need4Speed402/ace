@@ -52,7 +52,7 @@ public class Packages {
 				System.out.println(event);
 				return null;
 			}else {
-				return event.run(ident -> resolver.call(ident));
+				return event.run(resolver);
 			}
 		}
 	}

@@ -15,7 +15,10 @@ public class NodeCall implements Node{
 	
 	@Override
 	public Value run(Value environment) {
-		return function.run(environment).call(argument.run(environment));
+		Value vf = this.function.run(environment);
+		Value vp = this.argument.run(environment);
+		
+		return vf.call(vp);
 	}
 	
 	@Override

@@ -1,7 +1,6 @@
 package parser.token;
 
 import node.Node;
-import node.NodeBlock;
 import node.NodeEnvironment;
 import node.NodeScope;
 import parser.Stream;
@@ -46,9 +45,9 @@ public class TokenEnvironment extends TokenBlock {
 		Node[] nodes = this.createNodes();
 		
 		if (nodes.length == 0) {
-			return new NodeScope(new NodeBlock(nodes));
+			return new NodeScope(nodes);
 		}else {
-			return new NodeEnvironment(new NodeBlock(nodes));
+			return new NodeEnvironment(new NodeScope(nodes));
 		}
 	}
 }

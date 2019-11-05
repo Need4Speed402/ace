@@ -12,7 +12,6 @@ public class Function implements Value{
 				if (Value.compare(env, ".")) {
 					return p;
 				}else {
-					System.out.println(((ValueIdentifier) env).getReference());
 					return ((ValueIdentifier) env).getReference();
 				}
 			});
