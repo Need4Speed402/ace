@@ -9,7 +9,7 @@ public class TokenIdentifier extends Token implements Modifier{
 	
 	public TokenIdentifier (String key) {
 		if (key == null) throw new NullPointerException();
-		if (key.length() == 0) throw new IllegalArgumentException("identifier cannot be ane empty string");
+		if (key.length() == 0) throw new IllegalArgumentException("identifier cannot be an empty string");
 		
 		this.id = key;
 	}

@@ -244,7 +244,7 @@ public class TokenStatement extends TokenBlock implements Modifier{
 	}
 	
 	public static Token readImmediate (Stream s) {
-		if (!s.hasChr() || s.isNext(Stream.whitespace)) return null;
+		if (!s.hasChr() || s.isNext(Stream.whitespace) || s.isNext(")]};".toCharArray())) return null;
 		
 		if (s.isNext(ops)) {
 			StringBuilder operator = new StringBuilder();

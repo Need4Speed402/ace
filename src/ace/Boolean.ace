@@ -1,55 +1,43 @@
-Class {
-	:this ? {{
-		: . {} {}
-	}}
+.cmp = unsafe identifier compare
+
+value: arg: (
+	;; run cb if true
+	cmp *arg ? (): cb: (
+		value cb () ()
+	)
 	
-	:this !? {{
-		: {} . {}
-	}}
+	;; run cb if false
+	cmp *arg !? (): cb: (
+		value () cb ()
+	)
 	
-	:this ?? {{
-		>res = : (.) {} {}
-		
-		Object {
-			:this ~ {{
-				:: {
-					res
-				} . {}
-			}}
-			
-			res
-		}
-	}}
-	
-	:this `!` {
-		: false true
+	;; invert
+	cmp *arg `!` {
+		value false true
 	}
 	
-	:this & {{
-		: . false
-	}}
+	;; xor
+	cmp *arg ! (): v2: (
+		value {!v2} {v2} ()
+	)
 	
-	:this | {{
-		: true .
-	}}
+	;; and
+	cmp *arg & (): v2: (
+		value v2 false
+	)
 	
-	:this ! {{
-		: !. .
-	}}
+	;; or
+	cmp *arg | (): v2: (
+		value true v2
+	)
 	
-	:this == {{
-		: . !.
-	}}
+	;; not equal
+	cmp *arg ~: (): v2: (
+		value {!v2} {v2} ()
+	)
 	
-	:this != {{
-		: !. .
-	}}
-	
-	:this toString {
-		:this ?? {
-			'true'
-		} ~ {
-			'false'
-		}
-	}
-}
+	;; equal
+	cmp *arg : (): v2: (
+		value {v2} {!v2} ()
+	)
+)
