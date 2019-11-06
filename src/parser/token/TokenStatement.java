@@ -164,10 +164,10 @@ public class TokenStatement extends TokenBlock implements Modifier{
 	
 	public static Token modifierPrecedence (Token[] tokens) {
 		for (int i = tokens.length - 2; i >= 0; i--) {
-			if (tokens[i] instanceof TokenEnvironmentDefinition) {
+			if (tokens[i] instanceof TokenFunctionDefinition) {
 				Token[] nt = new Token[tokens.length - 1];
 				System.arraycopy(tokens, 0, nt, 0, i);
-				nt[i] = new Caller(((TokenEnvironmentDefinition) tokens[i]).getParamater(), new TokenEnvironment(tokens[i + 1]));
+				nt[i] = new TokenFunction(((TokenFunctionDefinition) tokens[i]).getParamater(), tokens[i + 1]);
 				System.arraycopy(tokens, i + 2, nt, i + 1, tokens.length - i - 2);
 				
 				tokens = nt;
@@ -308,7 +308,7 @@ public class TokenStatement extends TokenBlock implements Modifier{
 			ret = new TokenImmediate(ret, tokens.get(i));
 		}
 		
-		return env ? new TokenEnvironmentDefinition(ret) : ret;
+		return env ? new TokenFunctionDefinition(ret) : ret;
 	}
 }
  

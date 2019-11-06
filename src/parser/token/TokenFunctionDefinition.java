@@ -1,12 +1,14 @@
 package parser.token;
 
 import node.Node;
+import node.NodeCall;
+import node.NodeIdentifier;
 import node.NodeScope;
 
-public class TokenEnvironmentDefinition extends Token{
+public class TokenFunctionDefinition extends Token{
 	private final Token paramater;
 	
-	public TokenEnvironmentDefinition (Token paramater) {
+	public TokenFunctionDefinition (Token paramater) {
 		this.paramater = paramater;
 	}
 	
@@ -16,11 +18,11 @@ public class TokenEnvironmentDefinition extends Token{
 	
 	@Override
 	public Node createEvent() {
-		return new NodeScope();
+		return new NodeCall(new NodeIdentifier("Function"), new NodeScope());
 	}
 	
 	@Override
 	public String toString() {
-		return "()";
+		return this.paramater.toString() + ":";
 	}
 }

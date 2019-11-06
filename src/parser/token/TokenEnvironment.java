@@ -45,7 +45,7 @@ public class TokenEnvironment extends TokenBlock {
 		Node[] nodes = this.createNodes();
 		
 		if (nodes.length == 0) {
-			return new NodeScope(nodes);
+			return new NodeScope();
 		}else {
 			return new NodeEnvironment(new NodeScope(nodes));
 		}
