@@ -216,7 +216,7 @@ public class TokenString extends TokenBlock{
 				}else{ //look ahead to see if there is a number
 					StringBuilder ahead = new StringBuilder ();
 					
-					char[] validLookaheadChars = ",0123456789ABCDEFabcdef".toCharArray();
+					char[] validLookaheadChars = "-0123456789ABCDEFabcdef".toCharArray();
 					char[] breakCharacters = "!^*.".toCharArray();
 					
 					while (s.hasChr()) {

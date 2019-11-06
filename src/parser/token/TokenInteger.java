@@ -66,7 +66,7 @@ public class TokenInteger extends Token{
 	
 	public static Object parseNumber (String ident, String radix) {
 		if (ident.length() == 0) return null;
-		if (ident.charAt(ident.length() - 1) == '.' || ident.charAt(ident.length() - 1) == '_') return null;
+		if (ident.charAt(ident.length() - 1) == '.' || ident.charAt(ident.length() - 1) == '-') return null;
 		
 		int decimal = -1;
 		
@@ -76,9 +76,9 @@ public class TokenInteger extends Token{
 			if (c == '.') {
 				if (decimal != -1) return null;
 				decimal = i;
-			}else if (c == '_'){
-				if (ident.charAt(i - 1) == '.' || ident.charAt(i - 1) == '_') return null;
-				if (ident.charAt(i + 1) == '.' || ident.charAt(i + 1) == '_') return null;
+			}else if (c == '-'){
+				if (ident.charAt(i - 1) == '.' || ident.charAt(i - 1) == '-') return null;
+				if (ident.charAt(i + 1) == '.' || ident.charAt(i + 1) == '-') return null;
 			}else if (radix.indexOf(c) == -1) {
 				return null;
 			}
@@ -95,7 +95,7 @@ public class TokenInteger extends Token{
 			for (int i = 0; i < ident.length(); i++) {
 				char c = ident.charAt(i);
 				
-				if (c == '_') continue;
+				if (c == '-') continue;
 				
 				num = num.multiply(BigInteger.valueOf(radix.length())).add(BigInteger.valueOf(radix.indexOf(c)));
 			}
