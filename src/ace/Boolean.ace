@@ -1,13 +1,13 @@
 .cmp = unsafe identifier compare
 
-value: arg: (
+value, arg, (
 	;; run cb if true
-	cmp *arg ? (): cb: (
+	cmp *arg ? , cb, (
 		value cb () ()
 	)
 	
 	;; run cb if false
-	cmp *arg !? (): cb: (
+	cmp *arg !? , cb, (
 		value () cb ()
 	)
 	
@@ -17,27 +17,27 @@ value: arg: (
 	}
 	
 	;; xor
-	cmp *arg ! (): v2: (
+	cmp *arg ! , v2, (
 		value {!v2} {v2} ()
 	)
 	
 	;; and
-	cmp *arg & (): v2: (
+	cmp *arg & , v2, (
 		value v2 false
 	)
 	
 	;; or
-	cmp *arg | (): v2: (
+	cmp *arg | , v2, (
 		value true v2
 	)
 	
 	;; not equal
-	cmp *arg ~: (): v2: (
+	cmp *arg ~: , v2, (
 		value {!v2} {v2} ()
 	)
 	
 	;; equal
-	cmp *arg : (): v2: (
+	cmp *arg : , v2, (
 		value {v2} {!v2} ()
 	)
 )
