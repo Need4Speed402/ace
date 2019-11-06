@@ -11,7 +11,7 @@ import parser.Stream;
 import parser.TokenList;
 
 public class TokenStatement extends TokenBlock implements Modifier{
-	public static final String operators = "= ?.,_ @ |&! ~:<> +- */\\% ^ $# `";
+	public static final String operators = "= ?._ @ |&! ~:<> +- */\\% ^ $# `";
 	public static final char[] ops = operators.replaceAll(" ", "").toCharArray();
 	public static final int[] operatorValues;
 	
@@ -244,7 +244,7 @@ public class TokenStatement extends TokenBlock implements Modifier{
 	}
 	
 	public static Token readImmediate (Stream s) {
-		if (!s.hasChr() || s.isNext(Stream.whitespace) || s.isNext(")]};".toCharArray())) return null;
+		if (!s.hasChr() || s.isNext(Stream.whitespace) || s.isNext(")]},".toCharArray())) return null;
 		
 		if (s.isNext(ops)) {
 			StringBuilder operator = new StringBuilder();
@@ -268,7 +268,7 @@ public class TokenStatement extends TokenBlock implements Modifier{
 		{
 			StringBuilder ident = new StringBuilder();
 			
-			while (s.hasChr() && !s.isNext(Stream.whitespace) && !s.isNext("()[]{}'\";:".toCharArray())) ident.append(s.chr());
+			while (s.hasChr() && !s.isNext(Stream.whitespace) && !s.isNext("()[]{}'\",:".toCharArray())) ident.append(s.chr());
 			
 			Object number = TokenInteger.parseNumber(ident.toString());
 			
@@ -285,30 +285,27 @@ public class TokenStatement extends TokenBlock implements Modifier{
 	}
 	
 	public static Token readImmediates (Stream s) {
+		if (s.next(',')){
+			return new TokenFunctionDefinition(new TokenScope());
+		}
+		
 		TokenList tokens = new TokenList();
-		boolean env = false;
 		
 		while (s.hasChr()) {
 			Token next = readImmediate(s);
 			
-			tokens.push(next);
-			
-			if (s.next(':') && (!s.hasChr() || s.isNext(Stream.whitespace))) {
-				env = true;
+			if (next == null) {
 				break;
+			}else if (s.next(',')) {
+				tokens.push(next);
+				
+				return new TokenFunctionDefinition(tokens.asImmediates());
+			}else {
+				tokens.push(next);
 			}
-			
-			if (s.isNext(Stream.whitespace)) break;
-			if (s.isNext(";)]}".toCharArray())) break;
 		}
 		
-		Token ret = tokens.get(0);
-		
-		for (int i = 1; i < tokens.size(); i++) {
-			ret = new TokenImmediate(ret, tokens.get(i));
-		}
-		
-		return env ? new TokenFunctionDefinition(ret) : ret;
+		return tokens.asImmediates();
 	}
 }
  

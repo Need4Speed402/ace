@@ -9,7 +9,7 @@ public class TokenScope extends TokenBlock implements Modifier{
 		super(readBlock(s, ')'));
 	}
 	
-	private TokenScope (Token[] tokens) {
+	public TokenScope (Token ... tokens) {
 		super(tokens);
 	}
 	
