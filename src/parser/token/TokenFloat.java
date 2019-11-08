@@ -18,6 +18,16 @@ public class TokenFloat extends Token{
 	
 	@Override
 	public String toString() {
-		return this.decimal.toString();
+		String str = this.decimal.toString();
+		int index = str.indexOf(".");
+		if (index == -1) index = str.length();
+		
+		while (index > 3) {
+			index -= 3;
+			
+			str = str.substring(0, index) + "-" + str.substring(index);
+		}
+		
+		return str;
 	}
 }

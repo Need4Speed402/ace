@@ -25,7 +25,16 @@ public class TokenInteger extends Token{
 	
 	@Override
 	public String toString() {
-		return this.number.toString();
+		String str = this.number.toString();
+		int index = str.length();
+		
+		while (index > 3) {
+			index -= 3;
+			
+			str = str.substring(0, index) + "-" + str.substring(index);
+		}
+		
+		return str;
 	}
 	
 	public static BigInteger getInt (Value v) {
