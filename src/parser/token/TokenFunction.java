@@ -21,6 +21,6 @@ public class TokenFunction extends Token{
 	
 	@Override
 	public String toString() {
-		return this.param.toString() + ": " + this.body;
+		return this.param.toString() + ", " + this.body;
 	}
 }

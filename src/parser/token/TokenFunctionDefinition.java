@@ -23,6 +23,6 @@ public class TokenFunctionDefinition extends Token{
 	
 	@Override
 	public String toString() {
-		return this.paramater.toString() + ":";
+		return this.paramater.toString() + ",";
 	}
 }

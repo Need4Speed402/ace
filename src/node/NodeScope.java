@@ -24,13 +24,12 @@ public class NodeScope implements Node{
 					if (Value.compare(p, "`.`")) {
 						return p2 -> {
 							if (Value.compare(p2, "=")) {
-								return p3 -> {
-									if (p3 instanceof ValueIdentifier) {
-										memory.put(name, ((ValueIdentifier) p3).getReference());
-									}else {
-										memory.put(name, p3);
+								return v -> {
+									if (v instanceof ValueIdentifier) {
+										v = ((ValueIdentifier) v).getReference();
 									}
 									
+									memory.put(name, v);
 									return Value.NULL;
 								};
 							}else if (Value.compare(p2, "*")) {
@@ -51,9 +50,13 @@ public class NodeScope implements Node{
 			for (int i = 0; i < this.contents.length; i++) {
 				Value v = this.contents[i].run(scope);
 				
-				while (v instanceof ValueIdentifier) v = ((ValueIdentifier) v).getReference();
-				
-				if (v != Value.NULL) return v;
+				if (v != Value.NULL) {
+					if (v instanceof ValueIdentifier) {
+						v = ((ValueIdentifier) v).getReference();
+					}
+					
+					return v;
+				};
 			}
 		}
 		

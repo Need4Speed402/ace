@@ -11,7 +11,7 @@ import parser.Stream;
 import parser.TokenList;
 
 public class TokenStatement extends TokenBlock implements Modifier{
-	public static final String operators = "= ?._ @ |&! ~:<> +- */\\% ^ $# `";
+	public static final String operators = "= ._ @ |&!? ~:<> +- */\\% ^ $# `";
 	public static final char[] ops = operators.replaceAll(" ", "").toCharArray();
 	public static final int[] operatorValues;
 	
