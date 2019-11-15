@@ -1,4 +1,4 @@
-.cmp = unsafe identifier compare
+.cmp : unsafe identifier compare
 
 value, arg, (
 	;; run cb if true
@@ -32,12 +32,12 @@ value, arg, (
 	)
 	
 	;; not equal
-	cmp *arg ~: , v2, (
+	cmp *arg ~= , v2, (
 		value {!v2} {v2} ()
 	)
 	
 	;; equal
-	cmp *arg : , v2, (
+	cmp *arg = , v2, (
 		value {v2} {!v2} ()
 	)
 )

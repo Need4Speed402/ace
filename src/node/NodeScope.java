@@ -23,7 +23,7 @@ public class NodeScope implements Node{
 				return p -> {
 					if (Value.compare(p, "`.`")) {
 						return p2 -> {
-							if (Value.compare(p2, "=")) {
+							if (Value.compare(p2, ":")) {
 								return v -> {
 									if (v instanceof ValueIdentifier) {
 										v = ((ValueIdentifier) v).getReference();
