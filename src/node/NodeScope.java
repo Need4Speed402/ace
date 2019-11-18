@@ -13,42 +13,12 @@ public class NodeScope implements Node{
 		this.contents = contents;
 	}
 	
-	public Value run(Value environment) {
+	public Value run(Value parentEnv) {
 		if (this.contents.length != 0) {
-			HashMap<String, Value> memory = new HashMap<String, Value>();
-			
-			Value scope = env -> {
-				String name = ((ValueIdentifier) env).id;
-				
-				return p -> {
-					if (Value.compare(p, "`.`")) {
-						return p2 -> {
-							if (Value.compare(p2, ":")) {
-								return v -> {
-									if (v instanceof ValueIdentifier) {
-										v = ((ValueIdentifier) v).getReference();
-									}
-									
-									memory.put(name, v);
-									return Value.NULL;
-								};
-							}else if (Value.compare(p2, "*")) {
-								return memory.getOrDefault(name, Value.NULL);
-							}else {
-								return memory.getOrDefault(name, Value.NULL).call(p2);
-							}
-						};
-					}
-					
-					Value ret = memory.get(name);
-					if (ret == null) ret = environment.call(env);
-					
-					return ret.call(p);
-				};
-			};
+			ScopeEnvironment scope = new ScopeEnvironment(parentEnv);
 			
 			for (int i = 0; i < this.contents.length; i++) {
-				Value v = this.contents[i].run(scope);
+				Value v = scope.run(this.contents[i]);
 				
 				if (v != Value.NULL) {
 					if (v instanceof ValueIdentifier) {
@@ -82,5 +52,48 @@ public class NodeScope implements Node{
 			
 			return "(\n" + TokenEnvironment.indent(b.toString()) + "\n)";
 		}
+	}
+	
+	private class ScopeEnvironment {
+		private HashMap<String, Value> memory = new HashMap<String, Value>();
+		private final Value parentEnv;
+		private int current = -1;
+		
+		public ScopeEnvironment (Value parentEnv) {
+			this.parentEnv = parentEnv;
+		}
+		
+		public Value run (Node node) {
+			return node.run(this.env(++this.current));
+		}
+		
+		public Value env (int index) {
+			return env -> {
+				String name = ((ValueIdentifier) env).id;
+				
+				return p -> {
+					if (index == this.current && Value.compare(p, "`.`")) {
+						return p2 -> {
+							if (Value.compare(p2, ":")) {
+								return v -> {
+									if (index == this.current) this.memory.put(name, v);
+									return Value.NULL;
+								};
+							}else if (Value.compare(p2, "`*`")) {
+								return this.memory.getOrDefault(name, Value.NULL);
+							}else {
+								return memory.getOrDefault(name, Value.NULL).call(p2);
+							}
+						};
+					}
+					
+					Value ret = memory.get(name);
+					if (ret == null) ret = this.parentEnv.call(env);
+					
+					return ret.call(p);
+				};
+			};
+		}
+		
 	}
 }

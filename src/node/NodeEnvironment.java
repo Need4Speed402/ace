@@ -12,23 +12,15 @@ public class NodeEnvironment implements Node{
 	
 	@Override
 	public Value run(Value environment) {
-		return p -> {
-			if (p instanceof ValueIdentifier) {
-				p = ((ValueIdentifier) p).getReference();
+		return p -> this.contents.run(env -> {
+			Value v = p.call(new ValueIdentifier(((ValueIdentifier) env).id, environment));
+			
+			if (v == Value.NULL) {
+				return environment.call(env);
+			}else {
+				return v;
 			}
-			
-			Value pp = p;
-			
-			return this.contents.run(env -> {
-				Value v = pp.call(new ValueIdentifier(((ValueIdentifier) env).id, environment));
-				
-				if (v == Value.NULL) {
-					return environment.call(env);
-				}else {
-					return v;
-				}
-			});
-		};
+		});
 	}
 	
 	@Override
