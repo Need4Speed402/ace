@@ -64,7 +64,11 @@ public class NodeScope implements Node{
 		}
 		
 		public Value run (Node node) {
-			return node.run(this.env(++this.current));
+			this.current++;
+			Value res = node.run(this.env(this.current));
+			this.current++;
+			
+			return res;
 		}
 		
 		public Value env (int index) {
