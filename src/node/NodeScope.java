@@ -76,8 +76,10 @@ public class NodeScope implements Node{
 				String name = ((ValueIdentifier) env).id;
 				
 				return p -> {
-					if (index == this.current && Value.compare(p, "`.`")) {
-						return p2 -> {
+					Value context = (this.memory.containsKey(name) ? this.memory.get(name) : this.parentEnv.call(env)).call(p);
+					
+					if (Value.compare(p, "`.`")) return p2 -> {
+						if (index == this.current) {
 							if (Value.compare(p2, ":")) {
 								return v -> {
 									if (index == this.current) this.memory.put(name, v);
@@ -88,16 +90,14 @@ public class NodeScope implements Node{
 							}else {
 								return memory.getOrDefault(name, Value.NULL).call(p2);
 							}
-						};
-					}
+						}
+						
+						return context.call(p2);
+					};
 					
-					Value ret = memory.get(name);
-					if (ret == null) ret = this.parentEnv.call(env);
-					
-					return ret.call(p);
+					return context;
 				};
 			};
 		}
-		
 	}
 }
