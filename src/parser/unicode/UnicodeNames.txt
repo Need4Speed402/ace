@@ -1,4 +1,12 @@
-null - `0
+null - `0^
+0 - `0^
+n - `a^
+t - `9^
+r - `d^
+b - `8^
+f - `c^
+v - `b^
+
 start of heading - `1^
 start of text - `2^
 end of text - `3^
@@ -9,6 +17,7 @@ bell - `6^
 backspace - `8^
 horizontal tab - `9^
 line feed - `a^
+new line - `a^
 vertical tab - `b^
 form feed - `c^
 carriage return - `d^

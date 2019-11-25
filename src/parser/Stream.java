@@ -51,13 +51,15 @@ public class Stream {
 		this.code = code;
 	}
 	
-	public Stream (String code, int pointer) {
+	public Stream (String code, int pointer, int line, int col) {
 		this.code = code;
 		this.pointer = pointer;
+		this.line = line;
+		this.col = col;
 	}
 	
 	public Stream (String code) {
-		this(code, 0);
+		this(code, 0, 0, 0);
 	}
 	
 	public char peek () {
@@ -155,5 +157,15 @@ public class Stream {
 	
 	public int getCol() {
 		return col;
+	}
+	
+	public Stream clone () {
+		return new Stream(this.code, this.pointer, this.line, this.col);
+	}
+	
+	public void set (Stream s) {
+		this.pointer = s.pointer;
+		this.line = s.line;
+		this.col = s.col;
 	}
 }

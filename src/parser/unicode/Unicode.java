@@ -7,10 +7,13 @@ import parser.token.Token;
 import parser.token.TokenString;
 
 public class Unicode {
-	public static HashMap<String, String> getLookup () {
+	private static final HashMap<String, String> lookup, inverse;
+	
+	static {
 		Stream s = new Stream(Unicode.class.getResourceAsStream("UnicodeNames.txt"));
 		
-		HashMap<String, String> map = new HashMap<String, String>();
+		lookup = new HashMap<String, String>();
+		inverse = new HashMap<String, String>();
 		
 		while (s.hasChr()) {
 			StringBuilder bind = new StringBuilder();
@@ -27,9 +30,19 @@ public class Unicode {
 			if (tokens.length != 1) throw new RuntimeException("Could not parse unicode table");
 			if (!(tokens[0] instanceof TokenString.StringSegment)) throw new RuntimeException("Could not parse unicode table");
 			
-			map.put(bind.toString().trim(), ((TokenString.StringSegment) tokens[0]).toString());
+			String key = bind.toString().trim();
+			String value = ((TokenString.StringSegment) tokens[0]).toString();
+			
+			lookup.put(key, value);
+			if (!inverse.containsKey(value)) inverse.put(value, key);
 		}
-		
-		return map;
+	}
+	
+	public static HashMap<String, String> getLookup () {
+		return lookup;
+	}
+	
+	public static HashMap<String, String> getInverse (){
+		return inverse;
 	}
 }

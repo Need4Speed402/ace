@@ -15,7 +15,7 @@ import parser.unicode.Unicode;
 
 public class TokenString extends TokenBlock{
 	public static HashMap<String, String> unicodeNames = Unicode.getLookup();
-	
+	public static HashMap<String, String> inverseUnicodeNames = Unicode.getInverse();
 
 	public TokenString (Token[] tokens) {
 		super(tokens);
@@ -98,12 +98,19 @@ public class TokenString extends TokenBlock{
 				
 				if (!escaped && c == '\'') b.append("`'");
 				else if (c == '`') b.append("``");
-				else if (c == '\n') b.append("`n");
-				else if (c == '\r') b.append("`r");
-				else if (c == '\t') b.append("`t");
-				else if (c == '\f') b.append("`f");
-				else if (c == '\b') b.append("`b");
-				else if (c < 32 || c > 126) b.append('`' + Integer.toString(c, 16).toUpperCase() + '^');
+				else if (c < 32 || c > 126) {
+					String n = inverseUnicodeNames.get(String.valueOf(c));
+					
+					if (n != null) {
+						if (n.length() == 1) {
+							b.append("`" + n);
+						}else {
+							b.append("`[" + n + ']');
+						}
+					}else {
+						b.append('`' + Integer.toString(c, 16).toUpperCase() + '^');
+					}
+				}
 				else b.append(c);
 			}
 			
@@ -136,6 +143,34 @@ public class TokenString extends TokenBlock{
 		public char charAt (int i) {
 			return b.charAt(i);
 		}
+	}
+	
+	public static BigInteger readInt (Stream ss) {
+		StringBuilder ahead = new StringBuilder ();
+		Stream s = ss.clone();
+		
+		char[] validLookaheadChars = "-0123456789ABCDEFabcdef".toCharArray();
+		char[] breakCharacters = "!^*.".toCharArray();
+		
+		while (s.hasChr()) {
+			if (s.isNext(breakCharacters)) {
+				ahead.append(s.chr());
+				
+				BigInteger i = (BigInteger) TokenInteger.parseNumber(ahead.toString());
+				
+				if (i != null) {
+					ss.set(s);
+				}
+				
+				return i;
+			}else if (ahead.length() == 0 || s.isNext(validLookaheadChars)) {
+				ahead.append(s.chr());
+			}else {
+				break;
+			}
+		}
+		
+		return null;
 	}
 	
 	public static TokenString readString (Stream s, char escape) {
@@ -174,13 +209,14 @@ public class TokenString extends TokenBlock{
 				while (s.next('\r'));
 				
 				if (escape == '"' && s.next('"')) break;
-				else if (s.next('t')) current.append('\t');
-				else if (s.next('n')) current.append('\n');
-				else if (s.next('r')) current.append('\r');
-				else if (s.next('f')) current.append('\f');
-				else if (s.next('b')) current.append('\b');
-				else if (s.next('`')) current.append('`');
-				else if (s.next('[')) {
+				else if (s.next('(')) {
+					if (current.length() > 0) {
+						tokens.push(new StringSegment(current.toString()));
+						current.setLength(0);
+					}
+					
+					tokens.push(new TokenScope(s));
+				}else if (s.next('[')) {
 					StringBuilder name = new StringBuilder();
 					
 					boolean whitespace = true;
@@ -201,49 +237,22 @@ public class TokenString extends TokenBlock{
 						}
 					}
 					
-					String decoded = unicodeNames.get(name.toString().toLowerCase());
+					String decoded = unicodeNames.get(name.toString());
 					
 					if (decoded == null) throw new ParserException("No known unicode literal: " + name);
 					
 					current.append(decoded);
-				}else if (s.next('(')) {
-					if (current.length() > 0) {
-						tokens.push(new StringSegment(current.toString()));
-						current.setLength(0);
-					}
-					
-					tokens.push(new TokenScope(s));
 				}else{ //look ahead to see if there is a number
-					StringBuilder ahead = new StringBuilder ();
+					BigInteger i = readInt(s);
 					
-					char[] validLookaheadChars = "-0123456789ABCDEFabcdef".toCharArray();
-					char[] breakCharacters = "!^*.".toCharArray();
-					
-					while (s.hasChr()) {
-						if (s.isNext(breakCharacters)) {
-							ahead.append(s.chr());
-							Object val = TokenInteger.parseNumber(ahead.toString());
-							
-							if (val instanceof BigInteger) {
-								ahead.setLength(0);
-								current.append((char) ((BigInteger) val).intValue());
-							}
-							
-							break;
-						}else if (ahead.length() == 0 || s.isNext(validLookaheadChars)) {
-							ahead.append(s.chr());
-						}else {
-							break;
-						}
-					}
-					
-					if (ahead.length() > 0) {
-						if (ahead.charAt(0) == '0') {
-							ahead.deleteCharAt(0);
-							current.append('\0');
-						}
+					if (i != null) {
+						current.append((char) i.intValue());
+					}else {
+						String chr = String.valueOf(s.chr());
+						String decoded = unicodeNames.get(chr);
 						
-						current.append(ahead.toString());
+						if (decoded == null) decoded = chr;
+						current.append(decoded);
 					}
 				}
 				
