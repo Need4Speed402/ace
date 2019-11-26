@@ -18,7 +18,7 @@ public class Function implements Value{
 						}
 					};
 				}else {
-					return ((ValueIdentifier) env).getReference();
+					return ((ValueIdentifier) env).value;
 				}
 			});
 		};

@@ -22,7 +22,7 @@ public class NodeScope implements Node{
 				
 				if (v != Value.NULL) {
 					if (v instanceof ValueIdentifier) {
-						v = ((ValueIdentifier) v).getReference();
+						v = ((ValueIdentifier) v).value;
 					}
 					
 					return v;

@@ -2,20 +2,16 @@ package value;
 
 public class ValueIdentifier implements Value {
 	public final String id;
-	private final Value environment;
+	public final Value value;
 	
-	public ValueIdentifier (String id, Value environment) {
+	public ValueIdentifier (String id, Value value) {
 		this.id = id;
-		this.environment = environment;
-	}
-	
-	public Value getReference (){
-		return this.environment.call(new ValueIdentifier(this.id, Value.NULL));
+		this.value = value;
 	}
 	
 	@Override
 	public Value call(Value p) {
-		return this.getReference().call(p);
+		return this.value.call(p);
 	}
 	
 	@Override
