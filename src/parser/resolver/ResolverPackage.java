@@ -8,26 +8,26 @@ import parser.Stream;
 import value.Value;
 import value.ValueIdentifier;
 
-public class PackageResolver implements Resolver{
+public class ResolverPackage implements Resolver{
 	private final String path;
 	
 	private static HashMap<String, Value> cache = new HashMap<String, Value>();
 	
-	public PackageResolver (String path) {
+	public ResolverPackage (String path) {
 		this.path = path;
 	}
 	
 	@Override
 	public Value call(Value value) {
 		if (!(value instanceof ValueIdentifier)) return Value.NULL;
-		String name = ((ValueIdentifier) value).id;
+		String name = ((ValueIdentifier) value).name;
 		
 		if (cache.containsKey(this.path + "/" + name)) {
 			return cache.get(this.path + "/" + name);
 		}else {
-			InputStream stream = PackageResolver.class.getClassLoader().getResourceAsStream(this.path + "/" + name + ".ace");
+			InputStream stream = ResolverPackage.class.getClassLoader().getResourceAsStream(this.path + "/" + name + ".ace");
 			
-			Value resolution = stream == null ? new PackageResolver(this.path + "/" + name) : new Value() {
+			Value resolution = stream == null ? new ResolverPackage(this.path + "/" + name) : new Value() {
 				private Value val;
 				
 				@Override
@@ -35,9 +35,10 @@ public class PackageResolver implements Resolver{
 					if (val == null) {
 						System.out.println("Loading: " + name);
 						
-						val = Packages.load(new Stream(stream), new CompoundResolver(
-							new PathResolver (new UnsafeResolver(), "unsafe"),
-							new PackageResolver ("ace")
+						val = Packages.load(new Stream(stream), new ResolverCompound(
+							new ResolverScope(),
+							new ResolverPath (new ResolverUnsafe(), "unsafe"),
+							new ResolverPackage ("ace")
 						), name);
 					}
 					

@@ -1,127 +1,55 @@
->Identifier = unsafe ID
->cmp = unsafe identifier IdentCompare
->isIdentifier = unsafe identifier IdentDiscover
+.Identifier = unsafe ID
+.cmp = unsafe identifier compare
+.isIdentifier = unsafe identifier discover
 
->Modifiable = {
-	>set = >value =
-	set .
-	
-	{
-		(cmp) . set {set}
-		(cmp) . get {value}
-	}
-}
+.Function = unsafe Function
 
->createNode = {{{
-	>next = Modifiable ...
-	>cb = {{.... .}}
+.createNode = define, next, (
+	.nextRef = .next
 	
-	{
-		>cmpFunc = (
-			(isIdentifier) .. {
-				(cmp) . ... cb
-			} {
-				. ~= ... ? cb
-			}
-		)
+	cxt, (
+		cmp *cxt defined {
+			t, f, t
+		}
 		
-		cmp . defined {{{..()}}}
-		cmp . cmp {cmpFunc}
-		cmp . next {next}
-	}
-}}}
-
-
-hello:world: (
-	>hello:world = 10
+		cmp *cxt next {
+			ctx, (
+				cmp *ctx = {value, (nextRef = value)}
+				(next) *ctx
+			)
+		}
+		
+		cmp *cxt cmp {
+			value, cb, (
+				(isIdentifier) define {
+					cmp *define *value cb
+				} {
+					*define :: *value ? cb
+				}
+			)
+		}
+	)
 )
 
->asbool = {
-	. true false
-}
+;;.classcid = Identifier ()
 
->classcid = Identifier ()
-
->class~ = {
-	asbool (classcid .cid) | asbool (Object cid .cid)
-}
-
->Class = {
-	(cmp) . ~= {class~}
-	(cmp) . cid {classcid}
+.Class = ctx, (
+	.id = Identifier ()
+	.instance = {()}
 	
-	>id = Identifier ()
-	>instance = {}
-	
-	>constructor = {
-		cmp . ~= {class~}
-		cmp . cid {id}
+	.constructor = callback, (
+		;;cmp *ctx :: {class~}
 		
-		>node = Modifiable {
-			(cmp) : defined {{{.()}}}
-		}
-
-		>default = (
-			.. {
+		.default = (
+			callback ctx, (
 				(
-					(cmp) . this {{
-						instance
-						
-						>search = {
-							>set = .set
-							>node = .get
-							
-							node defined {
-								node cmp ...
-								search (node next)
-							} {
-								{{set (createNode node . ..)}}
-							}
-						}
-						
-						search node
-					}}
 					
-					..
-				) .
-			}
-			
-			{
-				(cmp) . ~= {{
-					asbool (Object cid .cid)
-				}}
-			}
+				) ctx
+			)
 		)
-		
-		>instance = {
-			(cmp) . constructor {
-				constructor
-			}
-			
-			>search = {
-				>node = .
-				
-				node defined {
-					node cmp ...
-					
-					search (node next get)
-				} {
-					default
-				}
-			}
-			
-			(cmp) . ~= {{
-				asbool (id .cid) ? {true}
-				search (node get) .. .
-			}}
-			
-			search (node get) .
-		}
-		
-		instance
-	}
+	)
 	
 	constructor
-}
+)
 
 Class

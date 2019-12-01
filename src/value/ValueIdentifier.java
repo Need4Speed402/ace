@@ -1,11 +1,11 @@
 package value;
 
 public class ValueIdentifier implements Value {
-	public final String id;
+	public final String name;
 	public final Value value;
 	
 	public ValueIdentifier (String id, Value value) {
-		this.id = id;
+		this.name = id;
 		this.value = value;
 	}
 	
@@ -16,6 +16,6 @@ public class ValueIdentifier implements Value {
 	
 	@Override
 	public String toString() {
-		return super.toString() + "[" + this.id + "]";
+		return super.toString() + "[" + this.name + "]";
 	}
 }

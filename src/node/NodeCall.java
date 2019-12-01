@@ -23,6 +23,6 @@ public class NodeCall implements Node{
 	
 	@Override
 	public String toString() {
-		return "[" + this.function.toString() + " " + this.argument.toString() + "]";
+		return "(" + this.function.toString() + " " + this.argument.toString() + ")";
 	}
 }

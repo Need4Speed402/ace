@@ -4,7 +4,6 @@ import node.Node;
 import node.NodeCall;
 import node.NodeEnvironment;
 import node.NodeIdentifier;
-import node.NodeScope;
 
 public class TokenFunction extends Token{
 	private final Token param, body;
@@ -16,7 +15,7 @@ public class TokenFunction extends Token{
 	
 	@Override
 	public Node createEvent() {
-		return new NodeCall(new NodeCall(new NodeIdentifier("Function"), this.param.createEvent()), new NodeEnvironment(new NodeScope(this.body.createEvent())));
+		return new NodeCall(new NodeCall(new NodeIdentifier("Function"), this.param.createEvent()), new NodeEnvironment(new NodeCall(new NodeIdentifier("Scope"), new NodeEnvironment(this.body.createEvent()))));
 	}
 	
 	@Override

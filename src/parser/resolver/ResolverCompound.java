@@ -6,18 +6,18 @@ import java.util.LinkedList;
 import value.Value;
 import value.ValueIdentifier;
 
-public class CompoundResolver implements Resolver{
+public class ResolverCompound implements Resolver{
 	private Value[] resolvers;
 	private HashMap<String, Value> indexes = new HashMap<>();
 	
-	public CompoundResolver (Value ... resolvers) {
+	public ResolverCompound (Value ... resolvers) {
 		this.resolvers = resolvers;
 	}
 	
 	@Override
 	public Value call (Value value) {
 		if (!(value instanceof ValueIdentifier)) return Value.NULL;
-		String name = ((ValueIdentifier) value).id;
+		String name = ((ValueIdentifier) value).name;
 		
 		if (this.indexes.containsKey(name)) {
 			return this.indexes.get(name);
@@ -49,7 +49,7 @@ public class CompoundResolver implements Resolver{
 						if (resolvers.size() == 1) {
 							resolution = resolvers.get(0);
 						}else {
-							resolution = new CompoundResolver(resolvers.toArray(new Resolver[0]));
+							resolution = new ResolverCompound(resolvers.toArray(new Resolver[0]));
 						}
 					}else {
 						resolution = r;

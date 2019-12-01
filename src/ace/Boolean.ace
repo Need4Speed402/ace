@@ -1,43 +1,47 @@
-.cmp : unsafe identifier compare
+local cmp = unsafe identifier compare
+
+local check = bool, callback, (
+	bool callback {} x, x
+)
 
 value, arg, (
 	;; run cb if true
-	cmp *arg ? , cb, (
+	check (cmp *arg ?) , cb, (
 		value cb () ()
 	)
 	
 	;; run cb if false
-	cmp *arg !? , cb, (
+	check (cmp *arg !?) , cb, (
 		value () cb ()
 	)
 	
 	;; invert
-	cmp *arg `!` {
+	check (cmp *arg `!`) {
 		value false true
 	}
 	
 	;; xor
-	cmp *arg ! , v2, (
+	check (cmp *arg !) , v2, (
 		value {!v2} {v2} ()
 	)
 	
 	;; and
-	cmp *arg & , v2, (
+	check (cmp *arg &) , v2, (
 		value v2 false
 	)
 	
 	;; or
-	cmp *arg | , v2, (
+	check (cmp *arg |) , v2, (
 		value true v2
 	)
 	
 	;; not equal
-	cmp *arg ~= , v2, (
+	check (cmp *arg !:) , v2, (
 		value {!v2} {v2} ()
 	)
 	
 	;; equal
-	cmp *arg = , v2, (
+	check (cmp *arg :) , v2, (
 		value {v2} {!v2} ()
 	)
 )

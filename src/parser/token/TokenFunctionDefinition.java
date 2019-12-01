@@ -2,8 +2,8 @@ package parser.token;
 
 import node.Node;
 import node.NodeCall;
+import node.NodeEnvironment;
 import node.NodeIdentifier;
-import node.NodeScope;
 
 public class TokenFunctionDefinition extends Token{
 	private final Token paramater;
@@ -18,7 +18,7 @@ public class TokenFunctionDefinition extends Token{
 	
 	@Override
 	public Node createEvent() {
-		return new NodeCall(new NodeIdentifier("Function"), new NodeScope());
+		return new NodeCall(new NodeIdentifier("Function"), new NodeEnvironment());
 	}
 	
 	@Override

@@ -1,7 +1,9 @@
 package parser.token;
 
 import node.Node;
-import node.NodeScope;
+import node.NodeCall;
+import node.NodeEnvironment;
+import node.NodeIdentifier;
 import parser.Stream;
 
 public class TokenScope extends TokenBlock implements Modifier{
@@ -26,7 +28,13 @@ public class TokenScope extends TokenBlock implements Modifier{
 	
 	@Override
 	public Node createEvent() {
-		return new NodeScope(this.createNodes());
+		Node[] nodes = this.createNodes();
+		
+		if (nodes.length == 0) {
+			return new NodeEnvironment();
+		}else {
+			return new NodeCall(new NodeIdentifier("Scope"), new NodeEnvironment(this.createNodes()));
+		}
 	}
 	
 	public static Token createBase (Stream s) {

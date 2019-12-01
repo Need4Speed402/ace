@@ -4,6 +4,8 @@ import parser.resolver.Resolver;
 
 public interface Value {
 	public static final Value NULL = p -> Value.NULL;
+	public static final Value TRUE = p1 -> p2 -> p1;
+	public static final Value FALSE = p1 -> p2 -> p2;
 	
 	public Value call (Value v);
 	
@@ -13,7 +15,7 @@ public interface Value {
 	
 	public static boolean compare(Value v, String identifier){
 		if (v instanceof ValueIdentifier) {
-			return ((ValueIdentifier) v).id == identifier;
+			return ((ValueIdentifier) v).name == identifier;
 		}
 		
 		return false;
@@ -23,6 +25,6 @@ public interface Value {
 		return
 			v1 instanceof ValueIdentifier &&
 			v2 instanceof ValueIdentifier &&
-			((ValueIdentifier) v1).id == ((ValueIdentifier) v2).id;
+			((ValueIdentifier) v1).name == ((ValueIdentifier) v2).name;
 	}
 }

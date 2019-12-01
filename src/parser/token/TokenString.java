@@ -210,7 +210,7 @@ public class TokenString extends TokenBlock{
 				
 				if (escape == '"' && s.next('"')) break;
 				else if (s.next('(')) {
-					if (current.length() > 0) {
+					if (current.length() > 0 || tokens.size() == 0) {
 						tokens.push(new StringSegment(current.toString()));
 						current.setLength(0);
 					}
@@ -242,7 +242,8 @@ public class TokenString extends TokenBlock{
 					if (decoded == null) throw new ParserException("No known unicode literal: " + name);
 					
 					current.append(decoded);
-				}else{ //look ahead to see if there is a number
+				}else{
+					//look ahead to see if there is a number
 					BigInteger i = readInt(s);
 					
 					if (i != null) {

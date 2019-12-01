@@ -4,11 +4,12 @@ import java.io.File;
 import java.nio.file.Files;
 
 import node.Node;
-import parser.resolver.CompoundResolver;
-import parser.resolver.FileResolver;
-import parser.resolver.PackageResolver;
-import parser.resolver.PathResolver;
-import parser.resolver.UnsafeResolver;
+import parser.resolver.ResolverCompound;
+import parser.resolver.ResolverFile;
+import parser.resolver.ResolverPackage;
+import parser.resolver.ResolverPath;
+import parser.resolver.ResolverScope;
+import parser.resolver.ResolverUnsafe;
 import parser.token.Token;
 import parser.token.TokenScope;
 import value.Value;
@@ -59,11 +60,12 @@ public class Packages {
 	
 	public static Value file (String path) {
 		try {
-			return Packages.load(new Stream(Files.readAllBytes(new File(path).toPath())), new CompoundResolver(
-				new PathResolver (new UnsafeResolver(), "unsafe"),
-				new PackageResolver("ace"),
-				new FileResolver(Packages.root),
-				new FileResolver(new File(path).getParentFile())
+			return Packages.load(new Stream(Files.readAllBytes(new File(path).toPath())), new ResolverCompound(
+				new ResolverScope(),
+				new ResolverPath (new ResolverUnsafe(), "unsafe"),
+				new ResolverPackage("ace"),
+				new ResolverFile(Packages.root),
+				new ResolverFile(new File(path).getParentFile())
 			), path);
 		}catch (Exception e) {
 			e.printStackTrace();

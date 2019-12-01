@@ -7,18 +7,18 @@ import parser.Packages;
 import value.Value;
 import value.ValueIdentifier;
 
-public class FileResolver implements Resolver{
+public class ResolverFile implements Resolver{
 	private File file;
 	private static HashMap<String, Value> resolutions = new HashMap<>();
 	
-	public FileResolver(File file) {
+	public ResolverFile(File file) {
 		this.file = file;
 	}
 	
 	@Override
 	public Value call(Value value) {
 		if (!(value instanceof ValueIdentifier)) return Value.NULL;
-		String name = ((ValueIdentifier) value).id;
+		String name = ((ValueIdentifier) value).name;
 		
 		File file = new File(this.file, name);
 		
@@ -28,7 +28,7 @@ public class FileResolver implements Resolver{
 		if (new File(file.getAbsolutePath() + ".ace").isFile()) {
 			resolution = p -> Packages.file(file.getAbsolutePath() + ".ace").call(p);
 		}else if (file.isDirectory()){
-			resolution = new FileResolver(file);
+			resolution = new ResolverFile(file);
 		}else {
 			resolution = Resolver.NULL;
 		}

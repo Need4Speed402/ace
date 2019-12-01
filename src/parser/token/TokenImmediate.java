@@ -3,7 +3,7 @@ package parser.token;
 import node.Node;
 import node.NodeCall;
 
-public class TokenImmediate extends Token implements Modifier{
+public class TokenImmediate extends Token{
 	private final Token first, second;
 	
 	public TokenImmediate(Token first, Token second) {
@@ -19,10 +19,5 @@ public class TokenImmediate extends Token implements Modifier{
 	@Override
 	public String toString() {
 		return "(" + this.first.toString() + ":" + this.second.toString() + ")";
-	}
-	
-	@Override
-	public boolean isModifier() {
-		return this.first instanceof Modifier && ((Modifier) this.first).isModifier();
 	}
 }
