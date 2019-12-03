@@ -2,24 +2,22 @@ package parser.token;
 
 import node.Node;
 import node.NodeCall;
-import node.NodeEnvironment;
 import node.NodeIdentifier;
 
 public class TokenFunction extends Token{
-	private final Token param, body;
+	private final Token param;
 	
-	public TokenFunction (Token param, Token body) {
+	public TokenFunction (Token param) {
 		this.param = param;
-		this.body = body;
 	}
 	
 	@Override
 	public Node createEvent() {
-		return new NodeCall(new NodeCall(new NodeIdentifier("Function"), this.param.createEvent()), new NodeEnvironment(new NodeCall(new NodeIdentifier("Scope"), new NodeEnvironment(this.body.createEvent()))));
+		return new NodeCall(new NodeIdentifier("Parameter"), this.param.createEvent());
 	}
 	
 	@Override
 	public String toString() {
-		return this.param.toString() + ", " + this.body;
+		return this.param.toString() + ",";
 	}
 }

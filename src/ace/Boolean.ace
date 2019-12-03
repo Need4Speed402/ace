@@ -1,19 +1,23 @@
 local cmp = unsafe identifier compare
 
-local check = bool, callback, (
-	bool callback {} x, x
-)
+local check = Function bool, callback, {
+	bool callback {} Function x, {*x}
+}
 
-value, arg, (
+Function value, arg, {
 	;; run cb if true
-	check (cmp *arg ?) , cb, (
-		value cb () ()
-	)
+	check (cmp *arg ?) {
+		Function cb, {
+			value cb {} Function x, {*x}
+		}
+	}
 	
 	;; run cb if false
-	check (cmp *arg !?) , cb, (
-		value () cb ()
-	)
+	check (cmp *arg !?) {
+		Function cb, {
+			value {} cb Function x, {*x}
+		}
+	}
 	
 	;; invert
 	check (cmp *arg `!`) {
@@ -21,27 +25,37 @@ value, arg, (
 	}
 	
 	;; xor
-	check (cmp *arg !) , v2, (
-		value {!v2} {v2} ()
-	)
+	check (cmp *arg !) {
+		Funciton v2, {
+			value {!v2} {v2} ()
+		}
+	}
 	
 	;; and
-	check (cmp *arg &) , v2, (
-		value v2 false
-	)
+	check (cmp *arg &) {
+		Function v2, {
+			value v2 false
+		}
+	}
 	
 	;; or
-	check (cmp *arg |) , v2, (
-		value true v2
-	)
+	check (cmp *arg |) {
+		Function v2, {
+			value true v2
+		}
+	}
 	
 	;; not equal
-	check (cmp *arg !:) , v2, (
-		value {!v2} {v2} ()
-	)
+	check (cmp *arg !:) {
+		Function v2, {
+			value {!v2} {v2} ()
+		}
+	}
 	
 	;; equal
-	check (cmp *arg :) , v2, (
-		value {v2} {!v2} ()
-	)
-)
+	check (cmp *arg :) {
+		Function v2, {
+			value {v2} {!v2} ()
+		}
+	}
+}

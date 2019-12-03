@@ -31,7 +31,7 @@ public class TokenInteger extends Token{
 		while (index > 3) {
 			index -= 3;
 			
-			str = str.substring(0, index) + "-" + str.substring(index);
+			str = str.substring(0, index) + "," + str.substring(index);
 		}
 		
 		return str;
@@ -75,7 +75,7 @@ public class TokenInteger extends Token{
 	
 	public static Object parseNumber (String ident, String radix) {
 		if (ident.length() == 0) return null;
-		if (ident.charAt(ident.length() - 1) == '.' || ident.charAt(ident.length() - 1) == '-') return null;
+		if (ident.charAt(ident.length() - 1) == '.' || ident.charAt(ident.length() - 1) == ',') return null;
 		
 		int decimal = -1;
 		
@@ -85,9 +85,9 @@ public class TokenInteger extends Token{
 			if (c == '.') {
 				if (decimal != -1) return null;
 				decimal = i;
-			}else if (c == '-'){
-				if (ident.charAt(i - 1) == '.' || ident.charAt(i - 1) == '-') return null;
-				if (ident.charAt(i + 1) == '.' || ident.charAt(i + 1) == '-') return null;
+			}else if (c == ','){
+				if (ident.charAt(i - 1) == '.' || ident.charAt(i - 1) == ',') return null;
+				if (ident.charAt(i + 1) == '.' || ident.charAt(i + 1) == ',') return null;
 			}else if (radix.indexOf(c) == -1) {
 				return null;
 			}
@@ -104,7 +104,7 @@ public class TokenInteger extends Token{
 			for (int i = 0; i < ident.length(); i++) {
 				char c = ident.charAt(i);
 				
-				if (c == '-') continue;
+				if (c == ',') continue;
 				
 				num = num.multiply(BigInteger.valueOf(radix.length())).add(BigInteger.valueOf(radix.indexOf(c)));
 			}

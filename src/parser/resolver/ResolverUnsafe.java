@@ -14,7 +14,7 @@ public class ResolverUnsafe implements Resolver{
 	}
 	
 	public ResolverUnsafe () {
-		this("unsafe/");
+		this("");
 	}
 	
 	@Override
@@ -27,11 +27,11 @@ public class ResolverUnsafe implements Resolver{
 			}else {
 				Value v = null;
 				
-				if (ResolverUnsafe.class.getClassLoader().getResource(p + ".class") != null) {
+				if (ResolverUnsafe.class.getClassLoader().getResource("unsafe/" + p + ".class") != null) {
 					System.out.println("Loading unsafe: " + p);
 					
 					try{
-						v = (Value) Class.forName(p.replaceAll("/", ".")).newInstance();
+						v = (Value) Class.forName("unsafe." + p.replaceAll("/", ".")).newInstance();
 					}catch (Exception e) {}
 				}
 				

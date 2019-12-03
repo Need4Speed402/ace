@@ -1,30 +1,25 @@
-package parser.resolver;
+package unsafe;
 
 import java.util.HashMap;
 
 import value.Value;
 import value.ValueIdentifier;
 
-public class ResolverScope implements Resolver{
+public class Scope implements Value{
 	@Override
-	public Value call(Value ctx) {
-		if (Value.compare(ctx, "Scope")) {
-			return env -> {
-				Scope scope = new Scope();
-				Value ret = env.call(scope);
-				scope.close();
-				return ret;
-			};
-		}
-		return Resolver.NULL;
+	public Value call(Value env) {
+		ScopeEnv scope = new ScopeEnv();
+		Value ret = env.call(scope);
+		scope.close();
+		return ret;
 	}
 
-	private static class Scope implements Value{
+	private static class ScopeEnv implements Value{
 		private HashMap<String, Value> memory = new HashMap<String, Value>();
 		private Value local;
 		private boolean closed = false;
 		
-		public Scope () {
+		public ScopeEnv () {
 			this.local = parent -> var -> {
 				if (var instanceof ValueIdentifier) {
 					String name = ((ValueIdentifier) var).name;

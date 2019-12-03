@@ -46,9 +46,9 @@ public class TokenEnvironment extends TokenBlock {
 		Node[] nodes = this.createNodes();
 		
 		if (nodes.length == 0) {
-			return new NodeEnvironment();
+			return new NodeCall(new NodeIdentifier("Environment"), new NodeEnvironment());
 		}else {
-			return new NodeEnvironment(new NodeCall(new NodeIdentifier("Scope"), new NodeEnvironment(nodes)));
+			return new NodeCall(new NodeIdentifier("Environment"), new NodeEnvironment(new NodeCall(new NodeIdentifier("Scope"), new NodeEnvironment(nodes))));
 		}
 	}
 }

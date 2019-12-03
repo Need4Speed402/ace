@@ -36,8 +36,7 @@ public class ResolverPackage implements Resolver{
 						System.out.println("Loading: " + name);
 						
 						val = Packages.load(new Stream(stream), new ResolverCompound(
-							new ResolverScope(),
-							new ResolverPath (new ResolverUnsafe(), "unsafe"),
+							new ResolverUnsafe(),
 							new ResolverPackage ("ace")
 						), name);
 					}

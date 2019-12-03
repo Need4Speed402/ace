@@ -7,8 +7,6 @@ import node.Node;
 import parser.resolver.ResolverCompound;
 import parser.resolver.ResolverFile;
 import parser.resolver.ResolverPackage;
-import parser.resolver.ResolverPath;
-import parser.resolver.ResolverScope;
 import parser.resolver.ResolverUnsafe;
 import parser.token.Token;
 import parser.token.TokenScope;
@@ -61,8 +59,7 @@ public class Packages {
 	public static Value file (String path) {
 		try {
 			return Packages.load(new Stream(Files.readAllBytes(new File(path).toPath())), new ResolverCompound(
-				new ResolverScope(),
-				new ResolverPath (new ResolverUnsafe(), "unsafe"),
+				new ResolverUnsafe(),
 				new ResolverPackage("ace"),
 				new ResolverFile(Packages.root),
 				new ResolverFile(new File(path).getParentFile())

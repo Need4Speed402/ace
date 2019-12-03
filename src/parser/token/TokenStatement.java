@@ -11,7 +11,7 @@ import parser.Stream;
 import parser.TokenList;
 
 public class TokenStatement extends TokenBlock implements Modifier{
-	public static final String operators = "= . _ @# ? |&! ~:<> +- */\\% ^$ `";
+	public static final String operators = "= ., _ @# ? |&! ~:;<> +- */\\% ^$ `";
 	public static final char[] ops = operators.replaceAll(" ", "").toCharArray();
 	public static final int[] operatorValues;
 	
@@ -164,14 +164,7 @@ public class TokenStatement extends TokenBlock implements Modifier{
 	
 	public static Token modifierPrecedence (Token[] tokens) {
 		for (int i = tokens.length - 2; i >= 0; i--) {
-			if (tokens[i] instanceof TokenFunctionDefinition) {
-				Token[] nt = new Token[tokens.length - 1];
-				System.arraycopy(tokens, 0, nt, 0, i);
-				nt[i] = new TokenFunction(((TokenFunctionDefinition) tokens[i]).getParamater(), tokens[i + 1]);
-				System.arraycopy(tokens, i + 2, nt, i + 1, tokens.length - i - 2);
-				
-				tokens = nt;
-			}else if (tokens[i] instanceof Modifier && ((Modifier) tokens[i]).isModifier()) {
+			if (tokens[i] instanceof TokenFunction || tokens[i] instanceof Modifier && ((Modifier) tokens[i]).isModifier()) {
 				Token[] nt = new Token[tokens.length - 1];
 				System.arraycopy(tokens, 0, nt, 0, i);
 				nt[i] = new Caller(tokens[i], tokens[i + 1]);
@@ -244,7 +237,7 @@ public class TokenStatement extends TokenBlock implements Modifier{
 	}
 	
 	public static Token readImmediate (Stream s) {
-		if (!s.hasChr() || s.isNext(Stream.whitespace) || s.isNext(")]},".toCharArray())) return null;
+		if (!s.hasChr() || s.isNext(Stream.whitespace) || s.isNext(")]},;".toCharArray())) return null;
 		
 		if (s.isNext(ops)) {
 			StringBuilder operator = new StringBuilder();
@@ -268,7 +261,17 @@ public class TokenStatement extends TokenBlock implements Modifier{
 		{
 			StringBuilder ident = new StringBuilder();
 			
-			while (s.hasChr() && !s.isNext(Stream.whitespace) && !s.isNext("()[]{}'\",:".toCharArray())) ident.append(s.chr());
+			while (s.hasChr() && !s.isNext(Stream.whitespace) && !s.isNext("()[]{}'\"".toCharArray())) {
+				if (s.isNext(',', ';')) {
+					Stream ss = s.clone();
+					ss.chr();
+					if (!ss.hasChr() || ss.isNext(Stream.whitespace) || ss.isNext("()[]{}'\";".toCharArray())) {
+						break;
+					}
+				}
+				
+				ident.append(s.chr());
+			}
 			
 			Object number = TokenInteger.parseNumber(ident.toString());
 			
@@ -286,7 +289,7 @@ public class TokenStatement extends TokenBlock implements Modifier{
 	
 	public static Token readImmediates (Stream s) {
 		if (s.next(',')){
-			return new TokenFunctionDefinition(new TokenScope());
+			return new TokenFunction(new TokenScope());
 		}
 		
 		TokenList tokens = new TokenList();
@@ -299,7 +302,7 @@ public class TokenStatement extends TokenBlock implements Modifier{
 			}else if (s.next(',')) {
 				tokens.push(next);
 				
-				return new TokenFunctionDefinition(tokens.asImmediates());
+				return new TokenFunction(tokens.asImmediates());
 			}else {
 				tokens.push(next);
 			}
