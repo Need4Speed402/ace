@@ -2,9 +2,9 @@ package unsafe.unsafe;
 
 import parser.token.TokenInteger;
 import value.Value;
+import value.ValueIdentifier;
 
 public class console implements Value{
-
 	@Override
 	public Value call(Value v) {
 		if (Value.compare(v, "put")) {
@@ -12,10 +12,16 @@ public class console implements Value{
 				System.out.write(TokenInteger.getInt(arg).intValue());
 				return Value.NULL;
 			};
-		}else if (Value.compare(v, "test")) {
-			System.out.println("Test print");
-		}else if (Value.compare(v, "test2")) {
-			System.out.println("Test print 2");
+		}else if (Value.compare(v, "ident")) {
+			return ident -> {
+				if (ident instanceof ValueIdentifier) {
+					System.out.println(((ValueIdentifier) ident).name);
+				}else {
+					System.out.println("Not an identifier");
+				}
+				
+				return Value.NULL;
+			};
 		}else if (Value.compare(v, "print")) {
 			return p -> {
 				System.out.println(p.toString() + (p == Value.NULL ? "[null]" : ""));
