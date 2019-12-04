@@ -27,4 +27,12 @@ public interface Value {
 			v2 instanceof ValueIdentifier &&
 			((ValueIdentifier) v1).name == ((ValueIdentifier) v2).name;
 	}
+	
+	public static Value resolve (Value v) {
+		if (v instanceof ValueIdentifier) {
+			return ((ValueIdentifier) v).value;
+		}else {
+			return v;
+		}
+	}
 }

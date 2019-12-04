@@ -1,21 +1,21 @@
 local cmp = unsafe identifier compare
 
-local check = Function bool, callback, {
-	Function (bool callback {})
+local check = Scope bool, callback, {
+	Scope (bool callback {})
 }
 
-Function value, arg, {
+Scope value, arg, {
 	;; run cb if true
 	check (cmp *arg ?) {
-		Function cb, {
-			Function (value cb {})
+		Scope cb, {
+			Scope (value cb {})
 		}
 	}
 	
 	;; run cb if false
 	check (cmp *arg !?) {
-		Function cb, {
-			Function (value {} cb)
+		Scope cb, {
+			Scope (value {} cb)
 		}
 	}
 	
@@ -26,36 +26,36 @@ Function value, arg, {
 	
 	;; xor
 	check (cmp *arg !) {
-		Function v2, {
-			Function (value {!v2} {v2})
+		Scope v2, {
+			Scope (value {!v2} {v2})
 		}
 	}
 	
 	;; and
 	check (cmp *arg &) {
-		Function v2, {
+		Scope v2, {
 			value v2 false
 		}
 	}
 	
 	;; or
 	check (cmp *arg |) {
-		Function v2, {
+		Scope v2, {
 			value true v2
 		}
 	}
 	
 	;; not equal
 	check (cmp *arg !:) {
-		Function v2, {
-			Function (value {!v2} {v2})
+		Scope v2, {
+			Scope (value {!v2} {v2})
 		}
 	}
 	
 	;; equal
 	check (cmp *arg :) {
-		Function v2, {
-			Function (value {v2} {!v2})
+		Scope v2, {
+			Scope (value {v2} {!v2})
 		}
 	}
 }

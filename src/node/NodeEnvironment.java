@@ -17,12 +17,8 @@ public class NodeEnvironment implements Node{
 		return var -> {
 			Value scope = env -> var.call(new ValueIdentifier(((ValueIdentifier) env).name, environment.call(env)));
 			
-			for (int i = 0; i < this.contents.length; i++) {
-				Value v = this.contents[i].run(scope);
-				
-				if (v instanceof ValueIdentifier) {
-					v = ((ValueIdentifier) v).value;
-				}
+			for (Node instruction : this.contents) {
+				Value v = Value.resolve(instruction.run(scope));
 				
 				if (v != Value.NULL) {
 					return v;

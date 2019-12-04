@@ -28,12 +28,8 @@ public class Scope implements Value{
 					return ctx -> {
 						if (!this.closed && Value.compare(ctx, "=")) {
 							return set -> {
-								if (set instanceof ValueIdentifier) {
-									this.memory.put(name, a -> ((ValueIdentifier) set).value);
-								}else {
-									this.memory.put(name, a -> set);
-								}
-								
+								Value put = Value.resolve(set);
+								this.memory.put(name, a -> put);
 								return Value.NULL;
 							};
 						}else{
