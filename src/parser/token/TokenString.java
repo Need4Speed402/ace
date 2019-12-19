@@ -21,14 +21,14 @@ public class TokenString extends TokenBlock{
 		super(tokens);
 	}
 	
-	public static Node[] createStringElements (String s){
+	public static Node createStringElement (String s){
 		Node[] string = new Node[s.length()];
 		
 		for (int ii = 0; ii < string.length; ii++) {
-			string[ii] = Node.pipe("Integer", "Iterator", new TokenInteger.BooleanArray(s.charAt(ii)).toNodes());
+			string[ii] = new NodeCall("Integer", new TokenInteger.BooleanArray(s.charAt(ii)).toNode());
 		}
 		
-		return string;
+		return TokenBlock.createBlock(string);
 	}
 	
 	@Override
@@ -82,7 +82,7 @@ public class TokenString extends TokenBlock{
 		
 		@Override
 		public Node createEvent() {
-			return Node.pipe("String", "Iterator", createStringElements(this.text));
+			return new NodeCall("String", createStringElement(this.text));
 		}
 		
 		@Override

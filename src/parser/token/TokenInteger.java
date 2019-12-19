@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import node.Node;
+import node.NodeCall;
 import node.NodeIdentifier;
 import value.Value;
 
@@ -20,7 +21,7 @@ public class TokenInteger extends Token{
 	
 	@Override
 	public Node createEvent() {
-		return Node.pipe("Integer", "Iterator", this.number.toNodes());
+		return new NodeCall("Integer", this.number.toNode());
 	}
 	
 	@Override
@@ -182,14 +183,14 @@ public class TokenInteger extends Token{
 			return array;
 		}
 		
-		public Node[] toNodes () {
+		public Node toNode () {
 			Node[] values = new Node[this.length];
 			
 			for (int i = 0; i < values.length; i++) {
 				values[i] = new NodeIdentifier(this.array[i] ? "true" : "false");
 			}
 			
-			return values;
+			return TokenBlock.createBlock(values);
 		}
 		
 		public boolean get (int i) {

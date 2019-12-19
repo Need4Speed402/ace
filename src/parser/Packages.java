@@ -9,7 +9,7 @@ import parser.resolver.ResolverFile;
 import parser.resolver.ResolverPackage;
 import parser.resolver.ResolverUnsafe;
 import parser.token.Token;
-import parser.token.TokenScope;
+import parser.token.TokenBase;
 import value.Value;
 
 public class Packages {
@@ -33,7 +33,7 @@ public class Packages {
 			//followed by the path to the compiler/interpreter
 			if (s.isNext("#!")) while (s.hasChr() && !s.next('\n')) s.chr();
 			
-			ast = TokenScope.createBase(s);
+			ast = new TokenBase(s);
 		}catch (ParserException e) {
 			System.out.println(name + ":" + (s.getLine() + 1) + ":" + (s.getCol() + 1) + ": " + e.getMessage());
 			

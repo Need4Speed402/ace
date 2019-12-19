@@ -6,6 +6,10 @@ public class NodeCall implements Node{
 	private Node function;
 	private Node argument;
 	
+	public NodeCall(String function, Node argument) {
+		this(new NodeIdentifier(function), argument);
+	}
+	
 	public NodeCall (Node function, Node argument) {
 		if (function == null || argument == null) throw new NullPointerException();
 		
