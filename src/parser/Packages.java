@@ -60,9 +60,9 @@ public class Packages {
 	public static Value file (String path) {
 		try {
 			return Packages.load(new Stream(Files.readAllBytes(new File(path).toPath())), new ResolverCompound(
-				new ResolverUnsafe(),
+				new ResolverFile(Packages.root),
 				new ResolverPackage("ace"),
-				new ResolverFile(Packages.root)
+				new ResolverUnsafe()
 			), path);
 		}catch (Exception e) {
 			e.printStackTrace();

@@ -1,5 +1,6 @@
 package node;
 
+import parser.token.TokenEnvironment;
 import value.Value;
 import value.ValueIdentifier;
 
@@ -16,6 +17,6 @@ public class NodeEnvironment implements Node{
 	
 	@Override
 	public String toString() {
-		return "{" + this.contents.toString() + "}";
+		return "{\n" + TokenEnvironment.indent(this.contents.toString()) + "\n}";
 	}
 }
