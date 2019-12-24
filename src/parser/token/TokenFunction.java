@@ -2,7 +2,6 @@ package parser.token;
 
 import node.Node;
 import node.NodeCall;
-import node.NodeIdentifier;
 
 public class TokenFunction extends Token{
 	private final Token param;
@@ -13,7 +12,7 @@ public class TokenFunction extends Token{
 	
 	@Override
 	public Node createEvent() {
-		return new NodeCall(new NodeIdentifier("Parameter"), this.param.createEvent());
+		return new NodeCall("Parameter", this.param.createEvent());
 	}
 	
 	@Override

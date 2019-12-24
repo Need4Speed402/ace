@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.file.Files;
 
 import node.Node;
+import parser.resolver.Resolver;
 import parser.resolver.ResolverCompound;
 import parser.resolver.ResolverFile;
 import parser.resolver.ResolverPackage;
@@ -23,7 +24,7 @@ public class Packages {
 		Packages.file(args[0]);
 	}
 	
-	public static Value load (Stream s, Value resolver, String name) {
+	public static Value load (Stream s, Resolver resolver, String name) {
 		Token ast;
 		
 		try {
@@ -51,7 +52,7 @@ public class Packages {
 				System.out.println(event);
 				return null;
 			}else {
-				return event.run(resolver);
+				return event.run(Resolver.createNode(resolver));
 			}
 		}
 	}
@@ -61,8 +62,7 @@ public class Packages {
 			return Packages.load(new Stream(Files.readAllBytes(new File(path).toPath())), new ResolverCompound(
 				new ResolverUnsafe(),
 				new ResolverPackage("ace"),
-				new ResolverFile(Packages.root),
-				new ResolverFile(new File(path).getParentFile())
+				new ResolverFile(Packages.root)
 			), path);
 		}catch (Exception e) {
 			e.printStackTrace();

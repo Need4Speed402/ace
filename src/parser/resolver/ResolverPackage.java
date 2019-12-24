@@ -6,57 +6,56 @@ import java.util.HashMap;
 import parser.Packages;
 import parser.Stream;
 import value.Value;
-import value.ValueIdentifier;
 
 public class ResolverPackage implements Resolver{
-	private final String path;
+	private final String root;
 	
 	private static HashMap<String, Value> cache = new HashMap<String, Value>();
 	
-	public ResolverPackage (String path) {
-		this.path = path;
+	public ResolverPackage (String root) {
+		this.root = root;
 	}
 	
 	@Override
-	public Value call(Value value) {
-		if (!(value instanceof ValueIdentifier)) return Value.NULL;
-		String name = ((ValueIdentifier) value).name;
+	public Value exists(String[] path) {
+		String joinPath = this.root + "/" + String.join("/", path);
 		
-		if (cache.containsKey(this.path + "/" + name)) {
-			return cache.get(this.path + "/" + name);
-		}else {
-			InputStream stream = ResolverPackage.class.getClassLoader().getResourceAsStream(this.path + "/" + name + ".ace");
+		Value resolution = cache.get(joinPath);
+		
+		if (resolution == null) {
+			InputStream stream = ResolverPackage.class.getClassLoader().getResourceAsStream(joinPath + ".ace");
 			
-			Value resolution = stream == null ? new ResolverPackage(this.path + "/" + name) : new Value() {
-				private Value val;
-				
-				@Override
-				public Value call(Value v) {
-					if (val == null) {
-						System.out.println("Loading: " + name);
+			if (stream != null) {
+				return new Value() {
+					private Value val;
+					
+					@Override
+					public Value call(Value v) {
+						if (val == null) {
+							System.out.println("Loading: " + joinPath);
+							
+							val = Packages.load(new Stream(stream), new ResolverCompound(
+								new ResolverUnsafe(),
+								new ResolverPackage ("ace")
+							), joinPath);
+						}
 						
-						val = Packages.load(new Stream(stream), new ResolverCompound(
-							new ResolverUnsafe(),
-							new ResolverPackage ("ace")
-						), name);
+						return val.call(v);
 					}
 					
-					return val.call(v);
-				}
-				
-				@Override
-				public String toString() {
-					return super.toString() + "[" + path + "/" + name + "]";
-				}
-			};
-			
-			cache.put(this.path + "/" + name, resolution);
-			return resolution;
+					@Override
+					public String toString() {
+						return super.toString() + "[" + joinPath + "]";
+					}
+				};
+			}
 		}
+		
+		return null;
 	}
 
 	@Override
 	public String toString() {
-		return super.toString() + "[" + this.path + "]";
+		return super.toString() + "[" + this.root + "]";
 	}
 }

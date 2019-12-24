@@ -43,7 +43,7 @@ public class Scope implements Value{
 			
 			this.memory.put("local", this.local);
 			
-			this.memory.put("execute", env -> aa -> b -> {
+			this.memory.put("`", env -> aa -> b -> {
 				Value a = Value.resolve(aa);
 				return a == Value.NULL ? b.call(x -> Value.resolve(x)) : a;
 			});

@@ -30,16 +30,6 @@ public class TokenIdentifier extends Token implements Modifier{
 	
 	@Override
 	public boolean isModifier() {
-		if (Stream.uppercase.indexOf(this.id.charAt(0)) >= 0) for (int i = 1; i < this.id.length(); i++) {
-			if (TokenStatement.operators.indexOf(this.id.charAt(i)) >= 0) {
-				continue;
-			}
-			
-			if (Stream.uppercase.indexOf(this.id.charAt(i)) == -1) {
-				return true;
-			}
-		}
-		
-		return false;
+		return Stream.uppercase.indexOf(this.id.charAt(0)) >= 0;
 	}
 }

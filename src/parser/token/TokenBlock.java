@@ -51,7 +51,7 @@ public abstract class TokenBlock extends Token{
 		Node current = Node.NULL;
 		
 		for (int i = nodes.length - 1; i >= 0; i--) {
-			current = new NodeEnvironment(new NodeCall(new NodeCall("execute", nodes[i]), current));
+			current = new NodeEnvironment(new NodeCall(new NodeCall("`", nodes[i]), current));
 		}
 		
 		return new NodeCall("Block", current);
@@ -111,7 +111,7 @@ public abstract class TokenBlock extends Token{
 				if (next == terminator) {
 					break;
 				}else {
-					throw new ParserException("illegal location of closing block statement: " + next);
+					throw new ParserException("illegal location of closing block token: " + next);
 				}
 			}
 			

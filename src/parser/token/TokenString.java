@@ -73,6 +73,17 @@ public class TokenString extends TokenBlock{
 		return b.toString();
 	}
 	
+	public static class StringScope extends TokenScope {
+		public StringScope (Stream s){
+			super (s);
+		}
+		
+		@Override
+		public Node createEvent() {
+			return new NodeCall("String", super.createEvent());
+		}
+	}
+	
 	public static class StringSegment extends Token {
 		private final String text;
 		
@@ -210,12 +221,12 @@ public class TokenString extends TokenBlock{
 				
 				if (escape == '"' && s.next('"')) break;
 				else if (s.next('(')) {
-					if (current.length() > 0 || tokens.size() == 0) {
+					if (current.length() > 0) {
 						tokens.push(new StringSegment(current.toString()));
 						current.setLength(0);
 					}
 					
-					tokens.push(new TokenScope(s));
+					tokens.push(new StringScope(s));
 				}else if (s.next('[')) {
 					StringBuilder name = new StringBuilder();
 					
