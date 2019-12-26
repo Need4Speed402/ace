@@ -1,4 +1,4 @@
-package unsafe.unsafe;
+package unsafe;
 
 import value.Value;
 

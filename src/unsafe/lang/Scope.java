@@ -1,4 +1,4 @@
-package unsafe;
+package unsafe.lang;
 
 import java.util.HashMap;
 
