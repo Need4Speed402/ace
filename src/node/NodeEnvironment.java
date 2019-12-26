@@ -7,7 +7,7 @@ import value.ValueIdentifier;
 public class NodeEnvironment implements Node{
 	private final Node contents;
 	
-	public NodeEnvironment(Node contents) {
+	protected NodeEnvironment(Node contents) {
 		this.contents = contents;
 	}
 	
@@ -18,5 +18,19 @@ public class NodeEnvironment implements Node{
 	@Override
 	public String toString() {
 		return "{\n" + TokenEnvironment.indent(this.contents.toString()) + "\n}";
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof NodeEnvironment) {
+			return ((NodeEnvironment) obj).contents.equals(obj);
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return this.contents.hashCode() + 7;
 	}
 }

@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import node.Node;
-import node.NodeCall;
-import node.NodeIdentifier;
 import parser.ParserException;
 import parser.Stream;
 import parser.TokenList;
@@ -25,21 +23,21 @@ public class TokenString extends TokenBlock{
 		Node[] string = new Node[s.length()];
 		
 		for (int ii = 0; ii < string.length; ii++) {
-			string[ii] = new NodeCall("Integer", new TokenInteger.BooleanArray(s.charAt(ii)).toNode());
+			string[ii] = Node.call("Integer", new TokenInteger.BooleanArray(s.charAt(ii)).toNode());
 		}
 		
 		return TokenBlock.createBlock(string);
 	}
 	
 	@Override
-	public Node createEvent() {
+	public Node createNode() {
 		Node stack = null;
 		
 		for (Token t : this.getTokens()) {
 			if (stack == null) {
-				stack = t.createEvent();
+				stack = t.createNode();
 			}else {
-				stack = new NodeCall(new NodeCall(stack, new NodeIdentifier("+")), t.createEvent());
+				stack = Node.call(stack, Node.id("+"), t.createNode());
 			}
 		}
 		
@@ -79,12 +77,12 @@ public class TokenString extends TokenBlock{
 		}
 		
 		@Override
-		public Node createEvent() {
-			return new NodeCall("String", super.createEvent());
+		public Node createNode() {
+			return Node.call("String", super.createNode());
 		}
 	}
 	
-	public static class StringSegment extends Token {
+	public static class StringSegment implements Token {
 		private final String text;
 		
 		public StringSegment (String text) {
@@ -92,8 +90,8 @@ public class TokenString extends TokenBlock{
 		}
 		
 		@Override
-		public Node createEvent() {
-			return new NodeCall("String", createStringElement(this.text));
+		public Node createNode() {
+			return Node.call("String", createStringElement(this.text));
 		}
 		
 		@Override

@@ -1,11 +1,10 @@
 package parser.token;
 
 import node.Node;
-import node.NodeIdentifier;
 import parser.Stream;
 
-public class TokenIdentifier extends Token implements Modifier{
-	public final String id;
+public class TokenIdentifier implements Token, Modifier{
+	private final String id;
 	
 	public TokenIdentifier (String key) {
 		if (key == null) throw new NullPointerException();
@@ -24,8 +23,8 @@ public class TokenIdentifier extends Token implements Modifier{
 	}
 	
 	@Override
-	public Node createEvent() {
-		return new NodeIdentifier(this.id);
+	public Node createNode() {
+		return Node.id(this.id);
 	}
 	
 	@Override

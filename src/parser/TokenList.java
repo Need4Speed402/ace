@@ -31,6 +31,20 @@ public class TokenList {
 		return tokens;
 	}
 	
+	public TokenList sub (int i) {
+		return this.sub(i, this.size());
+	}
+	
+	public TokenList sub (int i, int end) {
+		TokenList n = new TokenList();
+		
+		for (; i < end; i++) {
+			n.push(this.get(i));
+		}
+		
+		return n;
+	}
+	
 	public int size () {
 		return this.tokens.size();
 	}

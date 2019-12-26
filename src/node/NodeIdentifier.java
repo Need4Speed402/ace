@@ -6,7 +6,7 @@ import value.ValueIdentifier;
 public class NodeIdentifier implements Node{
 	public final String name;
 	
-	public NodeIdentifier(String name) {
+	protected NodeIdentifier(String name) {
 		this.name = name.intern();
 	}
 	
@@ -18,5 +18,19 @@ public class NodeIdentifier implements Node{
 	@Override
 	public String toString() {
 		return this.name;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof NodeIdentifier) {
+			return ((NodeIdentifier) obj).name == name;
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return this.name.hashCode();
 	}
 }

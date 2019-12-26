@@ -6,11 +6,7 @@ public class NodeCall implements Node{
 	private Node function;
 	private Node argument;
 	
-	public NodeCall(String function, Node argument) {
-		this(new NodeIdentifier(function), argument);
-	}
-	
-	public NodeCall (Node function, Node argument) {
+	protected NodeCall (Node function, Node argument) {
 		if (function == null || argument == null) throw new NullPointerException();
 		
 		this.function = function;
@@ -28,5 +24,22 @@ public class NodeCall implements Node{
 	@Override
 	public String toString() {
 		return "(" + this.function.toString() + " " + this.argument.toString() + ")";
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof NodeCall) {
+			Node f = ((NodeCall) obj).function;
+			Node a = ((NodeCall) obj).argument;
+			
+			return f.equals(this.function) && a.equals(this.argument);
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return (this.function.hashCode() ^ this.argument.hashCode()) + 11;
 	}
 }

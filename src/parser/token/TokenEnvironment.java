@@ -1,7 +1,6 @@
 package parser.token;
 
 import node.Node;
-import node.NodeCall;
 import parser.Stream;
 
 public class TokenEnvironment extends TokenBlock {
@@ -40,7 +39,7 @@ public class TokenEnvironment extends TokenBlock {
 	}
 	
 	@Override
-	public Node createEvent() {
-		return new NodeCall("Environment", super.createEvent());
+	public Node createNode() {
+		return Node.call("Environment", super.createNode());
 	}
 }

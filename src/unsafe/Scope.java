@@ -8,57 +8,65 @@ import value.ValueIdentifier;
 public class Scope implements Value{
 	@Override
 	public Value call(Value env) {
-		ScopeEnv scope = new ScopeEnv();
-		Value ret = env.call(scope);
-		scope.close();
-		return ret;
+		return env.call(new ScopeEnv());
 	}
 
 	private static class ScopeEnv implements Value{
-		private HashMap<String, Value> memory = new HashMap<String, Value>();
-		private Value local;
+		private HashMap<String, Value> memory;
 		private boolean closed = false;
 		
 		public ScopeEnv () {
-			this.local = parent -> var -> {
-				if (var instanceof ValueIdentifier) {
-					String name = ((ValueIdentifier) var).name;
-					Value parentVar = parent.call(var);
-					
-					return ctx -> {
-						if (!this.closed && Value.compare(ctx, "=")) {
-							return set -> {
-								Value put = Value.resolve(set);
-								this.memory.put(name, a -> put);
-								return Value.NULL;
-							};
-						}else{
-							return parentVar.call(ctx);
+			this(new HashMap<String, Value>());
+			
+			memory.put("`,`", ident -> body -> arg -> body.call(ctx -> {
+				if (Value.compare(ident, ctx)) {
+					return g -> {
+						if (Value.compare(g, "`*`")) {
+							return arg;
+						}else {
+							return arg.call(g);
 						}
 					};
 				}else {
-					return var.call(".").call(this.local.call(parent));
+					return Value.resolve(ctx);
 				}
-			};
-			
-			this.memory.put("local", this.local);
-			
-			this.memory.put("`", env -> aa -> b -> {
-				Value a = Value.resolve(aa);
-				return a == Value.NULL ? b.call(x -> Value.resolve(x)) : a;
-			});
+			}));
 		}
 		
-		public void close () {
-			this.closed = true;
+		public ScopeEnv(HashMap<String, Value> memory) {
+			this.memory = memory;
+			
+			this.memory.put("`", a -> b -> {
+				this.closed = true;
+				
+				if (a != Value.NULL) {
+					return Value.resolve(a);
+				}else {
+					return b.call(new ScopeEnv(this.memory));
+				}
+			});
 		}
 
 		@Override
 		public Value call(Value var) {
-			String name = ((ValueIdentifier) var).name;
-			Value value = ((ValueIdentifier) var).value;
+			if (!(var instanceof ValueIdentifier)) return var;
 			
-			return this.memory.getOrDefault(name, a -> a).call(value);
+			String name = ((ValueIdentifier) var).name;
+			
+			return ctx -> {
+				if (Value.compare(ctx, "`.`")) return local -> {
+					if (!this.closed && Value.compare(local, "=")) {
+						return set -> {
+							this.memory.put(name, set);
+							return Value.NULL;
+						};
+					}
+					
+					return this.memory.getOrDefault(name, Value.NULL).call(local);
+				};
+				
+				return this.memory.getOrDefault(name, Value.resolve(var)).call(ctx);
+			};
 		}
 	}
 }

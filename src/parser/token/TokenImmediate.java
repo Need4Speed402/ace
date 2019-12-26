@@ -1,9 +1,8 @@
 package parser.token;
 
 import node.Node;
-import node.NodeCall;
 
-public class TokenImmediate extends Token{
+public class TokenImmediate implements Token{
 	private final Token first, second;
 	
 	public TokenImmediate(Token first, Token second) {
@@ -12,8 +11,8 @@ public class TokenImmediate extends Token{
 	}
 	
 	@Override
-	public Node createEvent() {
-		return new NodeCall(this.first.createEvent(), this.second.createEvent());
+	public Node createNode() {
+		return Node.call(this.first.createNode(), this.second.createNode());
 	}
 
 	@Override

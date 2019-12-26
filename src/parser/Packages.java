@@ -35,7 +35,7 @@ public class Packages {
 			if (s.isNext("#!")) while (s.hasChr() && !s.next('\n')) s.chr();
 			
 			ast = new TokenBase(s);
-		}catch (ParserException e) {
+		}catch (Exception e) {
 			System.out.println(name + ":" + (s.getLine() + 1) + ":" + (s.getCol() + 1) + ": " + e.getMessage());
 			
 			throw e;
@@ -46,7 +46,7 @@ public class Packages {
 			
 			return null;
 		}else {
-			Node event = ast.createEvent();
+			Node event = ast.createNode();
 			
 			if (PRINT_EVENTS) {
 				System.out.println(event);

@@ -5,13 +5,12 @@ import java.math.BigInteger;
 import java.util.Arrays;
 
 import node.Node;
-import node.NodeCall;
 import parser.ParserException;
 import parser.Stream;
 import parser.TokenList;
 
 public class TokenStatement extends TokenBlock implements Modifier{
-	public static final String operators = "= ., _ @# ? |&! ~:;<> +- */\\% ^$ `";
+	public static final String operators = "= ., _ @# ? |&! ~:<> +- */\\% ^$ `";
 	public static final char[] ops = operators.replaceAll(" ", "").toCharArray();
 	public static final int[] operatorValues;
 	
@@ -60,7 +59,7 @@ public class TokenStatement extends TokenBlock implements Modifier{
 		if (!ctoken && !rtoken) return 0;
 		
 		if (!ctoken) {
-			String o = ((TokenIdentifier) r).id;
+			String o = ((TokenIdentifier) r).getName();
 			
 			if (operators.indexOf(o.charAt(o.length() - 1)) >= 0) {
 				return 1;
@@ -70,7 +69,7 @@ public class TokenStatement extends TokenBlock implements Modifier{
 		}
 		
 		if (!rtoken) {
-			String o = ((TokenIdentifier) c).id;
+			String o = ((TokenIdentifier) c).getName();
 			
 			if (operators.indexOf(o.charAt(o.length() - 1)) >= 0) {
 				return -1;
@@ -79,8 +78,8 @@ public class TokenStatement extends TokenBlock implements Modifier{
 			}
 		}
 		
-		String o1 = ((TokenIdentifier) c).id;
-		String o2 = ((TokenIdentifier) r).id;
+		String o1 = ((TokenIdentifier) c).getName();
+		String o2 = ((TokenIdentifier) r).getName();
 		
 		int i = 0;
 		
@@ -164,10 +163,10 @@ public class TokenStatement extends TokenBlock implements Modifier{
 	
 	public static Token modifierPrecedence (Token[] tokens) {
 		for (int i = tokens.length - 2; i >= 0; i--) {
-			if (tokens[i] instanceof TokenFunction || tokens[i] instanceof Modifier && ((Modifier) tokens[i]).isModifier()) {
+			if (tokens[i] instanceof Modifier && ((Modifier) tokens[i]).isModifier()) {
 				Token[] nt = new Token[tokens.length - 1];
 				System.arraycopy(tokens, 0, nt, 0, i);
-				nt[i] = new Caller(tokens[i], tokens[i + 1]);
+				nt[i] = ((Modifier) tokens[i]).bind(tokens[i + 1]);
 				System.arraycopy(tokens, i + 2, nt, i + 1, tokens.length - i - 2);
 				
 				tokens = nt;
@@ -188,17 +187,17 @@ public class TokenStatement extends TokenBlock implements Modifier{
 	}
 	
 	@Override
-	public Node createEvent() {
+	public Node createNode() {
 		Token[] tokens = this.getTokens();
 		
 		if (tokens.length == 1) {
-			return tokens[0].createEvent();
+			return tokens[0].createNode();
 		}else {
-			return getCaller(tokens).createEvent();
+			return getCaller(tokens).createNode();
 		}
 	}
 	
-	private static class Caller extends Token {
+	private static class Caller implements Token {
 		Token function;
 		Token param;
 		
@@ -208,8 +207,8 @@ public class TokenStatement extends TokenBlock implements Modifier{
 		}
 		
 		@Override
-		public Node createEvent () {
-			return new NodeCall(this.function.createEvent(), this.param.createEvent());
+		public Node createNode () {
+			return Node.call(this.function.createNode(), this.param.createNode());
 		}
 		
 		@Override
@@ -237,19 +236,13 @@ public class TokenStatement extends TokenBlock implements Modifier{
 	}
 	
 	public static Token readImmediate (Stream s) {
-		if (!s.hasChr() || s.isNext(Stream.whitespace) || s.isNext(")]},;".toCharArray())) return null;
+		if (!s.hasChr() || s.isNext(Stream.whitespace) || s.isNext(")]};".toCharArray())) return null;
 		
 		if (s.isNext(ops)) {
 			StringBuilder operator = new StringBuilder();
 			while (s.isNext(ops)) operator.append(s.chr());
 			
-			Token next = readImmediate(s);
-			
-			if (next == null) {
-				return new TokenOperator(operator.toString());
-			}else {
-				return new TokenOperatorImmediate(operator.toString(), next);
-			}
+			return new TokenOperator(operator.toString());
 		}
 		
 		if (s.next('(')) return new TokenScope(s);
@@ -261,17 +254,23 @@ public class TokenStatement extends TokenBlock implements Modifier{
 		{
 			StringBuilder ident = new StringBuilder();
 			
-			while (s.hasChr() && !s.isNext(Stream.whitespace) && !s.isNext("()[]{}'\"".toCharArray())) {
-				if (s.isNext(',', ';')) {
-					Stream ss = s.clone();
-					ss.chr();
-					if (!ss.hasChr() || ss.isNext(Stream.whitespace) || ss.isNext("()[]{}'\";".toCharArray())) {
-						break;
-					}
+			{
+				Stream ss = s.clone();
+				
+				while (ss.hasChr() && !ss.isNext(Stream.whitespace) && !ss.isNext("()[]{}'\";".toCharArray())) {
+					ident.append(ss.chr());
 				}
 				
-				ident.append(s.chr());
+				if (operators.indexOf(ident.charAt(ident.length() - 1)) >= 0) {
+					int index = ident.length() - 1;
+					while (operators.indexOf(ident.charAt(index - 1)) >= 0) index--;
+					
+					ident.delete(index, ident.length());
+				}
+				
+				for (int i = 0; i < ident.length(); i++) s.chr();
 			}
+			
 			
 			Object number = TokenInteger.parseNumber(ident.toString());
 			
@@ -288,10 +287,6 @@ public class TokenStatement extends TokenBlock implements Modifier{
 	}
 	
 	public static Token readImmediates (Stream s) {
-		if (s.next(',')){
-			return new TokenFunction(new TokenScope());
-		}
-		
 		TokenList tokens = new TokenList();
 		
 		while (s.hasChr()) {
@@ -299,16 +294,23 @@ public class TokenStatement extends TokenBlock implements Modifier{
 			
 			if (next == null) {
 				break;
-			}else if (s.next(',')) {
-				tokens.push(next);
-				
-				return new TokenFunction(tokens.asImmediates());
 			}else {
 				tokens.push(next);
 			}
 		}
 		
-		return tokens.asImmediates();
+		TokenOperator first = tokens.first() instanceof TokenOperator ? (TokenOperator) tokens.first() : null;
+		TokenOperator last = tokens.last() instanceof TokenOperator ? (TokenOperator) tokens.last() : null;
+		
+		if (first == last) {
+			return tokens.asImmediates();
+		}else if (first != null && last != null) {
+			return new TokenOperatorTrailing(last.getName(), new TokenOperatorLeading(first.getName(), tokens.sub(1, tokens.size() - 1).asImmediates()));
+		}else if (first != null) {
+			return new TokenOperatorLeading(first.getName(), tokens.sub(1).asImmediates());
+		}else{
+			return new TokenOperatorTrailing(last.getName(), tokens.sub(0, tokens.size() - 1).asImmediates());
+		}
 	}
 }
  

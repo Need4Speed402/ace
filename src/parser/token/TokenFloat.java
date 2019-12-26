@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 import node.Node;
 
-public class TokenFloat extends Token{
+public class TokenFloat implements Token{
 	BigDecimal decimal;
 	
 	public TokenFloat (BigDecimal decimal) {
@@ -12,7 +12,7 @@ public class TokenFloat extends Token{
 	}
 
 	@Override
-	public Node createEvent() {
+	public Node createNode() {
 		throw new RuntimeException("not implemented");
 	}
 	

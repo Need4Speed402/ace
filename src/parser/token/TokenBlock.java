@@ -1,13 +1,11 @@
 package parser.token;
 
 import node.Node;
-import node.NodeCall;
-import node.NodeEnvironment;
 import parser.ParserException;
 import parser.Stream;
 import parser.TokenList;
 
-public abstract class TokenBlock extends Token{
+public abstract class TokenBlock implements Token{
 	private Token[] tokens;
 	
 	public TokenBlock (Token[] tokens) {
@@ -41,20 +39,21 @@ public abstract class TokenBlock extends Token{
 		return b.toString();
 	}
 	
-	public Node createEvent () {
+	@Override
+	public Node createNode () {
 		Node[] nodes = new Node[this.tokens.length];
-		for (int i = 0; i < nodes.length; i++) nodes[i] = this.tokens[i].createEvent();
+		for (int i = 0; i < nodes.length; i++) nodes[i] = this.tokens[i].createNode();
 		return createBlock(nodes);
 	}
 	
-	public static Node createBlock (Node[] nodes) {
+	public static Node createBlock (Node ... nodes) {
 		Node current = Node.NULL;
 		
 		for (int i = nodes.length - 1; i >= 0; i--) {
-			current = new NodeEnvironment(new NodeCall(new NodeCall("`", nodes[i]), current));
+			current = Node.env(Node.call("`", nodes[i], current));
 		}
 		
-		return new NodeCall("Block", current);
+		return Node.call("Block", current);
 	}
 	
 	public static Token[] readBlock (Stream s, char terminator) {

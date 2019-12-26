@@ -1,20 +1,14 @@
 package parser.token;
 
 import node.Node;
-import node.NodeCall;
-import node.NodeIdentifier;
 
-public class TokenOperatorImmediate extends Token implements Modifier{
+public class TokenOperatorLeading implements Token, Modifier{
 	private final Token token;
 	private final String operator;
 	
-	public TokenOperatorImmediate(String operator, Token token) {
+	public TokenOperatorLeading(String operator, Token token) {
 		this.operator = operator;
 		this.token = token;
-	}
-	
-	public String getOperator() {
-		return operator;
 	}
 	
 	@Override
@@ -23,8 +17,8 @@ public class TokenOperatorImmediate extends Token implements Modifier{
 	}
 	
 	@Override
-	public Node createEvent() {
-		return new NodeCall(this.token.createEvent(), new NodeIdentifier('`' + this.operator + '`'));
+	public Node createNode() {
+		return Node.call(this.token.createNode(), Node.id('`' + this.operator + '`'));
 	}
 	
 	@Override

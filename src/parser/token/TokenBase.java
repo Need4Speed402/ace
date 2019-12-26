@@ -1,7 +1,6 @@
 package parser.token;
 
 import node.Node;
-import node.NodeCall;
 import parser.Stream;
 
 public class TokenBase extends TokenBlock{
@@ -10,7 +9,7 @@ public class TokenBase extends TokenBlock{
 	}
 	
 	@Override
-	public Node createEvent() {
-		return new NodeCall("Package", super.createEvent());
+	public Node createNode() {
+		return Node.call("Package", super.createNode());
 	}
 }

@@ -1,61 +1,47 @@
-local cmp = unsafe identifier compare
+.cmp = unsafe identifier compare
 
-local check = Scope bool, callback, {
-	Scope (bool callback {})
-}
+.check = bool, callback, (
+	(bool callback {}) {}
+)
 
-Scope value, arg, {
+value, arg, (
 	;; run cb if true
-	check (cmp *arg ?) {
-		Scope cb, {
-			Scope (value cb {})
-		}
-	}
+	check (cmp *arg ?) (), cb, (
+		Scope (value cb {})
+	)
 	
 	;; run cb if false
-	check (cmp *arg !?) {
-		Scope cb, {
-			Scope (value {} cb)
-		}
-	}
+	check (cmp *arg !?) (), cb, (
+		Scope (value {} cb)
+	)
 	
 	;; invert
-	check (cmp *arg `!`) {
+	check (cmp *arg `!`) (), (
 		value false true
-	}
+	)
 	
 	;; xor
-	check (cmp *arg !) {
-		Scope v2, {
-			Scope (value {!v2} {v2})
-		}
-	}
+	check (cmp *arg !) (), v2, (
+		Scope (value {!v2} {v2})
+	)
 	
 	;; and
-	check (cmp *arg &) {
-		Scope v2, {
-			value v2 false
-		}
-	}
+	check (cmp *arg &) (), v2, (
+		value v2 false
+	)
 	
 	;; or
-	check (cmp *arg |) {
-		Scope v2, {
-			value true v2
-		}
-	}
+	check (cmp *arg |) (), v2, (
+		value true v2
+	)
 	
 	;; not equal
-	check (cmp *arg !:) {
-		Scope v2, {
-			Scope (value {!v2} {v2})
-		}
-	}
+	check (cmp *arg !:) (), v2, (
+		Scope (value {!v2} {v2})
+	)
 	
 	;; equal
-	check (cmp *arg :) {
-		Scope v2, {
-			Scope (value {v2} {!v2})
-		}
-	}
-}
+	check (cmp *arg :) (), v2, (
+		Scope (value {v2} {!v2})
+	)
+)

@@ -4,11 +4,9 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import node.Node;
-import node.NodeCall;
-import node.NodeIdentifier;
 import value.Value;
 
-public class TokenInteger extends Token{
+public class TokenInteger implements Token{
 	private final BooleanArray number;
 	
 	public TokenInteger (boolean[] number) {
@@ -20,8 +18,8 @@ public class TokenInteger extends Token{
 	}
 	
 	@Override
-	public Node createEvent() {
-		return new NodeCall("Integer", this.number.toNode());
+	public Node createNode() {
+		return Node.call("Integer", this.number.toNode());
 	}
 	
 	@Override
@@ -187,7 +185,7 @@ public class TokenInteger extends Token{
 			Node[] values = new Node[this.length];
 			
 			for (int i = 0; i < values.length; i++) {
-				values[i] = new NodeIdentifier(this.array[i] ? "true" : "false");
+				values[i] = Node.id(this.array[i] ? "true" : "false");
 			}
 			
 			return TokenBlock.createBlock(values);
