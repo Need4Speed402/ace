@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import node.Node;
+import parser.Color;
 import parser.ParserException;
 import parser.Stream;
 import parser.TokenList;
@@ -62,13 +63,13 @@ public class TokenString extends TokenBlock{
 			if (t instanceof StringSegment) {
 				b.append(((StringSegment) t).toString(escaped));
 			}else {
-				b.append('`').append(t.toString());
+				b.append(Color.purple("`" + t.toString()));
 			}
 		}
 		
 		b.append(escaped ? "`\"" : '\'');
 		
-		return b.toString();
+		return Color.yellow(b.toString());
 	}
 	
 	public static class StringScope extends TokenScope {
@@ -112,12 +113,12 @@ public class TokenString extends TokenBlock{
 					
 					if (n != null) {
 						if (n.length() == 1) {
-							b.append("`" + n);
+							b.append(Color.purple("`" + n));
 						}else {
-							b.append("`[" + n + ']');
+							b.append(Color.purple("`[" + n + ']'));
 						}
 					}else {
-						b.append('`' + Integer.toString(c, 16).toUpperCase() + '^');
+						b.append(Color.purple('`' + Integer.toString(c, 16).toUpperCase() + '^'));
 					}
 				}
 				else b.append(c);
@@ -152,34 +153,6 @@ public class TokenString extends TokenBlock{
 		public char charAt (int i) {
 			return b.charAt(i);
 		}
-	}
-	
-	public static BigInteger readInt (Stream ss) {
-		StringBuilder ahead = new StringBuilder ();
-		Stream s = ss.clone();
-		
-		char[] validLookaheadChars = "-0123456789ABCDEFabcdef".toCharArray();
-		char[] breakCharacters = "!^*.".toCharArray();
-		
-		while (s.hasChr()) {
-			if (s.isNext(breakCharacters)) {
-				ahead.append(s.chr());
-				
-				BigInteger i = (BigInteger) TokenInteger.parseNumber(ahead.toString());
-				
-				if (i != null) {
-					ss.set(s);
-				}
-				
-				return i;
-			}else if (ahead.length() == 0 || s.isNext(validLookaheadChars)) {
-				ahead.append(s.chr());
-			}else {
-				break;
-			}
-		}
-		
-		return null;
 	}
 	
 	public static TokenString readString (Stream s, char escape) {
@@ -253,7 +226,7 @@ public class TokenString extends TokenBlock{
 					current.append(decoded);
 				}else{
 					//look ahead to see if there is a number
-					BigInteger i = readInt(s);
+					BigInteger i = (BigInteger) TokenInteger.readNum(s, true);
 					
 					if (i != null) {
 						current.append((char) i.intValue());

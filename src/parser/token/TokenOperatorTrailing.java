@@ -1,6 +1,7 @@
 package parser.token;
 
 import node.Node;
+import parser.Color;
 
 public class TokenOperatorTrailing implements Token, Modifier{
 	private final Token token;
@@ -13,17 +14,12 @@ public class TokenOperatorTrailing implements Token, Modifier{
 	
 	@Override
 	public String toString() {
-		return this.token.toString() + this.operator;
+		return this.token.toString() + Color.red(this.operator);
 	}
 	
 	@Override
 	public Node createNode() {
-		return Node.call('`' + this.operator + '`', this.token.createNode());
-	}
-	
-	@Override
-	public Token bind(Token what) {
-		return () -> Node.call('`' + this.operator + '`', this.token.createNode(), TokenBlock.createBlock(what.createNode()));
+		return Node.call(this.token.createNode(), Node.id('`' + this.operator + '`'));
 	}
 	
 	@Override

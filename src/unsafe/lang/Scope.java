@@ -17,20 +17,6 @@ public class Scope implements Value{
 		
 		public ScopeEnv () {
 			this(new HashMap<String, Value>());
-			
-			memory.put("`,`", ident -> body -> arg -> body.call(ctx -> {
-				if (Value.compare(ident, ctx)) {
-					return g -> {
-						if (Value.compare(g, "`*`")) {
-							return arg;
-						}else {
-							return arg.call(g);
-						}
-					};
-				}else {
-					return Value.resolve(ctx);
-				}
-			}));
 		}
 		
 		public ScopeEnv(HashMap<String, Value> memory) {
@@ -54,10 +40,24 @@ public class Scope implements Value{
 			String name = ((ValueIdentifier) var).name;
 			
 			return ctx -> {
-				if (Value.compare(ctx, "`.`")) return local -> {
+				if (Value.compare(ctx, "`,`")) {
+					return body -> env -> arg -> body.call(ctx2 -> {
+						if (Value.compare(ctx2, name)) {
+							return g -> {
+								if (Value.compare(g, "`*`")) {
+									return arg;
+								}else {
+									return arg.call(g);
+								}
+							};
+						}else {
+							return env.call(ctx2);
+						}
+					});
+				}else if (Value.compare(ctx, "`.`")) return local -> {
 					if (!this.closed && Value.compare(local, "=")) {
 						return set -> {
-							this.memory.put(name, set);
+							this.memory.put(name, Value.resolve(set));
 							return Value.NULL;
 						};
 					}

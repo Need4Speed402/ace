@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import node.Node;
+import parser.Color;
+import parser.Stream;
 import value.Value;
 
 public class TokenInteger implements Token{
@@ -22,6 +24,35 @@ public class TokenInteger implements Token{
 		return Node.call("Integer", this.number.toNode());
 	}
 	
+	public static Object readNum (Stream ss, boolean integer) {
+		StringBuilder ahead = new StringBuilder ();
+		Stream s = ss.clone();
+		
+		char[] validLookaheadChars = "-0123456789ABCDEFabcdef".toCharArray();
+		char[] breakCharacters = "!^*.".toCharArray();
+		
+		while (s.hasChr()) {
+			if (s.isNext(breakCharacters)) {
+				if (!integer && s.next('.') && s.isNext(validLookaheadChars)) {
+					ahead.append('.');
+					continue;
+				}else {
+					ahead.append(s.chr());
+				}
+				
+				Object i = parseNumber(ahead.toString());
+				if (i != null) ss.set(s);
+				return i;
+			}else if (ahead.length() == 0 || s.isNext(validLookaheadChars)) {
+				ahead.append(s.chr());
+			}else {
+				break;
+			}
+		}
+		
+		return null;
+	}
+	
 	@Override
 	public String toString() {
 		String str = this.number.toString();
@@ -33,7 +64,7 @@ public class TokenInteger implements Token{
 			str = str.substring(0, index) + "," + str.substring(index);
 		}
 		
-		return str;
+		return Color.green(str);
 	}
 	
 	public static BigInteger getInt (Value v) {

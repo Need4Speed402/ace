@@ -1,6 +1,7 @@
 package parser.token;
 
 import node.Node;
+import parser.Color;
 import parser.Stream;
 
 public class TokenIdentifier implements Token, Modifier{
@@ -15,7 +16,11 @@ public class TokenIdentifier implements Token, Modifier{
 	
 	@Override
 	public String toString() {
-		return this.id;
+		if (this.isModifier()) {
+			return Color.cyan(this.id);
+		}else {
+			return this.id;
+		}
 	}
 	
 	public String getName() {

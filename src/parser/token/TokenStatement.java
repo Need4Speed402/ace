@@ -166,7 +166,7 @@ public class TokenStatement extends TokenBlock implements Modifier{
 			if (tokens[i] instanceof Modifier && ((Modifier) tokens[i]).isModifier()) {
 				Token[] nt = new Token[tokens.length - 1];
 				System.arraycopy(tokens, 0, nt, 0, i);
-				nt[i] = ((Modifier) tokens[i]).bind(tokens[i + 1]);
+				nt[i] = new Caller(tokens[i], tokens[i + 1]);
 				System.arraycopy(tokens, i + 2, nt, i + 1, tokens.length - i - 2);
 				
 				tokens = nt;
@@ -265,21 +265,36 @@ public class TokenStatement extends TokenBlock implements Modifier{
 					int index = ident.length() - 1;
 					while (operators.indexOf(ident.charAt(index - 1)) >= 0) index--;
 					
+					Object num = TokenInteger.parseNumber(ident.substring(0, index + 1));
+					
+					if (num != null) {
+						for (int i = 0; i <= index; i++) s.chr();
+						
+						if (num instanceof BigInteger) {
+							return new TokenInteger((BigInteger) num);
+						}
+						
+						if (num instanceof BigDecimal) {
+							return new TokenFloat((BigDecimal) num);
+						}
+					}
+					
 					ident.delete(index, ident.length());
 				}
 				
 				for (int i = 0; i < ident.length(); i++) s.chr();
 			}
 			
-			
-			Object number = TokenInteger.parseNumber(ident.toString());
-			
-			if (number != null && number instanceof BigInteger) {
-				return new TokenInteger((BigInteger) number);
-			}
-			
-			if (number != null && number instanceof BigDecimal) {
-				return new TokenFloat((BigDecimal) number);
+			{
+				Object num = TokenInteger.parseNumber(ident.toString());
+				
+				if (num != null && num instanceof BigInteger) {
+					return new TokenInteger((BigInteger) num);
+				}
+				
+				if (num != null && num instanceof BigDecimal) {
+					return new TokenFloat((BigDecimal) num);
+				}
 			}
 			
 			return new TokenIdentifier(ident.toString());

@@ -3,6 +3,7 @@ package parser.token;
 import java.math.BigDecimal;
 
 import node.Node;
+import parser.Color;
 
 public class TokenFloat implements Token{
 	BigDecimal decimal;
@@ -28,6 +29,6 @@ public class TokenFloat implements Token{
 			str = str.substring(0, index) + "-" + str.substring(index);
 		}
 		
-		return str;
+		return Color.green(str);
 	}
 }

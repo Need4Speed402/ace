@@ -1,47 +1,47 @@
 .cmp = unsafe identifier compare
 
-.check = bool, callback, (
-	(bool callback {}) {}
-)
+.check = Scope bool, callback, {
+	Scope (bool callback {})
+}
 
-value, arg, (
+Scope value, arg, {
 	;; run cb if true
-	check (cmp *arg ?) (), cb, (
+	check (cmp *arg ?) Scope {}, cb, {
 		Scope (value cb {})
-	)
+	}
 	
 	;; run cb if false
-	check (cmp *arg !?) (), cb, (
+	check (cmp *arg !?) Scope {}, cb, {
 		Scope (value {} cb)
-	)
+	}
 	
 	;; invert
-	check (cmp *arg `!`) (), (
+	check (cmp *arg `!`) Scope {}, {
 		value false true
-	)
+	}
 	
 	;; xor
-	check (cmp *arg !) (), v2, (
+	check (cmp *arg !) Scope {}, v2, {
 		Scope (value {!v2} {v2})
-	)
+	}
 	
 	;; and
-	check (cmp *arg &) (), v2, (
+	check (cmp *arg &) Scope {}, v2, {
 		value v2 false
-	)
+	}
 	
 	;; or
-	check (cmp *arg |) (), v2, (
+	check (cmp *arg |) Scope {}, v2, {
 		value true v2
-	)
+	}
 	
 	;; not equal
-	check (cmp *arg !:) (), v2, (
+	check (cmp *arg !:) Scope {}, v2, {
 		Scope (value {!v2} {v2})
-	)
+	}
 	
 	;; equal
-	check (cmp *arg :) (), v2, (
+	check (cmp *arg :) Scope {}, v2, {
 		Scope (value {v2} {!v2})
-	)
-)
+	}
+}
