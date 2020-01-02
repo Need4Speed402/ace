@@ -25,10 +25,10 @@ public class Scope implements Value{
 			this.memory.put("`", a -> b -> {
 				this.closed = true;
 				
-				if (a != Value.NULL) {
-					return Value.resolve(a);
-				}else {
+				if (Value.compare(a, "`")) {
 					return b.call(new ScopeEnv(this.memory));
+				}else{
+					return Value.resolve(a);
 				}
 			});
 		}

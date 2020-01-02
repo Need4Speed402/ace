@@ -12,7 +12,7 @@ public class NodeIdentifier implements Node{
 	
 	@Override
 	public Value run(Value environment) {
-		return new ValueIdentifier(this.name, environment.call(new ValueIdentifier(this.name, Value.NULL)));
+		return new ValueIdentifier(this.name, environment.call(new ValueIdentifier(this.name, v -> Value.NULL)));
 	}
 	
 	@Override

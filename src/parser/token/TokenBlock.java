@@ -47,7 +47,7 @@ public abstract class TokenBlock implements Token{
 	}
 	
 	public static Node createBlock (Node ... nodes) {
-		Node current = Node.NULL;
+		Node current = Node.env(Node.id("`"));
 		
 		for (int i = nodes.length - 1; i >= 0; i--) {
 			current = Node.env(Node.call("`", nodes[i], current));
