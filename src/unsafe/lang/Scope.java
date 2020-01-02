@@ -40,11 +40,11 @@ public class Scope implements Value{
 			String name = ((ValueIdentifier) var).name;
 			
 			return ctx -> {
-				if (Value.compare(ctx, "`,`")) {
+				if (Value.compare(ctx, "`,")) {
 					return body -> env -> arg -> body.call(ctx2 -> {
 						if (Value.compare(ctx2, name)) {
 							return g -> {
-								if (Value.compare(g, "`*`")) {
+								if (Value.compare(g, "*`")) {
 									return arg;
 								}else {
 									return arg.call(g);
@@ -54,7 +54,7 @@ public class Scope implements Value{
 							return env.call(ctx2);
 						}
 					});
-				}else if (Value.compare(ctx, "`.`")) return local -> {
+				}else if (Value.compare(ctx, ".`")) return local -> {
 					if (!this.closed && Value.compare(local, "=")) {
 						return set -> {
 							this.memory.put(name, Value.resolve(set));

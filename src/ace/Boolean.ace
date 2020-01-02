@@ -16,7 +16,7 @@ Scope value, arg, {
 	}
 	
 	;; invert
-	check (cmp *arg `!`) Scope {}, {
+	check (cmp *arg !`) Scope {}, {
 		value false true
 	}
 	

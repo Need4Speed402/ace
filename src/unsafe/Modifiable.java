@@ -17,12 +17,12 @@ public class Modifiable implements Value{
 		
 		@Override
 		public Value call(Value v) {
-			if (Value.compare(v, ":")) {
+			if (Value.compare(v, "=")) {
 				return set -> {
 					this.containing = set;
 					return Value.NULL;
 				};
-			}else if (Value.compare(v, "`*`")) {
+			}else if (Value.compare(v, "*`")) {
 				return this.containing;
 			}else {
 				return this.containing.call(v);

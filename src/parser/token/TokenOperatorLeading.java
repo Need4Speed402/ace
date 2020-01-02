@@ -19,6 +19,6 @@ public class TokenOperatorLeading implements Token{
 	
 	@Override
 	public Node createNode() {
-		return Node.call(this.token.createNode(), Node.id('`' + this.operator + '`'));
+		return Node.call(this.token.createNode(), Node.id(this.operator + '`'));
 	}
 }
