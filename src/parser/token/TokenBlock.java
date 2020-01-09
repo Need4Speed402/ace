@@ -4,6 +4,7 @@ import node.Node;
 import parser.ParserException;
 import parser.Stream;
 import parser.TokenList;
+import value.ValueIdentifier;
 
 public abstract class TokenBlock implements Token{
 	private Token[] tokens;
@@ -47,10 +48,10 @@ public abstract class TokenBlock implements Token{
 	}
 	
 	public static Node createBlock (Node ... nodes) {
-		Node current = Node.env(Node.id("`"));
+		Node current = Node.env(Node.id(ValueIdentifier.CONTINUE));
 		
 		for (int i = nodes.length - 1; i >= 0; i--) {
-			current = Node.env(Node.call("`", nodes[i], current));
+			current = Node.env(Node.call(ValueIdentifier.JOIN, nodes[i], current));
 		}
 		
 		return Node.call("Block", current);

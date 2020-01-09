@@ -8,29 +8,33 @@ import value.ValueIdentifier;
 public class Scope implements Value{
 	@Override
 	public Value call(Value env) {
-		return env.call(new ScopeEnv());
+		return env.call(new ScopeEnv(x -> x));
 	}
 
-	private static class ScopeEnv implements Value{
+	public static class ScopeEnv implements Value{
 		private HashMap<String, Value> memory;
+		private final Value wrapper;
 		private boolean closed = false;
 		
-		public ScopeEnv () {
-			this(new HashMap<String, Value>());
+		public ScopeEnv (Value wrapper) {
+			this(wrapper, new HashMap<String, Value>());
 		}
 		
-		public ScopeEnv(HashMap<String, Value> memory) {
+		public ScopeEnv(Value wrapper, HashMap<String, Value> memory) {
+			this.wrapper = wrapper;
 			this.memory = memory;
 			
-			this.memory.put("`", a -> b -> {
+			this.memory.put(ValueIdentifier.JOIN, a -> b -> {
 				this.closed = true;
 				
-				if (Value.compare(a, "`")) {
-					return b.call(new ScopeEnv(this.memory));
+				if (Value.compare(a, ValueIdentifier.CONTINUE)) {
+					return b.call(new ScopeEnv(this.wrapper, this.memory));
 				}else{
 					return Value.resolve(a);
 				}
 			});
+			
+			this.memory.put(ValueIdentifier.CONTINUE, v -> Value.NULL);
 		}
 
 		@Override
@@ -38,6 +42,7 @@ public class Scope implements Value{
 			if (!(var instanceof ValueIdentifier)) return var;
 			
 			String name = ((ValueIdentifier) var).name;
+			Value value = this.memory.getOrDefault(name, this.wrapper.call(var));
 			
 			return ctx -> {
 				if (Value.compare(ctx, "`,")) {
@@ -65,7 +70,7 @@ public class Scope implements Value{
 					return this.memory.getOrDefault(name, Value.NULL).call(local);
 				};
 				
-				return this.memory.getOrDefault(name, Value.resolve(var)).call(ctx);
+				return value.call(ctx);
 			};
 		}
 	}

@@ -72,7 +72,7 @@ public class ResolverPackage implements Resolver{
 			this.running = true;
 			
 			if (this.val == null) {
-				System.out.println("Loading: " + this.path);
+				//System.out.println("Loading: " + this.path);
 				
 				this.val = Packages.load(this.stream, this.resolver, this.path);
 			}

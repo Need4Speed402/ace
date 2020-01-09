@@ -10,7 +10,7 @@ public class Environment implements Value{
 				return body -> env -> arg -> body.call(env);
 			}
 			
-			return v.call(val);
+			return v.call(new Scope.ScopeEnv(val));
 		};
 	}
 }

@@ -1,6 +1,9 @@
 package value;
 
 public class ValueIdentifier implements Value {
+	public static final String CONTINUE = "`";
+	public static final String JOIN = "\\";
+	
 	public final String name;
 	public final Value value;
 	

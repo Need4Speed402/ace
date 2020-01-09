@@ -5,18 +5,32 @@
 }
 
 Scope value, arg, {
+	.call = Scope a, b, cb, {
+		Scope (value a b cb)
+		
+		` .` = Scope arg, {
+			check (cmp *arg ?) {
+				call b a
+			}
+			
+			check (cmp *arg !?) {
+				call a b
+			}
+		}
+	}
+	
 	;; run cb if true
-	check (cmp *arg ?) Scope {}, cb, {
-		Scope (value cb {})
+	check (cmp *arg ?) {
+		call Scope x, {x} ()
 	}
 	
 	;; run cb if false
-	check (cmp *arg !?) Scope {}, cb, {
-		Scope (value {} cb)
+	check (cmp *arg !?) {
+		call () Scope x, {x}
 	}
 	
 	;; invert
-	check (cmp *arg !`) Scope {}, {
+	check (cmp *arg !`) {
 		value false true
 	}
 	

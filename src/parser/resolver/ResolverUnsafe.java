@@ -17,7 +17,7 @@ public class ResolverUnsafe implements Resolver{
 		Value resolution = cache.get(joinedPath);
 		
 		if (resolution == null && ResolverUnsafe.class.getClassLoader().getResource(joinedPath + ".class") != null) {
-			System.out.println("Loading: " + joinedPath);
+			//System.out.println("Loading: " + joinedPath);
 			
 			try{
 				resolution = (Value) Class.forName(String.join(".", path)).newInstance();
