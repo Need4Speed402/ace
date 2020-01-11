@@ -18,11 +18,6 @@ public class Scope implements Value{
 		
 		public ScopeEnv (Value wrapper) {
 			this(wrapper, new HashMap<String, Value>());
-		}
-		
-		public ScopeEnv(Value wrapper, HashMap<String, Value> memory) {
-			this.wrapper = wrapper;
-			this.memory = memory;
 			
 			this.memory.put(ValueIdentifier.JOIN, a -> b -> {
 				this.closed = true;
@@ -35,6 +30,11 @@ public class Scope implements Value{
 			});
 			
 			this.memory.put(ValueIdentifier.CONTINUE, v -> Value.NULL);
+		}
+		
+		public ScopeEnv(Value wrapper, HashMap<String, Value> memory) {
+			this.wrapper = wrapper;
+			this.memory = memory;
 		}
 
 		@Override

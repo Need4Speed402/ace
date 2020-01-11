@@ -24,7 +24,7 @@ public class console implements Value{
 			};
 		}else if (Value.compare(v, "print")) {
 			return p -> {
-				System.out.println(p.toString() + (p == Value.NULL ? "[null]" : ""));
+				System.out.println(p);
 				return Value.NULL;
 			};
 		}
