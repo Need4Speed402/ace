@@ -2,7 +2,7 @@ package unsafe;
 
 import value.Value;
 
-public class Modifiable implements Value{
+public class Mutable implements Value{
 	@Override
 	public Value call(Value value) {
 		return new Instance(value);

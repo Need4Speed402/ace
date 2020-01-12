@@ -7,7 +7,7 @@ import parser.Packages;
 import parser.Stream;
 import value.Value;
 
-public class ResolverPackage implements Resolver{
+public class ResolverPackage extends Resolver{
 	private final String root;
 	
 	private static HashMap<String, Cache> cache = new HashMap<String, Cache>();
@@ -26,7 +26,7 @@ public class ResolverPackage implements Resolver{
 			InputStream stream = ResolverPackage.class.getClassLoader().getResourceAsStream(joinPath + ".ace");
 			
 			if (stream != null) {
-				resolution = new Cache(joinPath, new Stream(stream));
+				resolution = new Cache(joinPath, new Stream(stream), getParent());
 			}
 			
 			cache.put(joinPath, resolution);
@@ -51,20 +51,10 @@ public class ResolverPackage implements Resolver{
 		
 		public boolean running;
 		
-		public Cache (String path, Stream stream, Resolver ... resolvers) {
+		public Cache (String path, Stream stream, Resolver resolver) {
 			this.path = path;
 			this.stream = stream;
-			
-			if (resolvers.length == 1) {
-				this.resolver = resolvers[0];
-			}else if (resolvers.length == 0) {
-				this.resolver = new ResolverCompound(
-					new ResolverPackage ("ace"),
-					new ResolverUnsafe()
-				);
-			}else {
-				this.resolver = new ResolverCompound(resolvers);
-			}
+			this.resolver = resolver;
 		}
 		
 		@Override

@@ -5,11 +5,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 
-import parser.Packages;
 import parser.Stream;
 import value.Value;
 
-public class ResolverFile implements Resolver{
+public class ResolverFile extends Resolver{
 	private File root;
 	private static HashMap<String, ResolverPackage.Cache> resolutions = new HashMap<>();
 	
@@ -25,11 +24,7 @@ public class ResolverFile implements Resolver{
 		
 		if (resolution == null) {
 			if (file.isFile()) try {
-				resolution = new ResolverPackage.Cache(file.getAbsolutePath(), new Stream(new FileInputStream(file)),
-					new ResolverFile(Packages.root),
-					new ResolverPackage("ace"),
-					new ResolverUnsafe()
-				);
+				resolution = new ResolverPackage.Cache(file.getAbsolutePath(), new Stream(new FileInputStream(file)), getParent());
 			}catch (IOException e) {}
 			
 			resolutions.put(file.getAbsolutePath(), resolution);

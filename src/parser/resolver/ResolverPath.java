@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import value.Value;
 
-public class ResolverPath implements Resolver{
+public class ResolverPath extends Resolver{
 	private final Resolver child;
 	private final String[] path;
 	
@@ -15,6 +15,13 @@ public class ResolverPath implements Resolver{
 	public ResolverPath (Resolver child, String ... path) {
 		this.child = child;
 		this.path = path;
+	}
+	
+	@Override
+	public void setParent(Resolver parent) {
+		super.setParent(parent);
+		
+		this.child.setParent(parent);
 	}
 	
 	@Override

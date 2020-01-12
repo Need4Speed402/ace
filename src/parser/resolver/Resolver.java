@@ -3,8 +3,18 @@ package parser.resolver;
 import value.Value;
 import value.ValueIdentifier;
 
-public abstract interface Resolver{
-	public Value exists (String[] path);
+public abstract class Resolver {
+	private Resolver parent;
+	
+	public abstract Value exists (String[] path);
+	
+	public Resolver getParent () {
+		return this.parent;
+	}
+	
+	public void setParent (Resolver parent) {
+		this.parent = parent;
+	}
 	
 	public static Value createNode (Resolver r) {
 		return new ValueResolver(r);

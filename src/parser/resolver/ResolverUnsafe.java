@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import value.Value;
 
-public class ResolverUnsafe implements Resolver{
+public class ResolverUnsafe extends Resolver{
 	private static HashMap<String, Value> cache = new HashMap<>();
 	
 	@Override
