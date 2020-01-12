@@ -13,16 +13,19 @@ public class ResolverUnsafe extends Resolver{
 			path = new String[] {"unsafe", "lang", path[0]};
 		}
 		
-		String joinedPath = String.join("/", path);
-		Value resolution = cache.get(joinedPath);
+		String joinedPath = String.join(".", path);
+		Value resolution = null;
 		
-		if (resolution == null && ResolverUnsafe.class.getClassLoader().getResource(joinedPath + ".class") != null) {
+		if (!cache.containsKey(joinedPath)) {
 			//System.out.println("Loading: " + joinedPath);
 			
 			try{
-				resolution = (Value) Class.forName(String.join(".", path)).newInstance();
-				cache.put(joinedPath, resolution);
+				resolution = (Value) Class.forName(joinedPath).newInstance();
 			}catch (Exception e) {}
+			
+			cache.put(joinedPath, resolution);
+		}else {
+			resolution = cache.get(joinedPath);
 		}
 		
 		return resolution;

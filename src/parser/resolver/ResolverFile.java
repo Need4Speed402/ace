@@ -19,17 +19,19 @@ public class ResolverFile extends Resolver{
 	@Override
 	public Value exists(String[] path) {
 		File file = new File(this.root, String.join("/", path) + ".ace");
+		String str = file.getAbsolutePath();
 		
-		ResolverPackage.Cache resolution = resolutions.get(file.getAbsolutePath());
+		ResolverPackage.Cache resolution = null;
 		
-		if (resolution == null) {
+		if (!resolutions.containsKey(str)) {
 			if (file.isFile()) try {
-				resolution = new ResolverPackage.Cache(file.getAbsolutePath(), new Stream(new FileInputStream(file)), getParent());
+				resolution = new ResolverPackage.Cache(str, new Stream(new FileInputStream(file)), getParent());
 			}catch (IOException e) {}
 			
-			resolutions.put(file.getAbsolutePath(), resolution);
-		}else if (resolution.running) {
-			return null;
+			resolutions.put(str, resolution);
+		}else{
+			resolution = resolutions.get(str);
+			if (resolution != null && resolution.running) resolution = null;
 		}
 		
 		return resolution;
