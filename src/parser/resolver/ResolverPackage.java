@@ -20,9 +20,9 @@ public class ResolverPackage extends Resolver{
 	public Value exists(String[] path) {
 		String joinPath = this.root + "/" + String.join("/", path);
 		
-		Cache resolution = cache.get(joinPath);
+		Cache resolution = null;
 		
-		if (resolution == null) {
+		if (!cache.containsKey(joinPath)) {
 			InputStream stream = ResolverPackage.class.getClassLoader().getResourceAsStream(joinPath + ".ace");
 			
 			if (stream != null) {
@@ -30,8 +30,9 @@ public class ResolverPackage extends Resolver{
 			}
 			
 			cache.put(joinPath, resolution);
-		}else if (resolution.running) {
-			return null;
+		}else{
+			resolution = cache.get(joinPath);
+			if (resolution != null && resolution.running) resolution = null;
 		}
 		
 		return resolution;

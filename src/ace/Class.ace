@@ -1,55 +1,161 @@
-.Identifier = unsafe ID
+;;" 
+  " This module implements classes in ACE. The purpose of a class is
+  " to encapsulate state and behavior. Normally you would want to create
+  " a class to create a new type within your code, a type being a individually
+  " identifiable value within the application.
+"`"
+
 .cmp = unsafe identifier compare
 .isIdentifier = unsafe identifier discover
+.Mutable = unsafe Mutable
+.Function = Scope
 
-.Function = unsafe Function
+.check = Function bool, callback, {
+	Scope (bool callback {})
+}
 
-.createNode = define, next, (
-	.nextRef = .next
+.both = Function bool, cb1, cb2, {
+	Scope (bool cb1 cb2)
+}
+
+.vTrue = Function a, b, {a}
+.vFalse = Function a, b, {b}
+
+.createNode = Function next, ident, handler, ctx, {
+	check (cmp *ctx root) { vFalse }
+	check (cmp *ctx next) {*next}
 	
-	cxt, (
-		cmp *cxt defined {
-			t, f, t
+	check (cmp *ctx handler) Function {}, candidate, {
+		check (cmp *ident *candidate) {
+			handler
 		}
-		
-		cmp *cxt next {
-			ctx, (
-				cmp *ctx = {value, (nextRef = value)}
-				(next) *ctx
-			)
-		}
-		
-		cmp *cxt cmp {
-			value, cb, (
-				(isIdentifier) define {
-					cmp *define *value cb
+	}
+}
+
+.createID = (
+	.root = Function ctx, {
+		check (cmp *ctx root) { vTrue }
+		check (cmp *ctx next) { root }
+		check (cmp *ctx value) { vFalse }
+	}
+	
+	.current = Mutable root
+	
+	.create = Function next, value, ctx, {
+		check (cmp *ctx root) { vFalse }
+		check (cmp *ctx next) { *next }
+		check (cmp *ctx value) { value }
+	}
+	
+	Function {}, {
+		.loop = Function current, {
+			both (current root) {
+				create *current vTrue
+			} {
+				both (current value) {
+					create (loop (current next)) vFalse
 				} {
-					*define :: *value ? cb
+					create (current next) vTrue
 				}
-			)
+			}
 		}
-	)
+		
+		current = loop *current
+		*current
+	}
 )
 
-;;.classcid = Identifier ()
-
-.Class = ctx, (
-	.id = Identifier ()
-	.instance = {()}
+.compareID = Function v1, v2, {
+	.and = Function v1, v2, {v1 v2 vFalse}
+	.xor = Function v1, v2, {v1 (v2 vFalse vTrue) v2}
 	
-	.constructor = callback, (
-		;;cmp *ctx :: {class~}
+	both (and (v1 root) (v2 root)) {
+		vTrue
+	} {
+		both (xor (v1 value) (v2 value)) {
+			vFalse
+		} {
+			compareID (v1 next) (v2 next)
+		}
+	}
+}
+
+.Class = Function Constructor, {
+	.id = createID()
+	
+	;;" 
+	  " make will call the constructor and create a new instance of this class
+	"`"
+	.make = Function argument, {
+		check (cmp *argument classID) { id }
+		
+		.instance = ()
+		.node = Mutable Function ctx, {
+			check (cmp *ctx root) { vTrue }
+			check (cmp *ctx handler) { default }
+		}
 		
 		.default = (
-			callback ctx, (
-				(
-					
-				) ctx
-			)
+			.default = Constructor Function ctx, {
+				check (cmp *ctx .) {
+					argument
+				}
+				
+				check (cmp *ctx this) {
+					Function ident, {
+						;;"
+						  " when the class has instantiated, it will effectively become
+						  " immutable and no further methods can be attached.
+						  " 
+						  " So, just send back the immutable instance object if that exists
+						  " otherwise, it will try to insert it into the node list
+						"`"
+						Scope (
+							instance *ident
+							
+							.loop = Function current, {
+								both (current root) {
+									Function {}, handler, {
+										current = createNode Mutable *(*current) *ident *handler
+									}
+								} {
+									current handler *ident
+									loop (current next)
+								}
+							}
+							
+							loop node
+						)
+					}
+				}
+				
+				ctx
+			}
+			
+			Function ident, {}, {
+				check (cmp *ident ::) Function {}, Constructor, {
+					compareID id Constructor classID true false
+				}
+				
+				default *ident
+			}
 		)
-	)
+		
+		.instance = Function ident, {
+			.loop = Function current, {
+				current handler *ident
+				loop (current next)
+			}
+			
+			loop node
+		}
+		
+		Scope ident, {
+			Scope (instance *ident)
+		}
+	}
 	
-	constructor
-)
+	make
+}
 
 Class

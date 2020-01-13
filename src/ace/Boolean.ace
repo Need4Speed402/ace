@@ -1,53 +1,47 @@
-.cmp = unsafe identifier compare
-
-.check = Scope bool, callback, {
-	Scope (bool callback {})
-}
-
-Scope value, {
-	.this = Scope arg, {
-		;; run cb if true
-		check (cmp *arg ?) Scope {}, cb, {
-			Scope (value cb ())
-			` .` = this
-		}
-		
-		;; run cb if false
-		check (cmp *arg !?) Scope {}, cb, {
-			Scope (value () cb)
-			` .` = this
-		}
-		
-		;; invert
-		check (cmp *arg !`) {
-			value false true
-		}
-		
-		;; xor
-		check (cmp *arg !) Scope {}, v2, {
-			Scope (value {!v2} {v2})
-		}
-		
-		;; and
-		check (cmp *arg &) Scope {}, v2, {
-			value v2 false
-		}
-		
-		;; or
-		check (cmp *arg |) Scope {}, v2, {
-			value true v2
-		}
-		
-		;; not equal
-		check (cmp *arg !:) Scope {}, v2, {
-			Scope (value {!v2} {v2})
-		}
-		
-		;; equal
-		check (cmp *arg :) Scope {}, v2, {
-			Scope (value {v2} {!v2})
-		}
+.Boolean = Class {
+	.value = .
+	
+	;; run cb if true
+	this ? Scope {}, cb, {
+		Scope (value cb ())
+		` .` = this
 	}
 	
-	this
+	;; run cb if false
+	this !? Scope {}, cb, {
+		Scope (value () cb)
+		` .` = this
+	}
+	
+	;; invert
+	this !` {
+		value false true
+	}
+	
+	;; xor
+	this ! Scope {}, v2, {
+		value !v2 v2
+	}
+	
+	;; and
+	this & Scope {}, v2, {
+		value v2 false
+	}
+	
+	;; or
+	this | Scope {}, v2, {
+		value true v2
+	}
+	
+	;; not equal
+	this !: Scope {}, v2, {
+		value !v2 v2
+	}
+	
+	;; equal
+	this : Scope {}, v2, {
+		value v2 !v2
+	}
 }
+
+Boolean
