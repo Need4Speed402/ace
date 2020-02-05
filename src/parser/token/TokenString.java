@@ -12,7 +12,7 @@ import parser.Stream;
 import parser.TokenList;
 import parser.unicode.Unicode;
 
-public class TokenString extends TokenBlock{
+public class TokenString extends TokenProcedure{
 	public static HashMap<String, String> unicodeNames = Unicode.getLookup();
 	public static HashMap<String, String> inverseUnicodeNames = Unicode.getInverse();
 
@@ -27,7 +27,7 @@ public class TokenString extends TokenBlock{
 			string[ii] = Node.call("Integer", new TokenInteger.BooleanArray(s.charAt(ii)).toNode());
 		}
 		
-		return TokenBlock.createBlock(string);
+		return TokenProcedure.createBlock(string);
 	}
 	
 	@Override

@@ -46,13 +46,13 @@ public class Packages {
 			
 			return null;
 		}else {
-			Node event = ast.createNode();
+			Node node = ast.createNode();
 			
 			if (PRINT_EVENTS) {
-				System.out.println(event);
+				System.out.println(node);
 				return null;
 			}else {
-				return event.run(Resolver.createNode(resolver));
+				return node.run(Resolver.createNode(resolver));
 			}
 		}
 	}
@@ -61,7 +61,8 @@ public class Packages {
 		try {
 			return Packages.load(new Stream(Files.readAllBytes(new File(path).toPath())), new ResolverCompound(
 				new ResolverFile(Packages.root),
-				new ResolverPackage("ace"),
+				//new ResolverPackage("ace"),
+				new ResolverFile(new File("D:\\documents\\eclipse\\SimpleAceInterpreter\\src\\ace")),
 				new ResolverUnsafe()
 			), path);
 		}catch (Exception e) {

@@ -3,7 +3,7 @@ package parser.token;
 import node.Node;
 import parser.Stream;
 
-public class TokenEnvironment extends TokenBlock {
+public class TokenEnvironment extends TokenProcedure {
 	public TokenEnvironment (Stream s) {
 		super(readBlock(s, '}'));
 	}
@@ -32,9 +32,9 @@ public class TokenEnvironment extends TokenBlock {
 	@Override
 	public String toString () {
 		if (this.getLength() <= 1) {
-			return "{" + TokenBlock.toString(this, '\n') + "}";
+			return "{" + TokenProcedure.toString(this, '\n') + "}";
 		}else {
-			return "{\n" + indent(TokenBlock.toString(this, '\n')) + "\n}";
+			return "{\n" + indent(TokenProcedure.toString(this, '\n')) + "\n}";
 		}
 	}
 	

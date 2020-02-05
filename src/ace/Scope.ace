@@ -1,0 +1,42 @@
+;;" 
+  " In many programming languages, the use of parenthesis '()' where
+  " only really used for specifiying to the compiler exactly in which order
+  " you wanted your code to run, this is of course based off of western
+  " mathimatical notation.
+  " 
+  " In ace, the use of parenthesis signify a scope. Scopes are no more
+  " complicated then imediately invoked functions where they can support
+  " multi expression procedures, and its own variable scope.
+"`"
+
+(Function Scope) { Function resolve {
+	Function compare {
+		Function scope {
+			scope scope
+		} (Function scope {Function body {
+			body (Function context {
+				(compare (resolve context) ``) {
+					Function next {Function current {
+						(compare (resolve current) `) {
+							scope scope next
+						} {
+							resolve (resolve current)
+						}
+					}}
+				} {(compare (resolve context) `) {
+					Function null {
+						null null
+					} (Function null {Function void {(Function `) {} (
+						null null
+					)}})
+				} {
+					resolve (resolve context)
+				}}
+			})
+		}})
+	} (Function first {Function second {
+		Function true {Function false {
+			Scope (unsafe identifier compare (resolve first) (resolve second) true false)
+		}}
+	}})
+} (unsafe identifier resolve) } (unsafe lang Scope)

@@ -37,4 +37,9 @@ public class ResolverCompound extends Resolver{
 		
 		return null;
 	}
+	
+	@Override
+	public String toString() {
+		return super.toString() + Arrays.toString(this.resolvers);
+	}
 }

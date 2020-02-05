@@ -9,7 +9,7 @@ import parser.ParserException;
 import parser.Stream;
 import parser.TokenList;
 
-public class TokenStatement extends TokenBlock implements Modifier{
+public class TokenStatement extends TokenProcedure implements Modifier{
 	public static final String operators = "= ` ., @#\\ ?~ |&! :<> +- */% ^$";
 	public static final char[] ops = operators.replaceAll(" ", "").toCharArray();
 	public static final int[] operatorValues;

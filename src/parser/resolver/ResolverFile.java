@@ -5,12 +5,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 
+import parser.Packages;
 import parser.Stream;
 import value.Value;
 
 public class ResolverFile extends Resolver{
 	private File root;
-	private static HashMap<String, ResolverPackage.Cache> resolutions = new HashMap<>();
+	private static HashMap<String, Value> cache = new HashMap<>();
 	
 	public ResolverFile(File root) {
 		this.root = root;
@@ -21,17 +22,18 @@ public class ResolverFile extends Resolver{
 		File file = new File(this.root, String.join("/", path) + ".ace");
 		String str = file.getAbsolutePath();
 		
-		ResolverPackage.Cache resolution = null;
+		Value resolution = null;
 		
-		if (!resolutions.containsKey(str)) {
-			if (file.isFile()) try {
-				resolution = new ResolverPackage.Cache(str, new Stream(new FileInputStream(file)), getParent());
-			}catch (IOException e) {}
+		if (!cache.containsKey(str)) {
+			cache.put(str, null);
 			
-			resolutions.put(str, resolution);
+			if (file.isFile()) try {
+				resolution = Packages.load(new Stream(new FileInputStream(file)), getParent(), str);
+				
+				cache.put(str, resolution);
+			}catch (IOException e) {}
 		}else{
-			resolution = resolutions.get(str);
-			if (resolution != null && resolution.running) resolution = null;
+			resolution = cache.get(str);
 		}
 		
 		return resolution;

@@ -6,7 +6,6 @@ import java.math.BigInteger;
 import node.Node;
 import parser.Color;
 import parser.Stream;
-import value.Value;
 
 public class TokenInteger implements Token{
 	private final BooleanArray number;
@@ -65,26 +64,6 @@ public class TokenInteger implements Token{
 		}
 		
 		return Color.green(str);
-	}
-	
-	public static BigInteger getInt (Value v) {
-		BooleanArray arr = new BooleanArray();
-		
-		v.call("bits").call("for").call(p -> {
-			p.call("?").call(p2 -> {
-				arr.add(true);
-				return Value.NULL;
-			});
-			
-			p.call("!?").call(p2 ->  {
-				arr.add(false);
-				return Value.NULL;
-			});
-			
-			return Value.NULL;
-		});
-		
-		return arr.getInt();
 	}
 	
 	public static Object parseNumber (String ident) {
@@ -219,7 +198,7 @@ public class TokenInteger implements Token{
 				values[i] = Node.id(this.array[i] ? "true" : "false");
 			}
 			
-			return TokenBlock.createBlock(values);
+			return TokenProcedure.createBlock(values);
 		}
 		
 		public boolean get (int i) {

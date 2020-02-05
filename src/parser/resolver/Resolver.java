@@ -6,6 +6,8 @@ import value.ValueIdentifier;
 public abstract class Resolver {
 	private Resolver parent;
 	
+	public static final Value NULL = v -> Resolver.NULL;
+	
 	public abstract Value exists (String[] path);
 	
 	public Resolver getParent () {
@@ -31,23 +33,19 @@ public abstract class Resolver {
 		
 		@Override
 		public Value call(Value v) {
-			if (v instanceof ValueIdentifier) {
-				String s = ((ValueIdentifier) v).name;
-				
+			Value ret = this.resolver.exists(this.path);
+			
+			if (ret != null) {
+				return ret.call(v);
+			} else if (v instanceof ValueIdentifier) {
 				String[] npath = new String[this.path.length + 1];
 				System.arraycopy(this.path, 0, npath, 0, this.path.length);
-				npath[this.path.length] = s;
+				npath[this.path.length] = ((ValueIdentifier) v).name;
 				
-				Value ret = this.resolver.exists(npath);
-				
-				if (ret == null) {
-					ret = new ValueResolver(this.resolver, npath);
-				}
-				
-				return ret;
+				return new ValueResolver(this.resolver, npath);
+			}else {
+				return NULL;
 			}
-			
-			return Value.NULL;
 		}
 	}
 }

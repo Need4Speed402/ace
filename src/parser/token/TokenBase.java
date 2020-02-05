@@ -3,7 +3,7 @@ package parser.token;
 import node.Node;
 import parser.Stream;
 
-public class TokenBase extends TokenBlock{
+public class TokenBase extends TokenProcedure{
 	public TokenBase(Stream s) {
 		super(readBlock(s, '\0'));
 	}
