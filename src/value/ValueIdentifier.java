@@ -16,6 +16,6 @@ public class ValueIdentifier implements Value {
 	
 	@Override
 	public String toString() {
-		return super.toString() + "[" + this.name + "]";
+		return this.name + " -> " + this.value.toString();
 	}
 }

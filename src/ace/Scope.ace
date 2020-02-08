@@ -12,16 +12,18 @@
 (Function Scope) { Function resolve {
 	Function compare {
 		Function scope {
-			scope scope
-		} (Function scope {Function body {
+			scope scope (Function ctx {resolve (resolve ctx)})
+		} (Function scope {Function handler {Function body {
 			body (Function context {
 				(compare (resolve context) ``) {
 					Function next {Function current {
 						(compare (resolve current) `) {
-							scope scope next
+							scope scope (Function ctx {resolve (resolve ctx)}) next
+						} {(compare (resolve current) =) {
+							scope scope (resolve (resolve current)) next
 						} {
 							resolve (resolve current)
-						}
+						}}
 					}}
 				} {(compare (resolve context) `) {
 					Function null {
@@ -30,10 +32,30 @@
 						null null
 					)}})
 				} {
-					resolve (resolve context)
+					Function setctx {
+						(compare (resolve setctx) .`) {
+							Function setctx {
+								(compare (resolve setctx) =) {
+									Function value {
+										(Function =) {=} (Function setctx {
+											compare (resolve setctx) (resolve context) {
+												resolve (resolve value)
+											} {
+												resolve (resolve setctx)
+											}
+										})
+									}
+								} {
+									handler (resolve context) (resolve setctx)
+								}
+							}
+						} {
+							handler (resolve context) (resolve setctx)
+						}
+					}
 				}}
 			})
-		}})
+		}}})
 	} (Function first {Function second {
 		Function true {Function false {
 			Scope (unsafe identifier compare (resolve first) (resolve second) true false)

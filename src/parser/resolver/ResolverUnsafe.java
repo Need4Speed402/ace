@@ -38,6 +38,14 @@ public class ResolverUnsafe extends Resolver{
 				: RESOLVE.call(env)
 		));
 		
+		//this only exists for testing, as the std gets more developed, this
+		//will become unnecessary
+		unsafe.put("lang DefFunction", ident -> body -> arg -> body.call(env ->
+			compare(env, ident)
+				? ctx -> arg
+				: RESOLVE.call(env)
+		));
+		
 		unsafe.put("Mutable", init -> new Mutable(init));
 		
 		unsafe.put("console", p -> {
