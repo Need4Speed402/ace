@@ -7,7 +7,7 @@ import node.Node;
 import parser.resolver.Resolver;
 import parser.resolver.ResolverCompound;
 import parser.resolver.ResolverFile;
-import parser.resolver.ResolverPackage;
+import parser.resolver.ResolverPath;
 import parser.resolver.ResolverUnsafe;
 import parser.token.Token;
 import parser.token.TokenBase;
@@ -62,8 +62,8 @@ public class Packages {
 			return Packages.load(new Stream(Files.readAllBytes(new File(path).toPath())), new ResolverCompound(
 				new ResolverFile(Packages.root),
 				//new ResolverPackage("ace"),
-				new ResolverFile(new File("D:\\documents\\eclipse\\SimpleAceInterpreter\\src\\ace")),
-				new ResolverUnsafe()
+				new ResolverPath(new ResolverFile(new File("D:\\documents\\eclipse\\SimpleAceInterpreter\\src\\ace")), "std"),
+				new ResolverPath(new ResolverUnsafe(), "unsafe")
 			), path);
 		}catch (Exception e) {
 			e.printStackTrace();

@@ -61,4 +61,4 @@
 			Scope (unsafe identifier compare (resolve first) (resolve second) true false)
 		}}
 	}})
-} (unsafe identifier resolve) } (unsafe lang Scope)
+} (unsafe identifier resolve) } (unsafe root Scope)

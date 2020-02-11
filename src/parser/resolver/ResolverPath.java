@@ -26,13 +26,20 @@ public class ResolverPath extends Resolver{
 	
 	@Override
 	public Value exists(String[] path) {
-		if (path.length > this.path.length) {
-			for (int i = 0; i < this.path.length; i++) {
-				if (!this.path[i].equals(path[i])) return null;
-			}
+		if (path.length == 1) {
+			Value res = this.child.exists(new String[] {"root", path[0]});
+			if (res != null) return res;
 		}
 		
-		return this.child.exists(Arrays.copyOfRange(path, this.path.length, path.length));
+		if (path.length > this.path.length) {
+			for (int i = 0; i < this.path.length; i++) {
+				if (this.path[i] != path[i]) return null;
+			}
+			
+			return this.child.exists(Arrays.copyOfRange(path, this.path.length, path.length));
+		}
+		
+		return null;
 	}
 	
 	@Override

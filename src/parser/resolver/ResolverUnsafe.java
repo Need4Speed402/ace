@@ -22,17 +22,16 @@ public class ResolverUnsafe extends Resolver{
 	}
 	
 	static {
-		unsafe.put("lang ``", a -> IDENTITY);
-		
 		unsafe.put("identifier compare", v1 -> v2 -> compare(v1, v2) ? TRUE : FALSE);
 		unsafe.put("identifier discover", v -> v instanceof ValueIdentifier ? TRUE : FALSE);
 		unsafe.put("identifier resolve", RESOLVE);
 		
-		unsafe.put("lang Procedure", IDENTITY);
-		unsafe.put("lang Environment", IDENTITY);
-		unsafe.put("lang Package", SCOPE);
-		unsafe.put("lang Scope", SCOPE);
-		unsafe.put("lang Function", ident -> body -> arg -> body.call(env ->
+		unsafe.put("root ``", a -> IDENTITY);
+		unsafe.put("root Procedure", IDENTITY);
+		unsafe.put("root Environment", IDENTITY);
+		unsafe.put("root Package", SCOPE);
+		unsafe.put("root Scope", SCOPE);
+		unsafe.put("root Function", ident -> body -> arg -> body.call(env ->
 			compare(env, ident)
 				? arg
 				: RESOLVE.call(env)
@@ -40,7 +39,7 @@ public class ResolverUnsafe extends Resolver{
 		
 		//this only exists for testing, as the std gets more developed, this
 		//will become unnecessary
-		unsafe.put("lang DefFunction", ident -> body -> arg -> body.call(env ->
+		unsafe.put("root DefFunction", ident -> body -> arg -> body.call(env ->
 			compare(env, ident)
 				? ctx -> arg
 				: RESOLVE.call(env)
@@ -69,18 +68,6 @@ public class ResolverUnsafe extends Resolver{
 	
 	@Override
 	public Value exists(String[] path) {
-		if (path.length == 1) {
-			path = new String[] {"unsafe", "lang", path[0]};
-		}
-		
-		StringBuilder b = new StringBuilder ();
-		
-		for (int i = 1; i < path.length; i++) {
-			b.append(path[i]);
-			
-			if (i + 1 < path.length) b.append(' ');
-		}
-		
-		return unsafe.get(b.toString());
+		return unsafe.get(String.join(" ", path));
 	}
 }
