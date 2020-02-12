@@ -1,5 +1,5 @@
 ;;" 
-  " In many programming languages, the use of parenthesis '()' where
+  " In many programming languages, the use of parenthesis '()' were
   " only really used for specifiying to the compiler exactly in which order
   " you wanted your code to run, this is of course based off of western
   " mathimatical notation.
@@ -12,15 +12,13 @@
 (Function Scope) { Function resolve {
 	Function compare {
 		Function scope {
-			scope scope (Function ctx {resolve (resolve ctx)})
-		} (Function scope {Function handler {Function body {
-			body (Function context {
+			scope scope (Function context {
 				(compare (resolve context) ``) {
 					Function next {Function current {
 						(compare (resolve current) `) {
-							scope scope (Function ctx {resolve (resolve ctx)}) next
+							scope scope (Function ctx {resolve ctx}) next
 						} {(compare (resolve current) =) {
-							scope scope (resolve (resolve current)) next
+							scope scope current next
 						} {
 							resolve (resolve current)
 						}}
@@ -32,6 +30,12 @@
 						null null
 					)}})
 				} {
+					resolve context
+				}}
+			})
+		} (Function scope {Function handler {Function body {
+			body (Function context {
+				Function parentcontext {
 					Function setctx {
 						(compare (resolve setctx) .`) {
 							Function setctx {
@@ -39,21 +43,21 @@
 									Function value {
 										(Function =) {=} (Function setctx {
 											compare (resolve setctx) (resolve context) {
-												resolve (resolve value)
+												resolve value
 											} {
 												resolve (resolve setctx)
 											}
 										})
 									}
 								} {
-									handler (resolve context) (resolve setctx)
+									parentcontext (resolve setctx)
 								}
 							}
 						} {
-							handler (resolve context) (resolve setctx)
+							parentcontext (resolve setctx)
 						}
 					}
-				}}
+				} (handler (resolve context))
 			})
 		}}})
 	} (Function first {Function second {

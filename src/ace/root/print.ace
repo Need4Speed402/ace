@@ -1,3 +1,11 @@
-DefFunction what {
-	() (unsafe console *what)
-}
+(Function ``) {
+	(Function Scope) {
+		Function what {
+			Function null {
+				null null
+			} (Function null {Function void {(Function `) {} (
+				null null
+			)}}) (unsafe console (unsafe identifier resolve what))
+		}
+	} (unsafe root Scope)
+} (unsafe root ``)
