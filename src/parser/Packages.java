@@ -14,18 +14,48 @@ import parser.token.TokenBase;
 import value.Value;
 
 public class Packages {
+	public static final boolean RUNTIME_STATS = true;
+	
 	public static final boolean PRINT_AST = false;
 	public static final boolean PRINT_EVENTS = false;
 	
 	public static File root;
 	
+	public static long AST_TIME = 0;
+	public static long NODE_TIME = 0;
+	public static long RUN_TIME = 0;
+	
+	public static String formatTime (long time) {
+		String out = Long.toString(time / 1000000L);
+		
+		for (int i = out.length() - 3; i > 0; i -= 3) {
+			out = out.substring(0, i) + ',' + out.substring(i);
+		}
+		
+		return out + " ms";
+	}
+	
 	public static void main(String[] args) {
+		long start = System.nanoTime();
+		
 		root = new File(args[0]).getParentFile();
 		Packages.file(args[0]);
+		
+		RUN_TIME += System.nanoTime() - start;
+		
+		if (RUNTIME_STATS) {
+			System.out.println(" - Runtime Statistics - ");
+			System.out.println("AST / Parsing: " + formatTime(AST_TIME));
+			System.out.println("NODE / Tree Generation: " + formatTime(NODE_TIME));
+			System.out.println("Execution: " + formatTime(RUN_TIME - AST_TIME - NODE_TIME));
+			System.out.println("Total time: " + formatTime(RUN_TIME));
+		}
 	}
 	
 	public static Value load (Stream s, Resolver resolver, String name) {
 		Token ast;
+		
+		long startAST = System.nanoTime();
 		
 		try {
 			//when trying to run an .ace file as a bash file, the bash interpreter
@@ -41,12 +71,16 @@ public class Packages {
 			throw e;
 		}
 		
+		AST_TIME += System.nanoTime() - startAST;
+		
 		if (PRINT_AST) {
 			System.out.println(ast);
 			
 			return null;
 		}else {
+			long startNode = System.nanoTime();
 			Node node = ast.createNode();
+			NODE_TIME += System.nanoTime() - startNode;
 			
 			if (PRINT_EVENTS) {
 				System.out.println(node);

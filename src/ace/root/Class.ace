@@ -66,7 +66,7 @@
 	}
 )
 
-.compareID = Function v1, v2, {
+.compareID = Function v1, v2, {(
 	.and = Function v1, v2, {v1 v2 vFalse}
 	.xor = Function v1, v2, {v1 (v2 vFalse vTrue) v2}
 	
@@ -79,15 +79,15 @@
 			compareID (v1 next) (v2 next)
 		}
 	}
-}
+)}
 
-.Class = Function Constructor, {
+.Class = Function Constructor, {(
 	.id = createID()
 	
 	;;" 
 	  " make will call the constructor and create a new instance of this class
 	"`"
-	.make = Function argument, {
+	.make = Function argument, {(
 		check (cmp *argument classID) { id }
 		
 		.default = Mutable ()
@@ -99,7 +99,7 @@
 		}
 		
 		default = (
-			.default = Mutable Constructor Function ctx, {
+			.default = Mutable Constructor Function ctx, {(
 				check (cmp *ctx .) {
 					argument
 				}
@@ -131,7 +131,7 @@
 				}
 				
 				ctx
-			}
+			)}
 			
 			Function ident, _, {
 				check (cmp *ident ::) Function _, Constructor, {
@@ -152,9 +152,9 @@
 		Scope ident, {
 			Scope (*instance *ident)
 		}
-	}
+	)}
 	
 	make
-}
+)}
 
 Class

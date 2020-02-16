@@ -1,14 +1,14 @@
-.Boolean = Class {
+Class {(
 	.value = .
 	
 	;; run cb if true
-	this ? Scope {}, cb, {
+	this ? Scope _, cb, {
 		Scope (value cb ())
 		` .` = this
 	}
 	
 	;; run cb if false
-	this !? Scope {}, cb, {
+	this !? Scope _, cb, {
 		Scope (value () cb)
 		` .` = this
 	}
@@ -19,29 +19,27 @@
 	}
 	
 	;; xor
-	this ! Scope {}, v2, {
+	this ! Scope _, v2, {
 		value !v2 v2
 	}
 	
 	;; and
-	this & Scope {}, v2, {
+	this & Scope _, v2, {
 		value v2 false
 	}
 	
 	;; or
-	this | Scope {}, v2, {
+	this | Scope _, v2, {
 		value true v2
 	}
 	
 	;; not equal
-	this !: Scope {}, v2, {
+	this !: Scope _, v2, {
 		value !v2 v2
 	}
 	
 	;; equal
-	this : Scope {}, v2, {
+	this : Scope _, v2, {
 		value v2 !v2
 	}
-}
-
-Boolean
+)}
