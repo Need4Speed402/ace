@@ -53,9 +53,29 @@
 									parentcontext (resolve setctx)
 								}
 							}
+						} {(compare (resolve setctx) `,) {
+							Function body {
+								Function parentContext {
+									Function argument {
+										body (Function ctx {
+											(compare (resolve context) (resolve ctx)) {
+												Function argcontext {
+													(compare (resolve argcontext) *`) {
+														resolve argument
+													} {
+														argument (resolve argcontext)
+													}
+												}
+											} {
+												parentContext (resolve ctx)
+											}
+										})
+									}
+								}
+							}
 						} {
 							parentcontext (resolve setctx)
-						}
+						}}
 					}
 				} (handler (resolve context))
 			})

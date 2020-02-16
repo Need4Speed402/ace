@@ -1,0 +1,41 @@
+;;" 
+  " by default, scopes in ace don't let you reference variable declarations
+  " on the same statement / expression. That means that recursion is more
+  " difficult then just refering to the variable that was assigened because
+  " it will still be referring to the the value of the variable forfore
+  " the assignment.
+  " 
+  " This is a small abstraction that is used internally in the Ace standard
+  " library that makes it easier to create recursion.
+  " 
+  " For instance this will not work:
+  " 
+  " 1. .loop = {}, {}
+  " 2. .loop = message, {
+  " 3.     console println message
+  " 4.     loop message
+  " 5. }
+  " 6. loop 'Hello, world!'
+  " 
+  " Line 3 will not work because loop is not referring to the function decleration,
+  " it will instead refer to the loop variable on line 1.
+"`"
+
+.resolve = unsafe identifier resolve
+.compare = unsafe identifier compare
+
+Scope body, {
+	Scope Scope context, {
+		(Function ``) {
+			(Function Scope) {
+				body (Function referrer {
+					Scope (compare recurse (resolve referrer) {
+						(std boot Recursive) body
+					} {
+						context (resolve referrer)
+					})
+				})
+			} (unsafe root Scope)
+		} (unsafe root ``)
+	}
+}

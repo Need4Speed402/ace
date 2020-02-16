@@ -7,7 +7,9 @@
 
 .cmp = unsafe identifier compare
 .isIdentifier = unsafe identifier discover
-.Mutable = unsafe Mutable
+.Mutable = std boot Mutable
+
+.Recursive = std boot Recursive
 .Function = Scope
 
 .check = Function bool, callback, {
@@ -25,7 +27,7 @@
 	check (cmp *ctx root) { vFalse }
 	check (cmp *ctx next) {*next}
 	
-	check (cmp *ctx handler) Function {}, candidate, {
+	check (cmp *ctx handler) Function _, candidate, {
 		check (cmp *ident *candidate) {
 			handler
 		}
@@ -33,9 +35,9 @@
 }
 
 .createID = (
-	.root = Function ctx, {
+	.root = Recursive ctx, {
 		check (cmp *ctx root) { vTrue }
-		check (cmp *ctx next) { root }
+		check (cmp *ctx next) { recurse }
 		check (cmp *ctx value) { vFalse }
 	}
 	
@@ -47,20 +49,19 @@
 		check (cmp *ctx value) { value }
 	}
 	
-	Function {}, {
-		.loop = Function current, {
+	Function _, {
+		current = Recursive current, {
 			both (current root) {
 				create *current vTrue
 			} {
 				both (current value) {
-					create (loop (current next)) vFalse
+					create (recurse (current next)) vFalse
 				} {
 					create (current next) vTrue
 				}
 			}
-		}
+		} *current
 		
-		current = loop *current
 		*current
 	}
 )
@@ -89,14 +90,16 @@
 	.make = Function argument, {
 		check (cmp *argument classID) { id }
 		
-		.instance = ()
+		.default = Mutable ()
+		.instance = Mutable ()
+		
 		.node = Mutable Function ctx, {
 			check (cmp *ctx root) { vTrue }
-			check (cmp *ctx handler) { default }
+			check (cmp *ctx handler) { *default }
 		}
 		
-		.default = (
-			.default = Constructor Function ctx, {
+		default = (
+			.default = Mutable Constructor Function ctx, {
 				check (cmp *ctx .) {
 					argument
 				}
@@ -111,20 +114,18 @@
 						  " otherwise, it will try to insert it into the node list
 						"`"
 						Scope (
-							instance *ident
+							*instance *ident
 							
-							.loop = Function current, {
+							Recursive current, {
 								both (current root) {
-									Function {}, handler, {
+									Function _, handler, {
 										current = createNode Mutable *(*current) *ident *handler
 									}
 								} {
 									current handler *ident
-									loop (current next)
+									recurse (current next)
 								}
-							}
-							
-							loop node
+							} node
 						)
 					}
 				}
@@ -132,26 +133,24 @@
 				ctx
 			}
 			
-			Function ident, {}, {
-				check (cmp *ident ::) Function {}, Constructor, {
+			Function ident, _, {
+				check (cmp *ident ::) Function _, Constructor, {
 					compareID id Constructor classID true false
 				}
 				
-				default *ident
+				*default *ident
 			}
 		)
 		
-		.instance = Function ident, {
-			.loop = Function current, {
+		instance = Function ident, {
+			Recursive current, {
 				current handler *ident
-				loop (current next)
-			}
-			
-			loop node
+				recurse (current next)
+			} node
 		}
 		
 		Scope ident, {
-			Scope (instance *ident)
+			Scope (*instance *ident)
 		}
 	}
 	

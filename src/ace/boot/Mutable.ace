@@ -1,0 +1,29 @@
+(Function ``) {
+	(Function Scope) {
+		Function compare {
+			Function init {
+				(unsafe Mutable) (unsafe identifier resolve init) (
+					Function set {Function get {
+						Function context {
+							(compare (unsafe identifier resolve context) =) {
+								Function value {
+									Function null {
+										null null
+									} (Function null {Function void {(Function `) {} (
+										null null
+									)}}) (set (unsafe identifier resolve value))
+								}
+							} {(compare (unsafe identifier resolve context) *`) {
+								get ()
+							} {
+								get () (unsafe identifier resolve context)
+							}}
+						}
+					}}
+				)
+			}
+		} (Function a {Function b {Function true {Function false {
+			Scope (unsafe identifier compare (unsafe identifier resolve a) (unsafe identifier resolve b) true false)
+		}}}})
+	} (unsafe root Scope)
+} (unsafe root ``)
