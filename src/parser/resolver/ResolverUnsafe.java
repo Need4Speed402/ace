@@ -3,7 +3,6 @@ package parser.resolver;
 import java.util.HashMap;
 
 import value.Value;
-import value.ValueIdentifier;
 
 public class ResolverUnsafe extends Resolver{
 	private static HashMap<String, Value> unsafe = new HashMap<>();
@@ -11,20 +10,26 @@ public class ResolverUnsafe extends Resolver{
 	public static final Value TRUE = p1 -> p2 -> p1;
 	public static final Value FALSE = p1 -> p2 -> p2;
 	public static final Value IDENTITY = v -> v;
-	public static final Value RESOLVE = v -> v instanceof ValueIdentifier ? ((ValueIdentifier) v).value : v;
-	public static final Value SCOPE = v -> v.call(RESOLVE);
-	
-	public static boolean compare (Value v1, Value v2) {
-		return
-			v1 instanceof ValueIdentifier &&
-			v2 instanceof ValueIdentifier &&
-			((ValueIdentifier) v1).name == ((ValueIdentifier) v2).name;
-	}
+	public static final Value SCOPE = v -> v.call(IDENTITY);
 	
 	static {
-		unsafe.put("identifier compare", v1 -> v2 -> compare(v1, v2) ? TRUE : FALSE);
-		unsafe.put("identifier discover", v -> v instanceof ValueIdentifier ? TRUE : FALSE);
-		unsafe.put("identifier resolve", RESOLVE);
+		unsafe.put("compare", v1 -> v2 -> v1.getName() == v2.getName() ? TRUE : FALSE);
+		unsafe.put("assign", name -> value -> new Value () {
+			@Override
+			public Value call (Value v) {
+				return value.call(v);
+			}
+			
+			@Override
+			public String getName () {
+				return name.getName();
+			}
+			
+			@Override
+			public String toString() {
+				return "Assignment(" + name.getName() + ") -> " + value.toString();
+			}
+		});
 		
 		unsafe.put("root ``", a -> IDENTITY);
 		unsafe.put("root Procedure", IDENTITY);
@@ -32,9 +37,9 @@ public class ResolverUnsafe extends Resolver{
 		unsafe.put("root Package", SCOPE);
 		unsafe.put("root Scope", SCOPE);
 		unsafe.put("root Function", ident -> body -> arg -> body.call(env ->
-			compare(env, ident)
+			env.getName() == ident.getName()
 				? arg
-				: RESOLVE.call(env)
+				: env
 		));
 		
 		unsafe.put("Mutable", init -> new Mutable(init));

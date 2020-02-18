@@ -1,7 +1,6 @@
 package node;
 
 import value.Value;
-import value.ValueIdentifier;
 
 public class NodeIdentifier implements Node{
 	public final String name;
@@ -12,7 +11,22 @@ public class NodeIdentifier implements Node{
 	
 	@Override
 	public Value run(Value environment) {
-		return new ValueIdentifier(this.name, environment.call(new ValueIdentifier(this.name, v -> v)));
+		return environment.call(new Value () {
+			@Override
+			public Value call(Value v) {
+				return v;
+			}
+			
+			@Override
+			public String getName() {
+				return name;
+			}
+			
+			@Override
+			public String toString() {
+				return "Identifier(" + name + ")";
+			}
+		});
 	}
 	
 	@Override

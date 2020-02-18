@@ -7,82 +7,85 @@
   " In ace, the use of parenthesis signify a scope. Scopes are no more
   " complicated then imediately invoked functions where they can support
   " multi expression procedures, and its own variable scope.
+  " 
+  " Note that a lot of variable names are prefixed with '_'.
+  " That is because by nature of the tools natively provided by the compiler
+  " it is possible that an identifier not actually resolve as that identifier.
+  " For example, the name 'value' may resolve as the identifier 'somethingelse'.
+  " To avoid confusion for when this distinction may be possible, a '_' is
+  " prefixed.
 "`"
 
-(Function Scope) { Function resolve {
+(Function Scope) { Function assign {
 	Function compare {
-		Function scope {
-			scope scope (Function context {
-				(compare (resolve context) ``) {
-					Function next {Function current {
-						(compare (resolve current) `) {
-							scope scope (Function ctx {resolve ctx}) next
-						} {(compare (resolve current) =) {
-							scope scope current next
+		Function _scope {
+			_scope (Function _context {
+				(compare _context ``) {
+					(Function _next {Function _current {
+						(compare _current `) {
+							_scope (Function _ctx {_ctx}) _next
+						} {(compare _current =) {
+							_scope _current _next
 						} {
-							resolve (resolve current)
+							assign {} _current
 						}}
-					}}
-				} {(compare (resolve context) `) {
-					Function null {
-						null null
-					} (Function null {Function void {(Function `) {} (
-						null null
-					)}})
+					}})
+				} {(compare _context `) {
+					Function _null {
+						_null _null
+					} (Function _null {assign ` (Function void {
+						_null _null
+					})})
 				} {
-					resolve context
+					_context
 				}}
 			})
-		} (Function scope {Function handler {Function body {
-			body (Function context {
-				Function parentcontext {
-					Function setctx {
-						(compare (resolve setctx) .`) {
-							Function setctx {
-								(compare (resolve setctx) =) {
-									Function value {
-										(Function =) {=} (Function setctx {
-											compare (resolve setctx) (resolve context) {
-												resolve value
+		} (Function _handler {Function _body {
+			_body (Function _context {
+				assign _context (Function _parentcontext {
+					Function _setctx {
+						(compare _setctx .`) {
+							Function _setctx {
+								(compare _setctx =) {
+									Function _value {
+										(assign =) (Function _setctx {
+											compare _setctx _context {
+												assign _context _value
 											} {
-												resolve (resolve setctx)
+												assign {} _setctx
 											}
 										})
 									}
 								} {
-									parentcontext (resolve setctx)
+									_parentcontext _setctx
 								}
 							}
-						} {(compare (resolve setctx) `,) {
-							Function body {
-								Function parentContext {
-									Function argument {
-										body (Function ctx {
-											(compare (resolve context) (resolve ctx)) {
-												Function argcontext {
-													(compare (resolve argcontext) *`) {
-														resolve argument
-													} {
-														argument (resolve argcontext)
-													}
-												}
+						} {(compare _setctx `,) {
+							Function _body { Function _parentContext { Function _argument {
+								_body (Function _ctx {
+									(compare _context _ctx) {
+										assign _ctx (Function _argcontext {
+											(compare _argcontext *`) {
+												_argument
 											} {
-												parentContext (resolve ctx)
+												_argument _argcontext
 											}
 										})
+									} {
+										_parentContext _ctx
 									}
-								}
-							}
+								})
+							}}}
 						} {
-							parentcontext (resolve setctx)
+							_parentcontext _setctx
 						}}
 					}
-				} (handler (resolve context))
+				} (_handler _context))
 			})
-		}}})
-	} (Function first {Function second {
+		}})
+	} (assign compare (Function _first {Function _second {
 		Function true {Function false {
-			Scope (unsafe identifier compare (resolve first) (resolve second) true false)
+			Scope (unsafe compare _first _second true false)
 		}}
-	}})
-} (unsafe identifier resolve) } (unsafe root Scope)
+	}}))
+} (unsafe assign) } (unsafe root Scope)

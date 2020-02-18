@@ -21,21 +21,19 @@
   " it will instead refer to the loop variable on line 1.
 "`"
 
-.resolve = unsafe identifier resolve
-.compare = unsafe identifier compare
+.compare = unsafe compare
+.assign = unsafe assign
 
-Scope body, {
-	Scope Scope context, {
-		(Function ``) {
-			(Function Scope) {
-				body (Function referrer {
-					Scope (compare recurse (resolve referrer) {
-						(std boot Recursive) body
-					} {
-						context (resolve referrer)
-					})
+(Function ``) { (Function Scope) {
+	Function _body {
+		(std root Scope) (Function _context {
+			_body (Function _referrer {
+				Scope (compare recurse _referrer {
+					assign recurse ((std boot Recursive) _body)
+				} {
+					_context _referrer
 				})
-			} (unsafe root Scope)
-		} (unsafe root ``)
+			})
+	   })
 	}
-}
+} (unsafe root Scope) } (unsafe root ``)

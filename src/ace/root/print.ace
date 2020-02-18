@@ -1,7 +1,3 @@
-(Function ``) {
-	(Function Scope) {
-		Function what {
-			(std root Scope) {} (unsafe console (unsafe identifier resolve what))
-		}
-	} (unsafe root Scope)
-} (unsafe root ``)
+Scope message, {
+	() (unsafe console *message)
+}

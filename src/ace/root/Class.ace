@@ -5,11 +5,11 @@
   " identifiable value within the application.
 "`"
 
-.cmp = unsafe identifier compare
-.isIdentifier = unsafe identifier discover
-.Mutable = std boot Mutable
+.cmp = unsafe compare
 
+.Mutable = std boot Mutable
 .Recursive = std boot Recursive
+.Resolver = std boot Resolver
 .Function = Scope
 
 .check = Function bool, callback, {
@@ -24,11 +24,11 @@
 .vFalse = Function a, b, {b}
 
 .createNode = Function next, ident, handler, ctx, {
-	check (cmp *ctx root) { vFalse }
-	check (cmp *ctx next) {*next}
+	check (cmp root *ctx) { vFalse }
+	check (cmp next *ctx) {*next}
 	
-	check (cmp *ctx handler) Function _, candidate, {
-		check (cmp *ident *candidate) {
+	check (cmp handler *ctx) Function _, candidate, {
+		check (unsafe compare *ident *candidate) {
 			handler
 		}
 	}
@@ -36,17 +36,17 @@
 
 .createID = (
 	.root = Recursive ctx, {
-		check (cmp *ctx root) { vTrue }
-		check (cmp *ctx next) { recurse }
-		check (cmp *ctx value) { vFalse }
+		check (cmp root *ctx) { vTrue }
+		check (cmp next *ctx) { recurse }
+		check (cmp value *ctx) { vFalse }
 	}
 	
 	.current = Mutable root
 	
 	.create = Function next, value, ctx, {
-		check (cmp *ctx root) { vFalse }
-		check (cmp *ctx next) { *next }
-		check (cmp *ctx value) { value }
+		check (cmp root *ctx) { vFalse }
+		check (cmp next *ctx) { *next }
+		check (cmp value *ctx) { value }
 	}
 	
 	Function _, {
@@ -81,30 +81,30 @@
 	}
 )}
 
-.Class = Function Constructor, {(
+Function Constructor, {(
 	.id = createID()
 	
 	;;" 
 	  " make will call the constructor and create a new instance of this class
 	"`"
 	.make = Function argument, {(
-		check (cmp *argument classID) { id }
+		check (cmp classID *argument) { id }
 		
 		.default = Mutable ()
 		.instance = Mutable ()
 		
 		.node = Mutable Function ctx, {
-			check (cmp *ctx root) { vTrue }
-			check (cmp *ctx handler) { *default }
+			check (cmp root *ctx) { vTrue }
+			check (cmp handler *ctx) { *default }
 		}
 		
 		default = (
-			.default = Mutable Constructor Function ctx, {(
-				check (cmp *ctx .) {
+			.default = Mutable Constructor Resolver Function ctx, {(
+				check (cmp . *ctx) {
 					argument
 				}
 				
-				check (cmp *ctx this) {
+				check (cmp this *ctx) {
 					Function ident, {
 						;;"
 						  " when the class has instantiated, it will effectively become
@@ -134,7 +134,7 @@
 			)}
 			
 			Function ident, _, {
-				check (cmp *ident ::) Function _, Constructor, {
+				check (cmp :: *ident) Function _, Constructor, {
 					compareID id Constructor classID true false
 				}
 				
@@ -156,5 +156,3 @@
 	
 	make
 )}
-
-Class

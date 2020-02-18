@@ -1,12 +1,11 @@
 package parser.resolver;
 
+import java.util.Arrays;
+
 import value.Value;
-import value.ValueIdentifier;
 
 public abstract class Resolver {
 	private Resolver parent;
-	
-	public static final Value NULL = v -> Resolver.NULL;
 	
 	public abstract Value exists (String[] path);
 	
@@ -37,15 +36,23 @@ public abstract class Resolver {
 			
 			if (ret != null) {
 				return ret.call(v);
-			} else if (v instanceof ValueIdentifier) {
+			} else{
 				String[] npath = new String[this.path.length + 1];
 				System.arraycopy(this.path, 0, npath, 0, this.path.length);
-				npath[this.path.length] = ((ValueIdentifier) v).name;
+				npath[this.path.length] = v.getName();
 				
 				return new ValueResolver(this.resolver, npath);
-			}else {
-				return NULL;
 			}
+		}
+		
+		@Override
+		public String getName() {
+			return this.path[this.path.length - 1];
+		}
+		
+		@Override
+		public String toString() {
+			return "Resolver" + Arrays.toString(this.path);
 		}
 	}
 }

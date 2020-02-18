@@ -44,7 +44,7 @@ public class Packages {
 		RUN_TIME += System.nanoTime() - start;
 		
 		if (RUNTIME_STATS) {
-			System.out.println(" - Runtime Statistics - ");
+			System.out.println(Color.white(Color.bgBlack(" - Runtime Statistics - ")));
 			System.out.println("AST / Parsing: " + formatTime(AST_TIME));
 			System.out.println("NODE / Tree Generation: " + formatTime(NODE_TIME));
 			System.out.println("Execution: " + formatTime(RUN_TIME - AST_TIME - NODE_TIME));

@@ -2,7 +2,6 @@ package node;
 
 import parser.token.TokenEnvironment;
 import value.Value;
-import value.ValueIdentifier;
 
 public class NodeEnvironment implements Node{
 	private final Node contents;
@@ -12,7 +11,7 @@ public class NodeEnvironment implements Node{
 	}
 	
 	public Value run(Value environment) {
-		return var -> this.contents.run(env -> var.call(new ValueIdentifier(((ValueIdentifier) env).name, environment.call(env))));
+		return var -> this.contents.run(env -> var.call(environment.call(env)));
 	}
 	
 	@Override

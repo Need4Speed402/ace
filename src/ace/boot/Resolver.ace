@@ -1,0 +1,5 @@
+(Function ``) { (Function Scope) {
+	Function _body { Function _arg {
+		unsafe assign _arg (_body _arg)
+	}}
+} (unsafe root Scope) } (unsafe root ``)
