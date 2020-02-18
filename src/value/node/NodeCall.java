@@ -1,4 +1,4 @@
-package node;
+package value.node;
 
 import value.Value;
 

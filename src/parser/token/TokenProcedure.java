@@ -1,6 +1,6 @@
 package parser.token;
 
-import node.Node;
+import value.node.Node;
 import parser.ParserException;
 import parser.Stream;
 import parser.TokenList;

@@ -2,7 +2,7 @@ package parser.token;
 
 import java.math.BigDecimal;
 
-import node.Node;
+import value.node.Node;
 import parser.Color;
 
 public class TokenFloat implements Token{

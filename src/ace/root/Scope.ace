@@ -16,24 +16,25 @@
   " prefixed.
 "`"
 
-(Function Scope) { Function assign {
-	Function compare {
+(Function Scope) { Function _assign {
+	Function _compare {
+		;;unsafe console (_compare hello hello {true} {false})
 		Function _scope {
 			_scope (Function _context {
-				(compare _context ``) {
-					(Function _next {Function _current {
-						(compare _current `) {
+				(_compare _context ``) {
+					Function _next {Function _current {
+						(_compare _current `) {
 							_scope (Function _ctx {_ctx}) _next
-						} {(compare _current =) {
+						} {(_compare _current =) {
 							_scope _current _next
 						} {
-							assign {} _current
+							_assign {} _current
 						}}
-					}})
-				} {(compare _context `) {
+					}}
+				} {(_compare _context `) {
 					Function _null {
 						_null _null
-					} (Function _null {assign ` (Function void {
+					} (Function _null {_assign ` (Function void {
 						_null _null
 					})})
 				} {
@@ -42,17 +43,17 @@
 			})
 		} (Function _handler {Function _body {
 			_body (Function _context {
-				assign _context (Function _parentcontext {
+				_assign _context (Function _parentcontext {
 					Function _setctx {
-						(compare _setctx .`) {
+						(_compare _setctx .`) {
 							Function _setctx {
-								(compare _setctx =) {
+								(_compare _setctx =) {
 									Function _value {
-										(assign =) (Function _setctx {
-											compare _setctx _context {
-												assign _context _value
+										(_assign =) (Function _setctx {
+											_compare _setctx _context {
+												_assign _context _value
 											} {
-												assign {} _setctx
+												_assign {} _setctx
 											}
 										})
 									}
@@ -60,12 +61,12 @@
 									_parentcontext _setctx
 								}
 							}
-						} {(compare _setctx `,) {
+						} {(_compare _setctx `,) {
 							Function _body { Function _parentContext { Function _argument {
 								_body (Function _ctx {
-									(compare _context _ctx) {
-										assign _ctx (Function _argcontext {
-											(compare _argcontext *`) {
+									(_compare _context _ctx) {
+										_assign _ctx (Function _argcontext {
+											(_compare _argcontext *`) {
 												_argument
 											} {
 												_argument _argcontext
@@ -83,9 +84,9 @@
 				} (_handler _context))
 			})
 		}})
-	} (assign compare (Function _first {Function _second {
+	} (Function _first {Function _second {
 		Function true {Function false {
 			Scope (unsafe compare _first _second true false)
 		}}
-	}}))
+	}})
 } (unsafe assign) } (unsafe root Scope)

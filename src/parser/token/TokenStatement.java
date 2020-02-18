@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-import node.Node;
+import value.node.Node;
 import parser.ParserException;
 import parser.Stream;
 import parser.TokenList;

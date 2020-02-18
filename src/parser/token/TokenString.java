@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import node.Node;
+import value.node.Node;
 import parser.Color;
 import parser.ParserException;
 import parser.Stream;

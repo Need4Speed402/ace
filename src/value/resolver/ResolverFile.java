@@ -1,4 +1,4 @@
-package parser.resolver;
+package value.resolver;
 
 import java.io.File;
 import java.io.FileInputStream;

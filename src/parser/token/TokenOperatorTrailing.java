@@ -1,6 +1,6 @@
 package parser.token;
 
-import node.Node;
+import value.node.Node;
 import parser.Color;
 
 public class TokenOperatorTrailing implements Token, Modifier{

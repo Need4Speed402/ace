@@ -3,7 +3,7 @@ package parser.token;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import node.Node;
+import value.node.Node;
 import parser.Color;
 import parser.Stream;
 

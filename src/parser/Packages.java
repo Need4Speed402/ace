@@ -3,12 +3,8 @@ package parser;
 import java.io.File;
 import java.nio.file.Files;
 
-import node.Node;
-import parser.resolver.Resolver;
-import parser.resolver.ResolverCompound;
-import parser.resolver.ResolverFile;
-import parser.resolver.ResolverPath;
-import parser.resolver.ResolverUnsafe;
+import value.node.Node;
+import value.resolver.*;
 import parser.token.Token;
 import parser.token.TokenBase;
 import value.Value;
@@ -95,8 +91,8 @@ public class Packages {
 		try {
 			return Packages.load(new Stream(Files.readAllBytes(new File(path).toPath())), new ResolverCompound(
 				new ResolverFile(Packages.root),
-				//new ResolverPackage("ace"),
-				new ResolverPath(new ResolverFile(new File("D:\\documents\\eclipse\\SimpleAceInterpreter\\src\\ace")), "std"),
+				new ResolverPath(new ResolverPackage("ace"), "std"),
+				//new ResolverPath(new ResolverFile(new File("D:\\documents\\eclipse\\SimpleAceInterpreter\\src\\ace")), "std"),
 				new ResolverPath(new ResolverUnsafe(), "unsafe")
 			), path);
 		}catch (Exception e) {
