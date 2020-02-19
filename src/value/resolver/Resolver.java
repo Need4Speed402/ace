@@ -47,7 +47,7 @@ public abstract class Resolver {
 		
 		@Override
 		public String getName() {
-			return this.path[this.path.length - 1];
+			return this.path.length == 1 ? this.path[0] : "";
 		}
 		
 		@Override

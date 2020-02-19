@@ -36,4 +36,4 @@
 			})
 	   })
 	}
-} (unsafe root Scope) } (unsafe root ``)
+} ((assign Scope) (unsafe root Scope)) } (unsafe root ``)

@@ -20,4 +20,4 @@
 	} (Function _a {Function _b {Function _true {Function _false {
 		Scope (unsafe compare _a _b _true _false)
 	}}}})
-} (unsafe root Scope) } (unsafe root ``)
+} ((unsafe assign Scope) (unsafe root Scope)) } (unsafe root ``)
