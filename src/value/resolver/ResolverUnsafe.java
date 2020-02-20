@@ -64,7 +64,7 @@ public class ResolverUnsafe extends Resolver{
 	}
 	
 	@Override
-	public Value exists(String[] path) {
+	public Value exists(Resolver parent, String[] path) {
 		return unsafe.get(String.join(" ", path));
 	}
 }

@@ -5,17 +5,7 @@ import java.util.Arrays;
 import value.Value;
 
 public abstract class Resolver {
-	private Resolver parent;
-	
-	public abstract Value exists (String[] path);
-	
-	public Resolver getParent () {
-		return this.parent;
-	}
-	
-	public void setParent (Resolver parent) {
-		this.parent = parent;
-	}
+	public abstract Value exists (Resolver parent, String[] path);
 	
 	public static Value createNode (Resolver r) {
 		return new ValueResolver(r);
@@ -32,7 +22,7 @@ public abstract class Resolver {
 		
 		@Override
 		public Value call(Value v) {
-			Value ret = this.resolver.exists(this.path);
+			Value ret = this.resolver.exists(null, this.path);
 			
 			if (ret != null) {
 				return ret.call(v);

@@ -18,7 +18,7 @@ public class ResolverFile extends Resolver{
 	}
 	
 	@Override
-	public Value exists(String[] path) {
+	public Value exists(Resolver parent, String[] path) {
 		File file = new File(this.root, String.join("/", path) + ".ace");
 		String str = file.getAbsolutePath();
 		
@@ -28,7 +28,7 @@ public class ResolverFile extends Resolver{
 			cache.put(str, null);
 			
 			if (file.isFile()) try {
-				resolution = Packages.load(new Stream(new FileInputStream(file)), getParent(), str);
+				resolution = Packages.load(new Stream(new FileInputStream(file)), parent, str);
 				
 				cache.put(str, resolution);
 			}catch (IOException e) {}

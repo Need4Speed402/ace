@@ -18,16 +18,9 @@ public class ResolverPath extends Resolver{
 	}
 	
 	@Override
-	public void setParent(Resolver parent) {
-		super.setParent(parent);
-		
-		this.child.setParent(parent);
-	}
-	
-	@Override
-	public Value exists(String[] path) {
+	public Value exists(Resolver parent, String[] path) {
 		if (path.length == 1) {
-			Value res = this.child.exists(new String[] {"root", path[0]});
+			Value res = this.child.exists(parent, new String[] {"root", path[0]});
 			if (res != null) return res;
 		}
 		
@@ -36,7 +29,7 @@ public class ResolverPath extends Resolver{
 				if (this.path[i] != path[i]) return null;
 			}
 			
-			return this.child.exists(Arrays.copyOfRange(path, this.path.length, path.length));
+			return this.child.exists(parent, Arrays.copyOfRange(path, this.path.length, path.length));
 		}
 		
 		return null;

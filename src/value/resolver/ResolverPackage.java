@@ -17,7 +17,7 @@ public class ResolverPackage extends Resolver{
 	}
 	
 	@Override
-	public Value exists(String[] path) {
+	public Value exists(Resolver parent, String[] path) {
 		String joinPath = this.root + "/" + String.join("/", path);
 		
 		Value resolution = null;
@@ -28,7 +28,7 @@ public class ResolverPackage extends Resolver{
 			InputStream stream = ResolverPackage.class.getClassLoader().getResourceAsStream(joinPath + ".ace");
 			
 			if (stream != null) {
-				resolution = Packages.load(new Stream(stream), this.getParent(), joinPath);
+				resolution = Packages.load(new Stream(stream), parent, joinPath);
 				cache.put(joinPath, resolution);
 			}
 		}else{
