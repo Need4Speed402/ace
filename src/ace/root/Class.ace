@@ -12,6 +12,8 @@
 .Resolver = std boot Resolver
 .Function = Scope
 
+.Environment = unsafe root Environment
+
 .check = Function bool, callback, {
 	Scope (bool callback {})
 }
@@ -20,8 +22,8 @@
 	Scope (bool cb1 cb2)
 }
 
-.vTrue = Function a, b, {a}
-.vFalse = Function a, b, {b}
+.vTrue = Function a, b, {*a}
+.vFalse = Function a, b, {*b}
 
 .createNode = Function next, ident, handler, ctx, {
 	check (cmp root *ctx) { vFalse }
@@ -46,7 +48,7 @@
 	.create = Function next, value, ctx, {
 		check (cmp root *ctx) { vFalse }
 		check (cmp next *ctx) { *next }
-		check (cmp value *ctx) { value }
+		check (cmp value *ctx) { *value }
 	}
 	
 	Function _, {
@@ -66,7 +68,7 @@
 	}
 )
 
-.compareID = Function v1, v2, {(
+.compareID = Recursive v1, v2, {(
 	.and = Function v1, v2, {v1 v2 vFalse}
 	.xor = Function v1, v2, {v1 (v2 vFalse vTrue) v2}
 	
@@ -76,7 +78,7 @@
 		both (xor (v1 value) (v2 value)) {
 			vFalse
 		} {
-			compareID (v1 next) (v2 next)
+			recurse (v1 next) (v2 next)
 		}
 	}
 )}
@@ -133,13 +135,13 @@ Function Constructor, {(
 				ctx
 			)}
 			
-			Function ident, _, {
+			Function ident, _, {(
 				check (cmp :: *ident) Function _, Constructor, {
 					compareID id Constructor classID true false
 				}
 				
 				*default *ident
-			}
+			)}
 		)
 		
 		instance = Function ident, {
