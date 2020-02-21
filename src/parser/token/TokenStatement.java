@@ -213,7 +213,7 @@ public class TokenStatement extends TokenProcedure implements Modifier{
 		
 		@Override
 		public String toString () {
-			return "(" + this.function.toString() + " " + this.param.toString() + ")";
+			return this.function.toString() + " " + this.param.toString();
 		}
 	}
 	

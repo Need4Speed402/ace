@@ -14,7 +14,11 @@ public class TokenOperatorTrailing implements Token, Modifier{
 	
 	@Override
 	public String toString() {
-		return this.token.toString() + Color.red(this.operator);
+		if (this.token instanceof TokenIdentifier) {
+			return Color.purple(this.token.toString()) + Color.red(this.operator);
+		}else{
+			return this.token.toString() + Color.red(this.operator);
+		}
 	}
 	
 	@Override

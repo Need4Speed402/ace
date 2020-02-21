@@ -27,6 +27,11 @@ public enum Color {
 	BG_CYAN (Type.BACKGROUND, "46"),
 	BG_WHITE (Type.BACKGROUND, "47");
 	
+	public static String reset (String r) { return apply(r, CL_RESET, MOD_RESET, BG_RESET); }
+	
+	public static String bold (String r) { return apply(r, BOLD); }
+	public static String underscore (String r) { return apply(r, UNDERSCORE); }
+	
 	public static String red (String r) { return apply(r, RED); }
 	public static String green (String r) { return apply(r, GREEN); }
 	public static String blue (String r) { return apply(r, BLUE); }
@@ -89,7 +94,7 @@ public enum Color {
 		}
 		
 		if (current.length() > 0) {
-			sections.add(new Section(current.toString(), props.props));
+			sections.add(new Section(current.toString(), props.isReset() ? new Color[] {} : props.props));
 		}
 		
 		return sections.toArray(new Section[0]);
@@ -103,6 +108,7 @@ public enum Color {
 			b.append(sections[i].backApply(props));
 		}
 		
+		b.append("\u001B[0m");
 		return b.toString();
 	}
 	
@@ -116,33 +122,20 @@ public enum Color {
 		}
 		
 		private static Color[] simplify (Color[] props) {
-			Color[] n = new Color[props.length];
+			Color[] n = new Color[Type.values().length];
 			int len = 0;
 			
-			for (int i = 0; i < props.length; i++) {
-				Color prop = props[i];
-				boolean added = false;
-				
-				for (int ii = 0; ii < len; ii++) {
-					if (prop.type == n[ii].type) {
-						n[ii] = prop;
-						added = true;
-						break;
-					}
-				}
-				
-				if (!added) n[len++] = prop;
-			}
+			boolean[] gotten = new boolean[Type.values().length];
 			
-			for (int i = 0; i < len; i++) {
-				if (n[i].value.isEmpty()) {
-					for (int ii = i + 1; ii < len; ii++) {
-						n[ii - 1] = n[ii];
-					}
-					
-					len--;
-					i--;
+			for (int i = props.length - 1; i >= 0; i--) {
+				Color prop = props[i];
+				
+				if (!gotten[prop.type.ordinal()]) {
+					gotten[prop.type.ordinal()] = true;
+					n[len++] = prop;
 				}
+				
+				if (len == n.length) break;
 			}
 			
 			return Arrays.copyOf(n, len);
@@ -162,23 +155,56 @@ public enum Color {
 			return new Section(this.string, n);
 		}
 		
-		@Override
-		public String toString() {
-			StringBuilder b = new StringBuilder ();
-			b.append("\u001B[");
+		public boolean isReset () {
+			boolean isReset = false;
 			
-			if (this.props.length == 0) {
-				b.append("0");
-			}else for (int i = 0; i < this.props.length; i++) {
-				b.append(this.props[i].value);
-				if (i < this.props.length - 1) b.append(';');
+			for (int i = 0; i < this.props.length; i++) {
+				if (this.props[i].value.isEmpty()) {
+					isReset = true;
+				}else {
+					return false;
+				}
 			}
 			
-			b.append("m");
-			b.append(this.string);
-			b.append("\u001B[0m");
-			
-			return b.toString();
+			return isReset;
+		}
+		
+		@Override
+		public String toString() {
+			if (this.props.length != 0) {
+				StringBuilder b = new StringBuilder ();
+				b.append("\u001B[");
+				
+				boolean hasReset = false;
+				boolean hasState = false;
+				
+				for (int i = 0; i < this.props.length; i++) {
+					if (this.props[i].value.isEmpty()) {
+						if (!hasReset) b.append('0');
+						hasReset = true;
+					}else {
+						hasState = true;
+					}
+				}
+				
+				if (hasReset & hasState) {
+					b.append(';');
+				}
+				
+				for (int i = 0; i < this.props.length; i++) {
+					if (!this.props[i].value.isEmpty()) {
+						b.append(this.props[i].value);
+						if (i < this.props.length - 1) b.append(';');
+					}
+				}
+				
+				b.append("m");
+				b.append(this.string);
+				
+				return b.toString();
+			}else {
+				return this.string;
+			}
 		}
 	}
 	

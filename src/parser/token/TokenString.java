@@ -81,6 +81,17 @@ public class TokenString extends TokenProcedure{
 		public Node createNode() {
 			return Node.call("String", super.createNode());
 		}
+		
+		@Override
+		public String toString (){
+			if (this.getTokens().length == 0) {
+				return "()";
+			}else if (this.getTokens().length == 1) {
+				return "(" + Color.reset(this.getTokens()[0].toString()) + ")";
+			}else {
+				return "(\n" + Color.reset(TokenEnvironment.indent(TokenProcedure.toString(this, '\n'))) + "\n)";
+			}
+		}
 	}
 	
 	public static class StringSegment implements Token {
