@@ -50,6 +50,8 @@ public enum Color {
 	public static String bgBlack (String r) { return apply(r, BG_BLACK); }
 	public static String bgWhite (String r) { return apply(r, BG_WHITE); }
 	
+	private static final char delimiter = '\u001B';
+
 	public final Type type;
 	public final String value;
 	
@@ -64,7 +66,7 @@ public enum Color {
 		StringBuilder current = new StringBuilder();
 		
 		for (int i = 0; i < r.length(); i++) {
-			if (i + 2 < r.length() && r.charAt(i) == '\u001B' && r.charAt(i + 1) == '[') {
+			if (i + 2 < r.length() && r.charAt(i) == delimiter && r.charAt(i + 1) == '[') {
 				if (current.length() > 0) {
 					sections.add(new Section(current.toString(), props.props));
 					current.setLength(0);
@@ -79,7 +81,9 @@ public enum Color {
 				
 				String[] sec = b.toString().split(";");
 				
-				for (int ii = 0; ii < sec.length; ii++) {
+				if (sec.length == 2 && sec[0].equals("0") && sec[1].equals("0")){
+					props = new Section(null);
+				}else for (int ii = 0; ii < sec.length; ii++) {
 					if (sec[ii].isEmpty() || sec[ii].equals("0")) {
 						props = props.apply(MOD_RESET, CL_RESET, BG_RESET);
 					}else for (int iii = 0; iii < Color.values().length; iii++) {
@@ -94,7 +98,7 @@ public enum Color {
 		}
 		
 		if (current.length() > 0) {
-			sections.add(new Section(current.toString(), props.isReset() ? new Color[] {} : props.props));
+			sections.add(new Section(current.toString(), props.props));
 		}
 		
 		return sections.toArray(new Section[0]);
@@ -103,12 +107,17 @@ public enum Color {
 	private static String apply(String str, Color ... props) {
 		Section[] sections = parse(str);
 		StringBuilder b = new StringBuilder();
+
+		Section old = null;
 		
 		for (int i = 0; i < sections.length; i++) {
-			b.append(sections[i].backApply(props));
+			Section s = old == null ? sections[i] : sections[i].negative(old.props);
+
+			b.append(s.backApply(props));
+			//old = s;
 		}
 		
-		b.append("\u001B[0m");
+		b.append(delimiter + "[0;0m");
 		return b.toString();
 	}
 	
@@ -132,13 +141,13 @@ public enum Color {
 				
 				if (!gotten[prop.type.ordinal()]) {
 					gotten[prop.type.ordinal()] = true;
-					n[len++] = prop;
+					n[n.length - ++len] = prop;
 				}
 				
 				if (len == n.length) break;
 			}
 			
-			return Arrays.copyOf(n, len);
+			return Arrays.copyOfRange(n, n.length - len, n.length);
 		}
 		
 		public Section apply (Color ... props) {
@@ -154,47 +163,44 @@ public enum Color {
 			for (int i = 0; i < this.props.length; i++) n[i + props.length] = this.props[i];
 			return new Section(this.string, n);
 		}
-		
-		public boolean isReset () {
-			boolean isReset = false;
-			
-			for (int i = 0; i < this.props.length; i++) {
-				if (this.props[i].value.isEmpty()) {
-					isReset = true;
-				}else {
-					return false;
+
+		public Section negative (Color ... s) {
+			Color[] n = Arrays.copyOf(this.props, this.props.length);
+			int len = n.length;
+
+			for (int i = 0; i < len; i++){
+				for (int ii = 0; ii < s.length; ii++){
+					if (n[i].type == s[ii].type && n[i].value.equals(s[ii].value)){
+						for (int iii = i + 1; iii < len; iii++){
+							n[iii - 1] = n[iii];
+						}
+
+						len--;
+					}
 				}
 			}
-			
-			return isReset;
+
+			return new Section(this.string, Arrays.copyOf(n, len));
 		}
 		
 		@Override
 		public String toString() {
 			if (this.props.length != 0) {
 				StringBuilder b = new StringBuilder ();
-				b.append("\u001B[");
-				
+				b.append(delimiter + "[");
+
 				boolean hasReset = false;
-				boolean hasState = false;
 				
 				for (int i = 0; i < this.props.length; i++) {
 					if (this.props[i].value.isEmpty()) {
-						if (!hasReset) b.append('0');
+						if (!hasReset) {
+							if (b.charAt(b.length() - 1) != '[') b.append(';');							
+							b.append('0');
+						}
 						hasReset = true;
-					}else {
-						hasState = true;
-					}
-				}
-				
-				if (hasReset & hasState) {
-					b.append(';');
-				}
-				
-				for (int i = 0; i < this.props.length; i++) {
-					if (!this.props[i].value.isEmpty()) {
+					}else{
+						if (b.charAt(b.length() - 1) != '[') b.append(';');	
 						b.append(this.props[i].value);
-						if (i < this.props.length - 1) b.append(';');
 					}
 				}
 				
