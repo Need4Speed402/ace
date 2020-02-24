@@ -1,41 +1,42 @@
 package value.resolver;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
 
-import parser.Packages;
-import parser.Stream;
-import value.Value;
-
-public class ResolverFile extends Resolver{
+public class ResolverFile extends ResolverVirtual{
 	private File root;
-	private static HashMap<String, Value> cache = new HashMap<>();
+	
+	public ResolverFile(File root, Pair ... pairs) {
+		super(pairs);
+		this.root = root;
+	}
 	
 	public ResolverFile(File root) {
 		this.root = root;
 	}
 	
 	@Override
-	public Value exists(Resolver parent, String[] path) {
-		File file = new File(this.root, String.join("/", path) + ".ace");
-		String str = file.getAbsolutePath();
+	public Pair[] getPairs () {
+		ArrayList<Pair> pairs = new ArrayList<>();
+		pairs.addAll(Arrays.asList(super.getPairs()));
 		
-		Value resolution = null;
+		File[] files = this.root.listFiles();
 		
-		if (!cache.containsKey(str)) {
-			cache.put(str, null);
+		for (File file : files) {
+			String name = file.getName();
 			
-			if (file.isFile()) try {
-				resolution = Packages.load(new Stream(new FileInputStream(file)), parent, str);
-				
-				cache.put(str, resolution);
-			}catch (IOException e) {}
-		}else{
-			resolution = cache.get(str);
+			if (name.toLowerCase().endsWith(".ace") && file.isFile()) {
+				pairs.add(new Pair(name.substring(0, name.length() - 4), new ResolverSource(file)));
+			}
 		}
 		
-		return resolution;
+		for (File file : files) {
+			if (file.isDirectory()) {
+				pairs.add(new Pair(file.getName(), new ResolverFile(file)));
+			}
+		}
+		
+		return pairs.toArray(new Pair[0]);
 	}
 }

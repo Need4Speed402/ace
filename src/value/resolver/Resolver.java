@@ -1,17 +1,11 @@
 package value.resolver;
 
-import java.util.Arrays;
-
 import value.Value;
 
 public abstract class Resolver {
-	public abstract Value exists (Resolver parent, String[] path);
+	public abstract Value call (Resolver parent);
 	
-	public static Value createNode (Resolver r) {
-		return new ValueResolver(r);
-	}
-	
-	public static class ValueResolver implements Value {
+	/*public static class ValueResolver implements Value {
 		private final Resolver resolver;
 		private final String[] path;
 		
@@ -44,5 +38,5 @@ public abstract class Resolver {
 		public String toString() {
 			return "Resolver" + Arrays.toString(this.path);
 		}
-	}
+	}*/
 }
