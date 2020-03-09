@@ -1,5 +1,6 @@
 package resolver;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -20,14 +21,31 @@ public class ResolverVirtual extends Resolver {
 	
 	@Override
 	public Node createNode() {
-		Pair[] pairs = this.getPairs();
+		Pair root;
+		Pair[] pairs;
 		
-		Pair root = null;
-		for (int i = 0; i < pairs.length; i++) {
-			if (pairs[i].name.equals("root")) {
-				root = pairs[i];
-				break;
+		{
+			HashSet<String> names = new HashSet<>();
+			Pair[] p = this.getPairs();
+			
+			pairs = new Pair[p.length];
+			int len = 0;
+			
+			for (int i = 0; i < p.length; i++) {
+				String name = p[i].name;
+				
+				if (!names.contains(name)) {
+					names.add(name);
+					
+					//if (name.equals("root")) {
+					//	root = p[i];
+					//} else {
+						pairs[len++] = p[i];
+					//}
+				}
 			}
+			
+			pairs = Arrays.copyOf(pairs, len);
 		}
 		
 		Node rel = Node.id("[rel]");

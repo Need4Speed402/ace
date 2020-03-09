@@ -14,13 +14,13 @@ public class TokenEnvironment extends TokenProcedure {
 	
 	public static String indent (String s) {
 		StringBuilder ss = new StringBuilder();
-		ss.append('\t');
+		ss.append("  ");
 		
 		for (int i = 0; i < s.length(); i++) {
 			char c = s.charAt(i);
 			
 			if (c == '\n') {
-				ss.append('\n').append('\t');
+				ss.append('\n').append("  ");
 			}else {
 				ss.append(c);
 			}

@@ -31,15 +31,29 @@ public class Packages {
 	}
 	
 	public static void main(String[] args) {
-		Resolver r = new ResolverVirtual(
-			new Pair("unsafe", Unsafe.createUnsafe()),
-			new Pair("std", new ResolverFile(new File("D:\\documents\\eclipse\\SimpleAceInterpreter\\src\\ace")).insertRoot(new ResolverSource("unsafe", "root"))),
-			new Pair("import", new ResolverFile(new File(args[0]).getParentFile()).insertRoot(new ResolverSource("std", "root")))
-		);
+		File start = new File(args[0]);
 		
-		Node n = r.createNode();
+		String name = start.getName();
 		
-		System.out.println(n.toString());
+		if (name.indexOf('.') >= 0) {
+			name = name.substring(0, name.lastIndexOf('.'));
+		}
+		
+		//the entire thing has to be wrapped in a root folder
+		//so that unsafe, std, and import will be visible in the
+		//default environment without any special logic elsewhere in code.
+		Resolver r = new ResolverVirtual (new Pair ("root", new ResolverVirtual(
+			//new Pair("unsafe", Unsafe.createUnsafe()),
+			//new Pair("std", new ResolverFile(new File("D:\\documents\\eclipse\\SimpleAceInterpreter\\src\\ace")).insertRoot(new ResolverSource("unsafe", "root"))),
+			new Pair("import", new ResolverFile(start.getParentFile()))
+		)));
+		
+		Node n = Node.call(r.createNode(), Node.id("root"), Node.id("import"), Node.id(name), Node.id("`"));
+		
+		System.out.println(n);
+		n.run(Unsafe.DEFAULT_ENVIRONMENT);
+		
+		//System.out.println(n.toString());
 		
 		/*Packages.file(args[0]);
 		

@@ -11,6 +11,7 @@ public class Unsafe {
 	
 	public static final Node IDENTITY = Node.call("(function)", Node.id("{identity}"), Node.env(Node.id("{identity}")));
 	public static final Node SCOPE = Node.call("(function)", Node.id("{scope}"), Node.env(Node.call(Node.id("{scope}"), IDENTITY)));
+	public static final Node DO = Node.call("(function)", Node.id("void"), Node.env(IDENTITY));
 	
 	public static final Value DEFAULT_ENVIRONMENT = denv -> {
 		if (denv.getName() == "(function)") {
@@ -40,7 +41,7 @@ public class Unsafe {
 			};
 		}else if (denv.getName() == "(mutable)") {
 			return init -> new Mutable(init);
-		}else if (denv.getName() == "(console)") {
+		}else if (denv.getName() == "console") {
 			return p -> {
 				System.out.println(p);
 				return p;

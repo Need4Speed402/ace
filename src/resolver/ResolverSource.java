@@ -14,7 +14,7 @@ public class ResolverSource extends Resolver{
 	private final Source source;
 	
 	public ResolverSource (File f) {
-		this.source = () -> load(f);
+		this.source = () -> Node.call("console", Node.id("hello world"));//load(f);
 	}
 	
 	public ResolverSource(String ... path) {
@@ -27,29 +27,16 @@ public class ResolverSource extends Resolver{
 	
 	@Override
 	public Node createNode() {
-		/*
-		 * Modules in ACE are loaded once exactly when they are needed and then the result
-		 * of their execution is cached so when the module is used next time, that cached
-		 * version will be used.
-		 * 
-		 * (function) memory {
-		 *     (function) value {
-		 *         (check) (memory get) uninitialized
-		 *     }
-		 * } ((memory) uninitialized)
-		 */
-		
-		return Node.id("{source}");
-		
-		/*return Node.call("(function)", Node.call("memory"), Node.env(
-			Node.call("(function)", Node.id("param"), Node.env(
-				Node.call("memory", Node.id("memory"), Node.id("param"))
+		return Node.call("(mutable)", Node.id("[void]"), Node.call("(function)", Node.id("[set]"), Node.env(
+			Node.call("(function)", Node.id("[get]"), Node.env(
+				Node.call(Unsafe.DO, Node.call("[set]", Node.call("(function)", Node.id("[param]"), Node.env(
+					Node.call(Unsafe.DO,
+						Node.call("[set]", Node.id("(parent)")),
+						Node.call("[set]", this.source.get(), Node.id("[param]"))
+					)
+				))), Node.call("(function)", Node.id("[param]"), Node.env(Node.call("[get]", Node.id("[void]"), Node.id("[param]")))))
 			))
-		), Node.call("(memory)", Node.call("(function)", Node.id("memory"), Node.env(
-			Node.call("(function)", Node.id("param"), Node.env(
-				null
-			))
-		))));*/
+		)));
 	}
 
 	private interface Source {
