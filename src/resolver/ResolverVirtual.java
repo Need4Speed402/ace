@@ -21,7 +21,7 @@ public class ResolverVirtual extends Resolver {
 	
 	@Override
 	public Node createNode() {
-		IdentifierPair root = null;
+		IdentifierPair pairRoot = null;
 		IdentifierPair[] pairs;
 		
 		{
@@ -38,7 +38,7 @@ public class ResolverVirtual extends Resolver {
 					names.add(name);
 					
 					pairs[len++] = new IdentifierPair(p[i]);
-					if (name.equals("root")) root = pairs[len - 1];
+					if (name.equals("root")) pairRoot = pairs[len - 1];
 				}
 			}
 			
@@ -46,31 +46,44 @@ public class ResolverVirtual extends Resolver {
 		}
 		
 		Node rel = Node.id();
+		Node root = Node.id();
 		Node block = rel;
 		
 		for (IdentifierPair p : pairs) {
-			block = Node.call(Unsafe.SCOPE, Node.call(Unsafe.COMPARE, rel, Node.id(p.name), Node.env(p.identifier), Node.env(block)));
+			block = Node.call(Unsafe.SCOPE, Node.call(Unsafe.COMPARE, rel, p.identifier, Node.env(p.uniqueIdentifier), Node.env(block)));
 		}
 		
 		block = Node.call(Unsafe.FUNCTION, rel, Node.env(block));
 		
 		for (IdentifierPair p : pairs) {
-			block = Node.call(Unsafe.FUNCTION, p.identifier, Node.env(block), Node.call(Unsafe.ASSIGN, Node.id(p.name), p.resolver.createNode()));
+			block = Node.call(
+				Unsafe.FUNCTION,
+				p.uniqueIdentifier,
+				Node.env(block),
+				Node.call(Unsafe.ASSIGN, p.identifier, Node.call(p.resolver.createNode(), root))
+			);
 		}
 		
-		/*if (root != null) {
+		if (pairRoot != null) {
 			Node set = Node.id();
 			Node get = Node.id();
 			Node param = Node.id();
 			
-			block = Node.call(Unsafe.MUTABLE, Unsafe.DO, Node.call(Unsafe.FUNCTION, set, Node.env(
-				Node.call(Unsafe.FUNCTION, get, Node.env(
-					Node.call(set, Node.call(Node.env(block), Node.call(Unsafe.FUNCTION, param, Node.env(
-						Node.call(get, Node.id(), Node.id("root"), param)	
-					))))
-				))
-			)));
-		}*/
+			Node proot = Node.id();
+			
+			
+			block = Node.call(Unsafe.FUNCTION, proot, Node.env(
+				Node.call(Unsafe.MUTABLE, Unsafe.DO, Node.call(Unsafe.FUNCTION, set, Node.env(
+					Node.call(Unsafe.FUNCTION, get, Node.env(
+						Node.call(set, Node.call(Unsafe.FUNCTION, root, Node.env(block), Node.call(Unsafe.FUNCTION, param, Node.env(
+							Node.call(get, Node.id(), Node.id("root"), Node.call(proot, param))
+						))))
+					))
+				)))
+			));
+		}else {
+			block = Node.call(Unsafe.FUNCTION, root, Node.env(block));
+		}
 		
 		return block;
 	}
@@ -153,10 +166,13 @@ public class ResolverVirtual extends Resolver {
 	}
 	
 	private static class IdentifierPair extends Pair {
-		public NodeIdentifier identifier = Node.id();
+		public final NodeIdentifier uniqueIdentifier = Node.id();
+		public final NodeIdentifier identifier;
 		
 		public IdentifierPair(Pair p) {
 			super(p.name, p.resolver);
+			
+			this.identifier = Node.id(p.name);
 		}
 	}
 }

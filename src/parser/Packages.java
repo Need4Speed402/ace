@@ -3,7 +3,7 @@ package parser;
 import java.io.File;
 
 import resolver.Resolver;
-import resolver.ResolverFile;
+import resolver.ResolverSource;
 import resolver.ResolverVirtual;
 import resolver.ResolverVirtual.Pair;
 import value.Unsafe;
@@ -44,12 +44,15 @@ public class Packages {
 		Resolver r = new ResolverVirtual (new Pair ("root", new ResolverVirtual(
 			//new Pair("unsafe", Unsafe.createUnsafe()),
 			//new Pair("std", new ResolverFile(new File("D:\\documents\\eclipse\\SimpleAceInterpreter\\src\\ace")).insertRoot(new ResolverSource("unsafe", "root"))),
-			new Pair("import", new ResolverFile(start.getParentFile()))
+			//new Pair("import", new ResolverFile(start.getParentFile()))
+				
+			new Pair("dude", new ResolverSource(Unsafe.CONSOLE)),
+			new Pair(name, new ResolverSource(Node.call(Node.id("dude"), Node.id("hello world"))))
 		)));
 		
 		//System.out.println(r);
 		
-		Node n = Node.call(r.createNode(), Node.id("root"), Node.id("import"), Node.id(name), Node.id("`"));
+		Node n = Node.call(r.createNode(), Unsafe.IDENTITY, Node.id("root"), Node.id(name), Node.id("`"));
 		
 		//System.out.println(n);
 		n.run(Unsafe.DEFAULT_ENVIRONMENT);
