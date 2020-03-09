@@ -10,6 +10,6 @@ public class TokenBase extends TokenProcedure{
 	
 	@Override
 	public Node createNode() {
-		return Node.call("Package", super.createNode());
+		return Node.call(Node.id("Package"), super.createNode());
 	}
 }

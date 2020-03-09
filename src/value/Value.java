@@ -3,7 +3,7 @@ package value;
 public interface Value {
 	public Value call (Value v);
 	
-	public default String getName () {
-		return "";
+	public default int getID () {
+		return 0;
 	}
 }

@@ -25,7 +25,7 @@ public class TokenScope extends TokenProcedure implements Modifier{
 	
 	@Override
 	public Node createNode() {
-		return Node.call("Scope", super.createNode());
+		return Node.call(Node.id("Scope"), super.createNode());
 	}
 	
 	@Override

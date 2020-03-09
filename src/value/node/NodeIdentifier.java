@@ -5,10 +5,12 @@ import parser.token.TokenString;
 import value.Value;
 
 public class NodeIdentifier implements Node {
-	public final String name;
+	private static int counter = 0;
 	
-	protected NodeIdentifier(String name) {
-		this.name = name.intern();
+	public final int id;
+	
+	protected NodeIdentifier() {
+		this.id = ++counter;
 	}
 	
 	@Override
@@ -20,23 +22,26 @@ public class NodeIdentifier implements Node {
 			}
 			
 			@Override
-			public String getName() {
-				return name;
+			public int getID() {
+				return id;
 			}
 			
 			@Override
 			public String toString() {
-				return "Identifier(" + name + ")";
+				return "Identifier(" + NodeIdentifier.this.toString() + ")";
 			}
 		});
 	}
 	
 	@Override
 	public String toString() {
-		boolean isSpecial = this.name.isEmpty();
+		String name = Node.ids_rev.get(this);
+		if (name == null) name = Integer.toString(this.id);
+		
+		boolean isSpecial = name.isEmpty();
 		
 		if (!isSpecial) {
-			Stream s = new Stream(this.name);
+			Stream s = new Stream(name);
 			
 			while (s.hasChr()) {
 				if (s.next(Stream.whitespace) || s.next("{}[]();\"\'".toCharArray())) {
@@ -49,16 +54,16 @@ public class NodeIdentifier implements Node {
 		}
 		
 		if (isSpecial) {
-			return TokenString.readString (new Stream (this.name), '\0').toString();
+			return TokenString.readString (new Stream (name), '\0').toString();
 		}else {
-			return this.name;
+			return name;
 		}
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof NodeIdentifier) {
-			return ((NodeIdentifier) obj).name == name;
+			return ((NodeIdentifier) obj).id == this.id;
 		}
 		
 		return false;
@@ -66,6 +71,6 @@ public class NodeIdentifier implements Node {
 	
 	@Override
 	public int hashCode() {
-		return this.name.hashCode();
+		return this.id;
 	}
 }

@@ -2,11 +2,11 @@ package resolver;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 
 import parser.Color;
 import value.Unsafe;
 import value.node.Node;
+import value.node.NodeIdentifier;
 
 public class ResolverVirtual extends Resolver {
 	protected final Pair[] pairs;
@@ -21,14 +21,14 @@ public class ResolverVirtual extends Resolver {
 	
 	@Override
 	public Node createNode() {
-		Pair root;
-		Pair[] pairs;
+		IdentifierPair root = null;
+		IdentifierPair[] pairs;
 		
 		{
 			HashSet<String> names = new HashSet<>();
 			Pair[] p = this.getPairs();
 			
-			pairs = new Pair[p.length];
+			pairs = new IdentifierPair[p.length];
 			int len = 0;
 			
 			for (int i = 0; i < p.length; i++) {
@@ -37,29 +37,40 @@ public class ResolverVirtual extends Resolver {
 				if (!names.contains(name)) {
 					names.add(name);
 					
-					//if (name.equals("root")) {
-					//	root = p[i];
-					//} else {
-						pairs[len++] = p[i];
-					//}
+					pairs[len++] = new IdentifierPair(p[i]);
+					if (name.equals("root")) root = pairs[len - 1];
 				}
 			}
 			
 			pairs = Arrays.copyOf(pairs, len);
 		}
 		
-		Node rel = Node.id("[rel]");
-		Node block = Node.call("[root]", rel);
+		Node rel = Node.id();
+		Node block = rel;
 		
-		for (Pair p : pairs) {
-			block = Node.call(Unsafe.SCOPE, Node.call("(compare)", rel, Node.id(p.name), Node.env(Node.id("[" + p.name + "]")), Node.env(block)));
+		for (IdentifierPair p : pairs) {
+			block = Node.call(Unsafe.SCOPE, Node.call(Unsafe.COMPARE, rel, Node.id(p.name), Node.env(p.identifier), Node.env(block)));
 		}
 		
-		block = Node.call("(function)", rel, Node.env(block));
+		block = Node.call(Unsafe.FUNCTION, rel, Node.env(block));
 		
-		for (Pair p : pairs) {
-			block = Node.call("(function)", Node.id("[" + p.name + "]"), Node.env(block), p.resolver.createNode());
+		for (IdentifierPair p : pairs) {
+			block = Node.call(Unsafe.FUNCTION, p.identifier, Node.env(block), Node.call(Unsafe.ASSIGN, Node.id(p.name), p.resolver.createNode()));
 		}
+		
+		/*if (root != null) {
+			Node set = Node.id();
+			Node get = Node.id();
+			Node param = Node.id();
+			
+			block = Node.call(Unsafe.MUTABLE, Unsafe.DO, Node.call(Unsafe.FUNCTION, set, Node.env(
+				Node.call(Unsafe.FUNCTION, get, Node.env(
+					Node.call(set, Node.call(Node.env(block), Node.call(Unsafe.FUNCTION, param, Node.env(
+						Node.call(get, Node.id(), Node.id("root"), param)	
+					))))
+				))
+			)));
+		}*/
 		
 		return block;
 	}
@@ -138,6 +149,14 @@ public class ResolverVirtual extends Resolver {
 		public Pair (String name, Node v) {
 			this.name = name;
 			this.resolver = new ResolverSource(v);
+		}
+	}
+	
+	private static class IdentifierPair extends Pair {
+		public NodeIdentifier identifier = Node.id();
+		
+		public IdentifierPair(Pair p) {
+			super(p.name, p.resolver);
 		}
 	}
 }

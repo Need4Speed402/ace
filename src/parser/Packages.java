@@ -4,7 +4,6 @@ import java.io.File;
 
 import resolver.Resolver;
 import resolver.ResolverFile;
-import resolver.ResolverSource;
 import resolver.ResolverVirtual;
 import resolver.ResolverVirtual.Pair;
 import value.Unsafe;
@@ -48,9 +47,11 @@ public class Packages {
 			new Pair("import", new ResolverFile(start.getParentFile()))
 		)));
 		
+		//System.out.println(r);
+		
 		Node n = Node.call(r.createNode(), Node.id("root"), Node.id("import"), Node.id(name), Node.id("`"));
 		
-		System.out.println(n);
+		//System.out.println(n);
 		n.run(Unsafe.DEFAULT_ENVIRONMENT);
 		
 		//System.out.println(n.toString());

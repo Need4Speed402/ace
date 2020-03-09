@@ -24,7 +24,7 @@ public class TokenString extends TokenProcedure{
 		Node[] string = new Node[s.length()];
 		
 		for (int ii = 0; ii < string.length; ii++) {
-			string[ii] = Node.call("Integer", new TokenInteger.BooleanArray(s.charAt(ii)).toNode());
+			string[ii] = Node.call(Node.id("Integer"), new TokenInteger.BooleanArray(s.charAt(ii)).toNode());
 		}
 		
 		return TokenProcedure.createBlock(string);
@@ -79,7 +79,7 @@ public class TokenString extends TokenProcedure{
 		
 		@Override
 		public Node createNode() {
-			return Node.call("String", super.createNode());
+			return Node.call(Node.id("String"), super.createNode());
 		}
 		
 		@Override
@@ -103,7 +103,7 @@ public class TokenString extends TokenProcedure{
 		
 		@Override
 		public Node createNode() {
-			return Node.call("String", createStringElement(this.text));
+			return Node.call(Node.id("String"), createStringElement(this.text));
 		}
 		
 		@Override

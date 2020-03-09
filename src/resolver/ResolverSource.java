@@ -14,7 +14,7 @@ public class ResolverSource extends Resolver{
 	private final Source source;
 	
 	public ResolverSource (File f) {
-		this.source = () -> Node.call("console", Node.id("hello world"));//load(f);
+		this.source = () -> Node.call(Unsafe.CONSOLE, Node.id("hello world"));//load(f);
 	}
 	
 	public ResolverSource(String ... path) {
@@ -27,14 +27,18 @@ public class ResolverSource extends Resolver{
 	
 	@Override
 	public Node createNode() {
-		return Node.call("(mutable)", Node.id("[void]"), Node.call("(function)", Node.id("[set]"), Node.env(
-			Node.call("(function)", Node.id("[get]"), Node.env(
-				Node.call(Unsafe.DO, Node.call("[set]", Node.call("(function)", Node.id("[param]"), Node.env(
+		Node set = Node.id();
+		Node get = Node.id();
+		Node param = Node.id();
+		
+		return Node.call(Unsafe.MUTABLE, Node.id(), Node.call(Unsafe.FUNCTION, set, Node.env(
+			Node.call(Unsafe.FUNCTION, get, Node.env(
+				Node.call(Unsafe.DO, Node.call(set, Node.call(Unsafe.FUNCTION, param, Node.env(
 					Node.call(Unsafe.DO,
-						Node.call("[set]", Node.id("(parent)")),
-						Node.call("[set]", this.source.get(), Node.id("[param]"))
+						Node.call(set, Node.id()), // TODO
+						Node.call(set, this.source.get(), param)
 					)
-				))), Node.call("(function)", Node.id("[param]"), Node.env(Node.call("[get]", Node.id("[void]"), Node.id("[param]")))))
+				))), Node.call(Unsafe.FUNCTION, param, Node.env(Node.call(get, Node.id(), param))))
 			))
 		)));
 	}

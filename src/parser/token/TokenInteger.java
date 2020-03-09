@@ -20,7 +20,7 @@ public class TokenInteger implements Token{
 	
 	@Override
 	public Node createNode() {
-		return Node.call("Integer", this.number.toNode());
+		return Node.call(Node.id("Integer"), this.number.toNode());
 	}
 	
 	public static Object readNum (Stream ss, boolean integer) {

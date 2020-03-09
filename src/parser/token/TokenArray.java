@@ -21,6 +21,6 @@ public class TokenArray extends TokenProcedure{
 	
 	@Override
 	public Node createNode() {
-		return Node.call("Array", super.createNode());
+		return Node.call(Node.id("Array"), super.createNode());
 	}
 }

@@ -40,6 +40,6 @@ public class TokenEnvironment extends TokenProcedure {
 	
 	@Override
 	public Node createNode() {
-		return Node.call("Environment", super.createNode());
+		return Node.call(Node.id("Environment"), super.createNode());
 	}
 }

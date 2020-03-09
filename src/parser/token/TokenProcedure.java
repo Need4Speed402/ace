@@ -50,10 +50,10 @@ public abstract class TokenProcedure implements Token{
 		Node current = Node.env(Node.id("`"));
 		
 		for (int i = nodes.length - 1; i >= 0; i--) {
-			current = Node.env(Node.call("``", current, nodes[i]));
+			current = Node.env(Node.call(Node.id("``"), current, nodes[i]));
 		}
 		
-		return Node.call("Procedure", current);
+		return Node.call(Node.id("Procedure"), current);
 	}
 	
 	public static Token[] readBlock (Stream s, char terminator) {
