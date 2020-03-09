@@ -17,6 +17,7 @@ public class Unsafe {
 	public static final NodeIdentifier CONSOLE = Node.id();
 	
 	public static final NodeIdentifier PARENT = Node.id();
+	public static final NodeIdentifier ROOT = Node.id();
 	
 	private static final Node TEMP1 = Node.id();
 	private static final Node TEMP2 = Node.id();
@@ -48,7 +49,7 @@ public class Unsafe {
 				
 				@Override
 				public String toString() {
-					return "Assignment(" + super.toString() + ") -> " + value.toString();
+					return "Assignment(" + name.toString() + ") -> " + value.toString();
 				}
 			};
 		}else if (denv.getID() == MUTABLE.id) {
