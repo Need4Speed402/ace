@@ -1,8 +1,11 @@
-package value.resolver;
+package resolver;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import parser.Stream;
+import parser.token.TokenStatement;
 
 public class ResolverFile extends ResolverVirtual{
 	private File root;
@@ -23,11 +26,24 @@ public class ResolverFile extends ResolverVirtual{
 		
 		File[] files = this.root.listFiles();
 		
-		for (File file : files) {
+		main:for (File file : files) {
 			String name = file.getName();
 			
 			if (name.toLowerCase().endsWith(".ace") && file.isFile()) {
-				pairs.add(new Pair(name.substring(0, name.length() - 4), new ResolverSource(file)));
+				name = name.substring(0, name.length() - 4);
+				
+				//skip all files that have names that can't be accessed through ace syntax.
+				for (int i = 0; i < name.length(); i++) {
+					char c = name.charAt(i);
+					
+					if ((i == 0 || i == name.length()) && TokenStatement.operators.indexOf(c) >= 0) {
+						continue main;
+					}else if (new String(Stream.whitespace).indexOf(c) >= 0 || "(){}[];\"'".indexOf(c) >= 0) {
+						continue main;
+					}
+				}
+				
+				pairs.add(new Pair(name, new ResolverSource(file)));
 			}
 		}
 		

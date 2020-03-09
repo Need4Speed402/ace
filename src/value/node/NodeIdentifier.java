@@ -1,8 +1,10 @@
 package value.node;
 
+import parser.Stream;
+import parser.token.TokenString;
 import value.Value;
 
-public class NodeIdentifier implements Node{
+public class NodeIdentifier implements Node {
 	public final String name;
 	
 	protected NodeIdentifier(String name) {
@@ -31,7 +33,26 @@ public class NodeIdentifier implements Node{
 	
 	@Override
 	public String toString() {
-		return this.name;
+		boolean isSpecial = this.name.isEmpty();
+		
+		if (!isSpecial) {
+			Stream s = new Stream(this.name);
+			
+			while (s.hasChr()) {
+				if (s.next(Stream.whitespace) || s.next("{}[]();\"\'".toCharArray())) {
+					isSpecial = true;
+					break;
+				}
+				
+				s.chr();
+			}
+		}
+		
+		if (isSpecial) {
+			return TokenString.readString (new Stream (this.name), '\0').toString();
+		}else {
+			return this.name;
+		}
 	}
 	
 	@Override

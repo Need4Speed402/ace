@@ -2,12 +2,13 @@ package parser;
 
 import java.io.File;
 
+import resolver.Resolver;
+import resolver.ResolverFile;
+import resolver.ResolverSource;
+import resolver.ResolverVirtual;
+import resolver.ResolverVirtual.Pair;
 import value.Unsafe;
-import value.resolver.Resolver;
-import value.resolver.ResolverFile;
-import value.resolver.ResolverSource;
-import value.resolver.ResolverVirtual;
-import value.resolver.ResolverVirtual.Pair;
+import value.node.Node;
 
 public class Packages {
 	public static final boolean RUNTIME_STATS = true;
@@ -36,7 +37,9 @@ public class Packages {
 			new Pair("import", new ResolverFile(new File(args[0]).getParentFile()).insertRoot(new ResolverSource("std", "root")))
 		);
 		
-		System.out.println(r);
+		Node n = r.createNode();
+		
+		System.out.println(n.toString());
 		
 		/*Packages.file(args[0]);
 		

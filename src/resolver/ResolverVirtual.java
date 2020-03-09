@@ -1,15 +1,14 @@
-package value.resolver;
+package resolver;
 
-import java.util.HashMap;
-import java.util.Map.Entry;
-import java.util.Set;
+import java.util.HashSet;
+import java.util.Iterator;
 
 import parser.Color;
-import value.Value;
+import value.Unsafe;
+import value.node.Node;
 
 public class ResolverVirtual extends Resolver {
 	protected final Pair[] pairs;
-	private HashMap<String, Resolver> cache;
 	
 	public ResolverVirtual (Pair ... pairs) {
 		this.pairs = pairs;
@@ -19,38 +18,32 @@ public class ResolverVirtual extends Resolver {
 		return this.pairs;
 	}
 	
-	private HashMap<String, Resolver> getMap () {
-		if (this.cache == null) {
-			Pair[] pairs = this.getPairs();
-			this.cache = new HashMap<>();
-			
-			for (int i = 0; i < pairs.length; i++) {
-				this.cache.putIfAbsent(pairs[i].name, pairs[i].resolver);
+	@Override
+	public Node createNode() {
+		Pair[] pairs = this.getPairs();
+		
+		Pair root = null;
+		for (int i = 0; i < pairs.length; i++) {
+			if (pairs[i].name.equals("root")) {
+				root = pairs[i];
+				break;
 			}
 		}
 		
-		return this.cache;
-	}
-	
-	@Override
-	public Value call(Resolver r) {
-		return v -> this.child(v.getName()).call(r);
-	}
-	
-	public String[] children () {
-		Set<String> keys = this.getMap().keySet();
-		String[] values = new String[keys.size()];
-		int i = 0;
+		Node rel = Node.id("[rel]");
+		Node block = Node.call("[root]", rel);
 		
-		for (String s : keys) {
-			values[i++] = s;
+		for (Pair p : pairs) {
+			block = Node.call(Unsafe.SCOPE, Node.call("(compare)", rel, Node.id(p.name), Node.env(Node.id("[" + p.name + "]")), Node.env(block)));
 		}
 		
-		return values;
-	}
-	
-	public Resolver child (String name) {
-		return this.getMap().get(name);
+		block = Node.call("(function)", rel, Node.env(block));
+		
+		for (Pair p : pairs) {
+			block = Node.call("(function)", Node.id("[" + p.name + "]"), Node.env(block), p.resolver.createNode());
+		}
+		
+		return block;
 	}
 	
 	public ResolverVirtual insertRoot (Resolver r) {
@@ -76,24 +69,25 @@ public class ResolverVirtual extends Resolver {
 	
 	@Override
 	public String toString() {
-		Set<Entry<String, Resolver>> children = this.getMap().entrySet();
+		Pair[] children = this.getPairs();
 		
-		if (children.size() == 0) return "";
+		if (children.length == 0) return "";
 		
 		StringBuilder b = new StringBuilder();
-		int i = 0;
 		
-		for (Entry<String, Resolver> entry : children) {
-			boolean last = i == children.size() - 1;
+		for (int i = 0; i < children.length; i++) {
+			Pair entry = children[i];
+			
+			boolean last = i == children.length - 1;
 			
 			if (last) b.append('\u2514');
 			else b.append('\u251C');
 			
-			if (!(entry.getValue() instanceof ResolverSource)) {
-				b.append(' ').append(entry.getKey()).append('\n');
+			if (!(entry.resolver instanceof ResolverSource)) {
+				b.append(' ').append(entry.name).append('\n');
 				b.append(last ? "  " : "\u2502 ");
 				
-				String val = entry.getValue().toString();
+				String val = entry.resolver.toString();
 				
 				for (int ii = 0; ii < val.length(); ii++) {
 					char c = val.charAt(ii);
@@ -107,10 +101,8 @@ public class ResolverVirtual extends Resolver {
 				
 				b.append("\n");
 			}else{
-				b.append(' ').append(Color.cyan(entry.getKey())).append('\n');
+				b.append(' ').append(Color.cyan(entry.name)).append('\n');
 			}
-			
-			i++;
 		}
 		
 		return b.substring(0, b.length() - 1);
@@ -125,7 +117,7 @@ public class ResolverVirtual extends Resolver {
 			this.resolver = resolver;
 		}
 		
-		public Pair (String name, Value v) {
+		public Pair (String name, Node v) {
 			this.name = name;
 			this.resolver = new ResolverSource(v);
 		}

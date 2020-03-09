@@ -1,4 +1,4 @@
-package value.resolver;
+package resolver;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,18 +7,14 @@ import parser.Packages;
 import parser.Stream;
 import parser.token.Token;
 import parser.token.TokenBase;
-import value.Value;
+import value.Unsafe;
 import value.node.Node;
 
 public class ResolverSource extends Resolver{
 	private final Source source;
 	
-	public ResolverSource (Value v) {
-		this.source = parent -> v;
-	}
-	
 	public ResolverSource (File f) {
-		this (load(f));
+		this.source = () -> load(f);
 	}
 	
 	public ResolverSource(String ... path) {
@@ -26,37 +22,38 @@ public class ResolverSource extends Resolver{
 	}
 	
 	public ResolverSource(Node node) {
-		this.source = new Source () {
-			private boolean isLoading = false;
-			private Value value = null;
-			
-			@Override
-			public Value get(Resolver parent) {
-				if (this.isLoading) {
-					// TODO
-				}
-				
-				this.isLoading = true;
-				//TODO
-				this.value = node.run(env -> {
-					return null;
-				});
-				this.isLoading = false;
-				
-				return this.value;
-			}
-		};
+		this.source = () -> node;
 	}
 	
 	@Override
-	public Value call(Resolver parent) {
-		return v -> {
-			return this.source.get(parent).call(v);
-		};
+	public Node createNode() {
+		/*
+		 * Modules in ACE are loaded once exactly when they are needed and then the result
+		 * of their execution is cached so when the module is used next time, that cached
+		 * version will be used.
+		 * 
+		 * (function) memory {
+		 *     (function) value {
+		 *         (check) (memory get) uninitialized
+		 *     }
+		 * } ((memory) uninitialized)
+		 */
+		
+		return Node.id("{source}");
+		
+		/*return Node.call("(function)", Node.call("memory"), Node.env(
+			Node.call("(function)", Node.id("param"), Node.env(
+				Node.call("memory", Node.id("memory"), Node.id("param"))
+			))
+		), Node.call("(memory)", Node.call("(function)", Node.id("memory"), Node.env(
+			Node.call("(function)", Node.id("param"), Node.env(
+				null
+			))
+		))));*/
 	}
 
 	private interface Source {
-		public Value get (Resolver parent);
+		public Node get ();
 	}
 	
 	private static Node pathAsNode (String ... path) {
