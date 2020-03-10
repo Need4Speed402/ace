@@ -26,23 +26,26 @@ public class ResolverSource extends Resolver{
 	}
 	
 	@Override
-	public Node createNode() {
+	public Node createNode(boolean isRoot) {
 		Node set = Node.id();
 		Node get = Node.id();
 		Node param = Node.id();
 		Node root = Node.id();
+		Node parent = Node.id();
 		
-		return Node.call(Unsafe.FUNCTION, root, Node.env(
-			Node.call(Unsafe.MUTABLE, Node.id(), Node.call(Unsafe.FUNCTION, set, Node.env(
-				Node.call(Unsafe.FUNCTION, get, Node.env(
-					Node.call(Unsafe.DO, Node.call(set, Node.call(Unsafe.FUNCTION, param, Node.env(
-						Node.call(Unsafe.DO,
-							Node.call(set, Unsafe.PARENT), // TODO
-							Node.call(set, Node.call(Node.env(this.source.get()), root), param)
-						)
-					))), Node.call(Unsafe.FUNCTION, param, Node.env(Node.call(get, Node.id(), param))))
-				))
-			)))
+		return Node.call(Unsafe.FUNCTION, parent, Node.env(
+			Node.call(Unsafe.FUNCTION, root, Node.env(
+				Node.call(Unsafe.MUTABLE, Node.id(), Node.call(Unsafe.FUNCTION, set, Node.env(
+					Node.call(Unsafe.FUNCTION, get, Node.env(
+						Node.call(Unsafe.DO, Node.call(set, Node.call(Unsafe.FUNCTION, param, Node.env(
+							Node.call(Unsafe.DO,
+								Node.call(set, parent),
+								Node.call(set, Node.call(Node.env(this.source.get()), root), param)
+							)
+						))), Node.call(Unsafe.FUNCTION, param, Node.env(Node.call(get, Node.id(), param))))
+					))
+				)))
+			))
 		));
 	}
 

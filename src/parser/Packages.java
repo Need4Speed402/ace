@@ -46,13 +46,21 @@ public class Packages {
 			//new Pair("std", new ResolverFile(new File("D:\\documents\\eclipse\\SimpleAceInterpreter\\src\\ace")).insertRoot(new ResolverSource("unsafe", "root"))),
 			//new Pair("import", new ResolverFile(start.getParentFile()))
 			
-			new Pair("dude", new ResolverSource(Unsafe.CONSOLE)),
-			new Pair(name, new ResolverSource(Node.call(Node.id("dude"), Node.id("hello world"))))
+			new Pair("root", new ResolverVirtual(
+					new Pair("dude", new ResolverVirtual(
+						new Pair("what", new ResolverSource(Node.call(Unsafe.DO, Node.call(Unsafe.CONSOLE, Node.id("hijacked")))))
+					))
+			)),
+				
+			new Pair("dude", new ResolverVirtual(
+				new Pair("what", new ResolverSource(Unsafe.CONSOLE))
+			)),
+			new Pair(name, new ResolverSource(Node.call(Node.id("dude"), Node.id("what"), Node.id("hello world"))))
 		)));
 		
-		//System.out.println(r);
+		System.out.println(r);
 		
-		Node n = Node.call(r.createNode(), Unsafe.IDENTITY, Node.id("root"), Node.id(name), Node.id("`"));
+		Node n = Node.call(r.createNode(false), Unsafe.IDENTITY, Unsafe.IDENTITY, Node.id("root"), Node.id(name), Node.id("`"));
 		
 		//System.out.println(n);
 		n.run(Unsafe.DEFAULT_ENVIRONMENT);

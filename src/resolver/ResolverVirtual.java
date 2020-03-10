@@ -20,7 +20,7 @@ public class ResolverVirtual extends Resolver {
 	}
 	
 	@Override
-	public Node createNode() {
+	public Node createNode(boolean isRoot) {
 		IdentifierPair pairRoot = null;
 		IdentifierPair[] pairs;
 		
@@ -47,6 +47,7 @@ public class ResolverVirtual extends Resolver {
 		
 		Node rel = Node.id();
 		Node root = Node.id();
+		Node parent = Node.id();
 		Node block = rel;
 		
 		for (IdentifierPair p : pairs) {
@@ -72,11 +73,21 @@ public class ResolverVirtual extends Resolver {
 		block = Node.call(Unsafe.FUNCTION, rel, Node.env(block));
 		
 		for (IdentifierPair p : pairs) {
+			Node tparent;
+			
+			if (pairRoot == null) {
+				tparent = Node.call(parent, p.identifier);
+			}else if (pairRoot == p) {
+				tparent = parent;
+			}else {
+				tparent = Node.call(root, p.identifier);
+			}
+			
 			block = Node.call(
 				Unsafe.FUNCTION,
 				p.uniqueIdentifier,
 				Node.env(block),
-				Node.call(Unsafe.ASSIGN, p.identifier, Node.call(p.resolver.createNode(), root))
+				Node.call(Unsafe.ASSIGN, p.identifier, Node.call(p.resolver.createNode(pairRoot == p), tparent, root))
 			);
 		}
 		
@@ -84,9 +95,7 @@ public class ResolverVirtual extends Resolver {
 			Node set = Node.id();
 			Node get = Node.id();
 			Node param = Node.id();
-			
-			Node proot = Node.id();
-			
+			Node proot = Node.id();	
 			
 			block = Node.call(Unsafe.FUNCTION, proot, Node.env(
 				Node.call(Unsafe.MUTABLE, Unsafe.DO, Node.call(Unsafe.FUNCTION, set, Node.env(
@@ -95,7 +104,9 @@ public class ResolverVirtual extends Resolver {
 							Node.call(Unsafe.SCOPE, Node.call(Unsafe.COMPARE, Node.id("root"), param, Node.env(
 								param
 							), Node.env(
-								Node.call(get, Node.id(), Unsafe.ROOT, Node.call(proot, param))
+								isRoot
+								? Node.call(get, Node.id(), Node.call(get, Node.id(), Unsafe.ROOT, Node.call(proot, param)))
+								: Node.call(get, Node.id(), Unsafe.ROOT, Node.call(proot, param))
 							)))
 						))))
 					))
@@ -104,6 +115,8 @@ public class ResolverVirtual extends Resolver {
 		}else {
 			block = Node.call(Unsafe.FUNCTION, root, Node.env(block));
 		}
+		
+		block = Node.call(Unsafe.FUNCTION, parent, Node.env(block));
 		
 		return block;
 	}
