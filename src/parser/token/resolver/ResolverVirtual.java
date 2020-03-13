@@ -64,11 +64,7 @@ public class ResolverVirtual extends Resolver {
 			
 			block = Node.call(Unsafe.SCOPE, Node.call(Unsafe.COMPARE, rel, Unsafe.ROOT, Node.env(
 				Node.call(Unsafe.FUNCTION, param, Node.env(
-					Node.call(Unsafe.SCOPE, Node.call(Unsafe.COMPARE, Node.id("root"), param, Node.env(
-						param
-					), Node.env(
-						Node.call(pairRoot.uniqueIdentifier, Node.call(pairRoot.uniqueIdentifier, Unsafe.ROOT, param))	
-					)))
+					Node.call(pairRoot.uniqueIdentifier, Node.call(pairRoot.uniqueIdentifier, Unsafe.ROOT, param))
 				))
 			), Node.env(
 				block
@@ -88,12 +84,7 @@ public class ResolverVirtual extends Resolver {
 				tparent = Node.call(root, p.identifier);
 			}
 			
-			block = Node.call(
-				Unsafe.FUNCTION,
-				p.uniqueIdentifier,
-				Node.env(block),
-				Node.call(Unsafe.ASSIGN, p.identifier, Node.call(p.createNode(), tparent, root))
-			);
+			block = Node.call(Unsafe.FUNCTION, p.uniqueIdentifier, Node.env(block), Node.call(p.createNode(), tparent, root));
 		}
 		
 		if (pairRoot != null) {
@@ -106,9 +97,13 @@ public class ResolverVirtual extends Resolver {
 				Node.call(Unsafe.MUTABLE, Unsafe.DO, Node.call(Unsafe.FUNCTION, set, Node.env(
 					Node.call(Unsafe.FUNCTION, get, Node.env(
 						Node.call(set, Node.call(Unsafe.FUNCTION, root, Node.env(block), Node.call(Unsafe.FUNCTION, param, Node.env(
-							this.getName().equals("root")
-								? Node.call(get, Node.id(), Node.call(get, Node.id(), Unsafe.ROOT, Node.call(proot, param)))
-								: Node.call(get, Node.id(), Unsafe.ROOT, Node.call(proot, param))
+							Node.call(Unsafe.SCOPE, Node.call(Unsafe.COMPARE, Node.id("root"), param, Node.env(
+								param
+							), Node.env(Node.call(Unsafe.ASSIGN, param,
+								this.getName().equals("root")
+									? Node.call(get, Node.id(), Node.call(get, Node.id(), Unsafe.ROOT, Node.call(proot, param)))
+									: Node.call(get, Node.id(), Unsafe.ROOT, Node.call(proot, param))
+							))))
 						))))
 					))
 				)))
@@ -123,7 +118,11 @@ public class ResolverVirtual extends Resolver {
 				Node.call(Unsafe.MUTABLE, Unsafe.DO, Node.call(Unsafe.FUNCTION, set, Node.env(
 					Node.call(Unsafe.FUNCTION, get, Node.env(
 						Node.call(set, Node.call(Unsafe.FUNCTION, root, Node.env(block), Node.call(Unsafe.FUNCTION, param, Node.env(
-							Node.call(get, Node.id(), Node.call(proot, param))
+							Node.call(Unsafe.SCOPE, Node.call(Unsafe.COMPARE, Node.id("root"), param, Node.env(
+								param
+							), Node.env(Node.call(Unsafe.ASSIGN, param,
+								Node.call(get, Node.id(), Node.call(proot, param))
+							))))
 						))))
 					))
 				)))

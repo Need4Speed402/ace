@@ -44,17 +44,23 @@ public class Packages {
 			//new Pair("unsafe", Unsafe.createUnsafe()),
 			//new Pair("std", new ResolverFile(new File("D:\\documents\\eclipse\\SimpleAceInterpreter\\src\\ace")).insertRoot(new ResolverSource("unsafe", "root"))),
 			//new Pair("import", new ResolverFile(start.getParentFile()))
+				
+			new ResolverVirtual("poop", new ResolverSource("random", Node.id("Random"))),
+				
+			new ResolverSource("print", Node.call(Unsafe.DO, Node.call(Unsafe.CONSOLE, Node.call(Node.id("root"))))),
 			
 			new ResolverVirtual("root",
 			//	new ResolverVirtual("root",
 					new ResolverVirtual("dude",
-						new ResolverSource("what", Node.call(Unsafe.DO, Node.call(Unsafe.CONSOLE, Node.id("hijacked"))))
-					)
+						new ResolverSource("what", Node.call(Node.id("print"), Node.id("thestnh")))
+					),
+					
+					new ResolverSource("hello", Node.call(Unsafe.DO, Node.call(Node.id("dude"), Node.id("what"), Node.id("hello world"))))
 			//	)
 			),
 				
 			new ResolverVirtual("dude",
-				new ResolverSource("what", Unsafe.CONSOLE)
+				new ResolverSource("what", Node.call(Node.id("hello"), Node.id("aoesuthoeusnth")))
 			),
 				
 			new ResolverSource(name, Node.call(Node.id("dude"), Node.id("what"), Node.id("hello world")))
