@@ -1,4 +1,4 @@
-package parser.token;
+package parser.token.syntax;
 
 import parser.Color;
 

@@ -1,5 +1,6 @@
-package parser.token;
+package parser.token.syntax;
 
+import parser.token.Token;
 import value.node.Node;
 
 public class TokenImmediate implements Token{

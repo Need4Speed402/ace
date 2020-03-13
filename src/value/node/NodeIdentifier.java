@@ -1,7 +1,7 @@
 package value.node;
 
 import parser.Stream;
-import parser.token.TokenString;
+import parser.token.syntax.TokenString;
 import value.Value;
 
 public class NodeIdentifier implements Node {

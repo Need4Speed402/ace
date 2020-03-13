@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import parser.token.Token;
-import parser.token.TokenImmediate;
+import parser.token.syntax.TokenImmediate;
 
 public class TokenList {
 	private final List<Token> tokens;

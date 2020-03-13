@@ -1,4 +1,4 @@
-package parser.token;
+package parser.token.syntax;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -10,6 +10,7 @@ import parser.Color;
 import parser.ParserException;
 import parser.Stream;
 import parser.TokenList;
+import parser.token.Token;
 import parser.unicode.Unicode;
 
 public class TokenString extends TokenProcedure{

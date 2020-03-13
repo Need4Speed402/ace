@@ -1,7 +1,8 @@
-package parser.token;
+package parser.token.syntax;
 
 import value.node.Node;
 import parser.Stream;
+import parser.token.Token;
 
 public class TokenEnvironment extends TokenProcedure {
 	public TokenEnvironment (Stream s) {

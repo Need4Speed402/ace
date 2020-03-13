@@ -1,7 +1,9 @@
-package parser.token;
+package parser.token.syntax;
 
 import value.node.Node;
 import parser.Color;
+import parser.token.Modifier;
+import parser.token.Token;
 
 public class TokenOperatorTrailing implements Token, Modifier{
 	private final Token token;

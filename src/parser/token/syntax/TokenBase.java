@@ -1,4 +1,4 @@
-package parser.token;
+package parser.token.syntax;
 
 import value.node.Node;
 import parser.Stream;

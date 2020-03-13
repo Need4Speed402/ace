@@ -1,9 +1,10 @@
-package parser.token;
+package parser.token.syntax;
 
 import value.node.Node;
 import parser.ParserException;
 import parser.Stream;
 import parser.TokenList;
+import parser.token.Token;
 
 public abstract class TokenProcedure implements Token{
 	private Token[] tokens;

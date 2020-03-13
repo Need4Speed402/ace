@@ -1,4 +1,4 @@
-package parser.token;
+package parser.token.syntax;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -6,6 +6,7 @@ import java.math.BigInteger;
 import value.node.Node;
 import parser.Color;
 import parser.Stream;
+import parser.token.Token;
 
 public class TokenInteger implements Token{
 	private final BooleanArray number;

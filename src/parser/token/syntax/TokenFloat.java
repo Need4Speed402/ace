@@ -1,9 +1,10 @@
-package parser.token;
+package parser.token.syntax;
 
 import java.math.BigDecimal;
 
 import value.node.Node;
 import parser.Color;
+import parser.token.Token;
 
 public class TokenFloat implements Token{
 	BigDecimal decimal;

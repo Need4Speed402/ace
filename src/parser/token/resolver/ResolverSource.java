@@ -1,32 +1,36 @@
-package resolver;
+package parser.token.resolver;
 
 import java.io.File;
 import java.io.FileInputStream;
 
+import parser.Color;
 import parser.Packages;
 import parser.Stream;
+import parser.token.Resolver;
 import parser.token.Token;
-import parser.token.TokenBase;
+import parser.token.syntax.TokenBase;
 import value.Unsafe;
 import value.node.Node;
 
 public class ResolverSource extends Resolver{
 	private final Source source;
 	
-	public ResolverSource (File f) {
+	public ResolverSource (String name, File f) {
+		super(name);
 		this.source = () -> load(f);
 	}
 	
-	public ResolverSource(String ... path) {
-		this (pathAsNode(path));
+	public ResolverSource(String name, String ... path) {
+		this (name, pathAsNode(path));
 	}
 	
-	public ResolverSource(Node node) {
+	public ResolverSource(String name, Node node) {
+		super(name);
 		this.source = () -> node;
 	}
 	
 	@Override
-	public Node createNode(boolean isRoot) {
+	public Node createNode() {
 		Node set = Node.id();
 		Node get = Node.id();
 		Node param = Node.id();
@@ -87,5 +91,10 @@ public class ResolverSource extends Resolver{
 			
 			throw e;
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return Color.cyan(this.getName());
 	}
 }

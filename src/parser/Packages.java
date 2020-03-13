@@ -2,10 +2,9 @@ package parser;
 
 import java.io.File;
 
-import resolver.Resolver;
-import resolver.ResolverSource;
-import resolver.ResolverVirtual;
-import resolver.ResolverVirtual.Pair;
+import parser.token.Token;
+import parser.token.resolver.ResolverSource;
+import parser.token.resolver.ResolverVirtual;
 import value.Unsafe;
 import value.node.Node;
 
@@ -41,26 +40,29 @@ public class Packages {
 		//the entire thing has to be wrapped in a root folder
 		//so that unsafe, std, and import will be visible in the
 		//default environment without any special logic elsewhere in code.
-		Resolver r = new ResolverVirtual (new Pair ("root", new ResolverVirtual(
+		Token r = new ResolverVirtual ("root",
 			//new Pair("unsafe", Unsafe.createUnsafe()),
 			//new Pair("std", new ResolverFile(new File("D:\\documents\\eclipse\\SimpleAceInterpreter\\src\\ace")).insertRoot(new ResolverSource("unsafe", "root"))),
 			//new Pair("import", new ResolverFile(start.getParentFile()))
 			
-			new Pair("root", new ResolverVirtual(
-					new Pair("dude", new ResolverVirtual(
-						new Pair("what", new ResolverSource(Node.call(Unsafe.DO, Node.call(Unsafe.CONSOLE, Node.id("hijacked")))))
-					))
-			)),
+			new ResolverVirtual("root",
+			//	new ResolverVirtual("root",
+					new ResolverVirtual("dude",
+						new ResolverSource("what", Node.call(Unsafe.DO, Node.call(Unsafe.CONSOLE, Node.id("hijacked"))))
+					)
+			//	)
+			),
 				
-			new Pair("dude", new ResolverVirtual(
-				new Pair("what", new ResolverSource(Unsafe.CONSOLE))
-			)),
-			new Pair(name, new ResolverSource(Node.call(Node.id("dude"), Node.id("what"), Node.id("hello world"))))
-		)));
+			new ResolverVirtual("dude",
+				new ResolverSource("what", Unsafe.CONSOLE)
+			),
+				
+			new ResolverSource(name, Node.call(Node.id("dude"), Node.id("what"), Node.id("hello world")))
+		);
 		
 		System.out.println(r);
 		
-		Node n = Node.call(r.createNode(false), Unsafe.IDENTITY, Unsafe.IDENTITY, Node.id("root"), Node.id(name), Node.id("`"));
+		Node n = Node.call(r.createNode(), Unsafe.IDENTITY, Unsafe.IDENTITY, Node.id(name), Node.id("`"));
 		
 		//System.out.println(n);
 		n.run(Unsafe.DEFAULT_ENVIRONMENT);

@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import parser.Stream;
 import parser.token.Token;
-import parser.token.TokenString;
+import parser.token.syntax.TokenString;
 
 public class Unicode {
 	private static final HashMap<String, String> lookup, inverse;

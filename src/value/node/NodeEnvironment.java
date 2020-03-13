@@ -1,6 +1,6 @@
 package value.node;
 
-import parser.token.TokenEnvironment;
+import parser.token.syntax.TokenEnvironment;
 import value.Value;
 
 public class NodeEnvironment implements Node{

@@ -1,7 +1,8 @@
-package parser.token;
+package parser.token.syntax;
 
 import value.node.Node;
 import parser.Color;
+import parser.token.Token;
 
 public class TokenOperatorLeading implements Token{
 	private final Token token;

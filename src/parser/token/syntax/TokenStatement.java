@@ -1,4 +1,4 @@
-package parser.token;
+package parser.token.syntax;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -8,6 +8,8 @@ import value.node.Node;
 import parser.ParserException;
 import parser.Stream;
 import parser.TokenList;
+import parser.token.Modifier;
+import parser.token.Token;
 
 public class TokenStatement extends TokenProcedure implements Modifier{
 	public static final String operators = "= ` ., @#\\ ?~ |&! :<> +- */% ^$";

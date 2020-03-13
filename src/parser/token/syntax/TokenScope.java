@@ -1,7 +1,9 @@
-package parser.token;
+package parser.token.syntax;
 
 import value.node.Node;
 import parser.Stream;
+import parser.token.Modifier;
+import parser.token.Token;
 
 public class TokenScope extends TokenProcedure implements Modifier{
 	public TokenScope (Stream s) {

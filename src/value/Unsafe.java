@@ -1,8 +1,8 @@
 package value;
 
-import resolver.Resolver;
-import resolver.ResolverVirtual;
-import resolver.ResolverVirtual.Pair;
+import parser.token.Resolver;
+import parser.token.resolver.ResolverSource;
+import parser.token.resolver.ResolverVirtual;
 import value.node.Node;
 import value.node.NodeIdentifier;
 
@@ -78,20 +78,20 @@ public class Unsafe {
 	}
 	
 	public static Resolver createUnsafe () {
-		return new ResolverVirtual(
-			new Pair("compare", COMPARE),
-			new Pair("assign", ASSIGN),
-			new Pair("Mutable", MUTABLE),
-			new Pair("console", CONSOLE),
+		return new ResolverVirtual("unsafe",
+			new ResolverSource("compare", COMPARE),
+			new ResolverSource("assign", ASSIGN),
+			new ResolverSource("Mutable", MUTABLE),
+			new ResolverSource("console", CONSOLE),
 			
-			new Pair("root", new ResolverVirtual(
-				new Pair("``", DO),
-				new Pair("Procedure", IDENTITY),
-				new Pair("Environment", IDENTITY),
-				new Pair("Package", SCOPE),
-				new Pair("Scope", SCOPE),
-				new Pair("Function", FUNCTION)
-			))
+			new ResolverVirtual("root",
+				new ResolverSource("``", DO),
+				new ResolverSource("Procedure", IDENTITY),
+				new ResolverSource("Environment", IDENTITY),
+				new ResolverSource("Package", SCOPE),
+				new ResolverSource("Scope", SCOPE),
+				new ResolverSource("Function", FUNCTION)
+			)
 		);
 	}
 }

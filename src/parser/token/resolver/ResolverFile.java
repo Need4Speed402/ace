@@ -1,28 +1,30 @@
-package resolver;
+package parser.token.resolver;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import parser.Stream;
-import parser.token.TokenStatement;
+import parser.token.Resolver;
+import parser.token.syntax.TokenStatement;
 
 public class ResolverFile extends ResolverVirtual{
 	private File root;
 	
-	public ResolverFile(File root, Pair ... pairs) {
-		super(pairs);
+	public ResolverFile(String name, File root, Resolver ... resolvers) {
+		super(name, resolvers);
 		this.root = root;
 	}
 	
-	public ResolverFile(File root) {
+	public ResolverFile(String name, File root) {
+		super(name);
 		this.root = root;
 	}
 	
 	@Override
-	public Pair[] getPairs () {
-		ArrayList<Pair> pairs = new ArrayList<>();
-		pairs.addAll(Arrays.asList(super.getPairs()));
+	public Resolver[] getResolvers () {
+		ArrayList<Resolver> pairs = new ArrayList<>();
+		pairs.addAll(Arrays.asList(super.getResolvers()));
 		
 		File[] files = this.root.listFiles();
 		
@@ -43,16 +45,16 @@ public class ResolverFile extends ResolverVirtual{
 					}
 				}
 				
-				pairs.add(new Pair(name, new ResolverSource(file)));
+				pairs.add(new ResolverSource(name, file));
 			}
 		}
 		
 		for (File file : files) {
 			if (file.isDirectory()) {
-				pairs.add(new Pair(file.getName(), new ResolverFile(file)));
+				pairs.add(new ResolverFile(file.getName(), file));
 			}
 		}
 		
-		return pairs.toArray(new Pair[0]);
+		return pairs.toArray(new Resolver[0]);
 	}
 }
