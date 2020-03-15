@@ -5,15 +5,7 @@ import value.Value;
 public class NodeIdentifier implements Node{
 	public final String name;
 	
-	public final static Value NULL = new Value () {
-		public Value call (Value v) {
-			return NodeIdentifier.NULL;
-		}
-		
-		public String toString () {
-			return "`";
-		}
-	};
+	public final static Value NULL = p -> NodeIdentifier.NULL;
 	
 	protected NodeIdentifier(String name) {
 		this.name = name.intern();
