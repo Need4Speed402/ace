@@ -46,7 +46,7 @@ public class ResolverUnsafe extends Resolver{
 		
 		unsafe.put("console", p -> {
 			System.out.println(p);
-			return IDENTITY;
+			return p;
 		});
 	}
 	

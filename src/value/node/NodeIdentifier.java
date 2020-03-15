@@ -5,6 +5,16 @@ import value.Value;
 public class NodeIdentifier implements Node{
 	public final String name;
 	
+	public final static Value NULL = new Value () {
+		public Value call (Value v) {
+			return NodeIdentifier.NULL;
+		}
+		
+		public String toString () {
+			return "`";
+		}
+	};
+	
 	protected NodeIdentifier(String name) {
 		this.name = name.intern();
 	}
@@ -14,7 +24,7 @@ public class NodeIdentifier implements Node{
 		return environment.call(new Value () {
 			@Override
 			public Value call(Value v) {
-				return v;
+				return NULL;
 			}
 			
 			@Override
