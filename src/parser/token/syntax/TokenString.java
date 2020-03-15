@@ -211,31 +211,63 @@ public class TokenString extends TokenProcedure{
 					
 					tokens.push(new StringScope(s));
 				}else if (s.next('[')) {
-					StringBuilder name = new StringBuilder();
+					boolean didStuff = false;
+					boolean semiLegal = false, semiUsed = false;
 					
-					boolean whitespace = true;
-					char[] ignoreCharaters = " _-\t".toCharArray();
-					
-					while (s.hasChr()) {
-						if (s.next(']')) {
-							break;
-						}else if (s.next(ignoreCharaters)) {
-							whitespace = true;
-						}else{
-							if (whitespace && name.length() > 0) {
-								name.append(' ');
+					while (true) {
+						StringBuilder name = new StringBuilder();
+						
+						boolean whitespace = true;
+						boolean doBreak = false;
+						char[] ignoreCharaters = " _-\t\r".toCharArray();
+						
+						while (s.hasChr()) {
+							if (s.next(']')) {
+								doBreak = true;
+								break;
+							}else if (s.next('\n')) {
+								if (semiUsed) throw new ParserException("Illegal location of semicolon");
+								semiUsed = false;
+								semiLegal = false;
+								break;
+							}else if (s.next(';')) {
+								if (!semiLegal) throw new ParserException("Illegal location of semicolon");
+								semiUsed = true;
+								semiLegal = false;
+								break;
+							}else if (s.next(ignoreCharaters)) {
+								whitespace = true;
+							}else{
+								if (whitespace && name.length() > 0) {
+									name.append(' ');
+								}
+								
+								whitespace = false;
+								semiLegal = true;
+								semiUsed = false;
+								name.append(s.chr());
+							}
+						}
+						
+						if (name.length() != 0) {
+							BigInteger num = (BigInteger) TokenInteger.parseNumber(name.toString());
+							
+							if (num != null) {
+								current.append((char) num.intValue());
+							}else {
+								String decoded = unicodeNames.get(name.toString());
+								if (decoded == null) throw new ParserException("No known unicode literal: " + name);
+								current.append(decoded);
 							}
 							
-							whitespace = false;
-							name.append(s.chr());
+							didStuff = true;
 						}
+						
+						if (doBreak) break;
 					}
 					
-					String decoded = unicodeNames.get(name.toString());
-					
-					if (decoded == null) throw new ParserException("No known unicode literal: " + name);
-					
-					current.append(decoded);
+					if (!didStuff) throw new ParserException("Empty unicode literal");
+					if (semiUsed) throw new ParserException("Illegal location of semicolon");
 				}else{
 					//look ahead to see if there is a number
 					BigInteger i = (BigInteger) TokenInteger.readNum(s, true);
