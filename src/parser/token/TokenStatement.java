@@ -271,7 +271,7 @@ public class TokenStatement extends TokenProcedure implements Modifier{
 						num = TokenInteger.parseNumber(ident.substring(0, index + 1));
 					}else{
 						num = TokenInteger.parseNumber(ident.substring(0, index));
-						index--;
+						if (num != null) index--;
 					}
 					
 					if (num != null) {
