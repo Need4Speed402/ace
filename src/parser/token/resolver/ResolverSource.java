@@ -10,6 +10,7 @@ import parser.token.Resolver;
 import parser.token.Token;
 import parser.token.syntax.TokenBase;
 import value.Unsafe;
+import value.Value;
 import value.node.Node;
 
 public class ResolverSource extends Resolver{
@@ -17,11 +18,26 @@ public class ResolverSource extends Resolver{
 	
 	public ResolverSource (String name, File f) {
 		super(name);
-		this.source = () -> load(f);
-	}
-	
-	public ResolverSource(String name, String ... path) {
-		this (name, pathAsNode(path));
+		this.source = () -> new Node() {
+			private Node cache;
+			
+			private Node get () {
+				//System.out.println("Loading: " + f);
+				if (this.cache == null) this.cache = load(f);
+				return this.cache;
+			}
+			
+			@Override
+			public Value run(Value environment) {
+				//System.out.println("Running: " + f);
+				return this.get().run(environment);
+			}
+			
+			@Override
+			public String toString() {
+				return this.get().toString();
+			}
+		};
 	}
 	
 	public ResolverSource(String name, Node node) {
@@ -35,36 +51,26 @@ public class ResolverSource extends Resolver{
 		Node get = Node.id();
 		Node param = Node.id();
 		Node root = Node.id();
-		Node parent = Node.id();
 		
-		return Node.call(Unsafe.FUNCTION, parent, Node.env(
-			Node.call(Unsafe.FUNCTION, root, Node.env(
-				Node.call(Unsafe.MUTABLE, Node.id(), Node.call(Unsafe.FUNCTION, set, Node.env(
-					Node.call(Unsafe.FUNCTION, get, Node.env(
-						Node.call(Unsafe.DO, Node.call(set, Node.call(Unsafe.FUNCTION, param, Node.env(
+		return Node.call(Unsafe.FUNCTION, root, Node.env(
+			Node.call(Unsafe.MUTABLE, Node.id(), Node.call(Unsafe.FUNCTION, set, Node.env(
+				Node.call(Unsafe.FUNCTION, get, Node.env(
+					Node.call(Unsafe.DO, Node.call(set, Node.call(Unsafe.FUNCTION, param, Node.env(
+						Node.call(Unsafe.DO,
 							Node.call(Unsafe.DO,
-								Node.call(set, parent),
-								Node.call(set, Node.call(Node.env(this.source.get()), root), param)
-							)
-						))), Node.call(Unsafe.FUNCTION, param, Node.env(Node.call(get, Node.id(), param))))
-					))
-				)))
-			))
+								Node.call(set, Node.call(root, Unsafe.PARENT, Node.id(this.getName()))),
+								Node.call(set, Node.call(Node.env(this.source.get()), root))
+							),
+							Node.call(get, Node.id(), param)
+						)
+					))), Node.call(Unsafe.FUNCTION, param, Node.env(Node.call(get, Node.id(), param))))
+				))
+			)))
 		));
 	}
 
 	private interface Source {
 		public Node get ();
-	}
-	
-	private static Node pathAsNode (String ... path) {
-		Node nodes = Node.id(path[0]);
-		
-		for (int i = 1; i < path.length; i++) {
-			nodes = Node.call(nodes, Node.id(path[i]));
-		}
-		
-		return nodes;
 	}
 	
 	public static Node load (File f) {

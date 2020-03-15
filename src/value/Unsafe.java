@@ -16,8 +16,7 @@ public class Unsafe {
 	public static final NodeIdentifier MUTABLE = Node.id();
 	public static final NodeIdentifier CONSOLE = Node.id();
 	
-	public static final NodeIdentifier PARENT_ROOT = Node.id();
-	public static final NodeIdentifier ROOT = Node.id();
+	public static final NodeIdentifier PARENT = Node.id();
 	
 	private static final Node TEMP1 = Node.id();
 	private static final Node TEMP2 = Node.id();
