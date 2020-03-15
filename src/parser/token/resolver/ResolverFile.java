@@ -23,6 +23,7 @@ public class ResolverFile extends ResolverVirtual{
 	
 	@Override
 	public Resolver[] getResolvers () {
+		System.out.println("Looking up: " + this.root);
 		ArrayList<Resolver> pairs = new ArrayList<>();
 		pairs.addAll(Arrays.asList(super.getResolvers()));
 		

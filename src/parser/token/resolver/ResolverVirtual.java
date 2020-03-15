@@ -22,111 +22,112 @@ public class ResolverVirtual extends Resolver {
 	
 	@Override
 	public Node createNode() {
-		IdentifierResolver pairRoot = null;
-		IdentifierResolver[] pairs;
-		
-		{
-			HashSet<String> names = new HashSet<>();
-			Resolver[] p = this.getResolvers();
-			
-			pairs = new IdentifierResolver[p.length];
-			int len = 0;
-			
-			for (int i = 0; i < p.length; i++) {
-				String name = p[i].getName();
-				
-				if (!names.contains(name)) {
-					names.add(name);
-					
-					pairs[len++] = new IdentifierResolver(p[i]);
-					if (name.equals("root")) pairRoot = pairs[len - 1];
-				}
-			}
-			
-			pairs = Arrays.copyOf(pairs, len);
-		}
-		
-		Node rel = Node.id();
-		Node root = Node.id();
 		Node proot = Node.id();
 		
 		Node set = Node.id();
 		Node get = Node.id();
-		Node rparam = Node.id();
 		
-		Node genRoot;
-		Node parent;
-		
-		if (this.getName().equals("root")) {
-			genRoot = Node.call(get, Node.id(), rparam);
+		Node out = Node.delegate(() -> {
+			IdentifierResolver pairRoot = null;
+			IdentifierResolver[] pairs;
 			
-			if (pairRoot != null) {
-				Node param2 = Node.id();
-				parent = Node.call(Unsafe.FUNCTION, param2, Node.env(Node.call(get, Node.id(), Node.id("root"), param2)));
-			}else{
-				parent = proot;
+			{
+				HashSet<String> names = new HashSet<>();
+				Resolver[] p = this.getResolvers();
+				
+				pairs = new IdentifierResolver[p.length];
+				int len = 0;
+				
+				for (int i = 0; i < p.length; i++) {
+					String name = p[i].getName();
+					
+					if (!names.contains(name)) {
+						names.add(name);
+						
+						pairs[len++] = new IdentifierResolver(p[i]);
+						if (name.equals("root")) pairRoot = pairs[len - 1];
+					}
+				}
+				
+				pairs = Arrays.copyOf(pairs, len);
 			}
-		}else if (pairRoot != null) {
-			genRoot = Node.call(get, Node.id(), Node.id("root"), rparam);
-			parent = Node.call(proot, Unsafe.PARENT, Node.id(this.getName()));
-		} else {
-			genRoot = Node.call(proot, rparam);
-			parent = Node.call(proot, Unsafe.PARENT, Node.id(this.getName()));
-		}
-		
-		Node block = Node.call(parent, rel);
-		
-		for (IdentifierResolver p : pairs) {
-			block = Node.call(Unsafe.SCOPE, Node.call(Unsafe.COMPARE, rel, p.identifier, Node.env(
-				p.uniqueIdentifier
-			), Node.env(
-				block
-			)));
-		}
-		
-		block = Node.call(Unsafe.FUNCTION, rel, Node.env(block));
-		
-		for (IdentifierResolver p : pairs) {
-			Node troot;
 			
-			if (p == pairRoot) {
+			Node genRoot, parent;
+			
+			if (this.getName().equals("root")) {
+				genRoot = Node.call(get, Node.id());
+				
+				if (pairRoot != null) {
+					parent = Node.call(get, Node.id(), Node.id("root"));
+				}else{
+					parent = proot;
+				}
+			}else if (pairRoot != null) {
+				genRoot = Node.call(get, Node.id(), Node.id("root"));
+				parent = Node.call(proot, Unsafe.PARENT, Node.id(this.getName()));
+			} else {
+				genRoot = proot;
+				parent = Node.call(proot, Unsafe.PARENT, Node.id(this.getName()));
+			}
+			
+			Node rel = Node.id();
+			Node block = Node.call(parent, rel);
+			
+			for (IdentifierResolver p : pairs) {
+				block = Node.call(Unsafe.SCOPE, Node.call(Unsafe.COMPARE, rel, p.identifier, Node.env(
+					p.uniqueIdentifier
+				), Node.env(
+					block
+				)));
+			}
+			
+			block = Node.call(Unsafe.FUNCTION, rel, Node.env(block));
+			
+			for (IdentifierResolver p : pairs) {
+				Node root, tparent;
 				Node param = Node.id();
 				
-				troot = Node.call(Unsafe.FUNCTION, param, Node.env(
-					Node.call(Unsafe.SCOPE, Node.call(Unsafe.COMPARE, Unsafe.PARENT, param, Node.env(
-						proot
-					), Node.env(
-						Node.call(proot, param)
-					)))
+				if (p == pairRoot) {
+					tparent = proot;
+					root = Node.call(proot, param);
+				}else {
+					tparent = parent;
+					root = Node.call(Unsafe.ASSIGN, param, Node.call(genRoot, param));
+				}
+				
+				block = Node.call(Unsafe.FUNCTION, p.uniqueIdentifier, Node.env(block), Node.call(
+					p.createNode(),
+					Node.call(Unsafe.FUNCTION, param, Node.env(
+						Node.call(Unsafe.SCOPE, Node.call(Unsafe.COMPARE, Unsafe.PARENT, param, Node.env(
+							tparent
+						), Node.env(
+							root
+						)))
+					))
 				));
-			}else {
-				troot = root;
 			}
 			
-			block = Node.call(Unsafe.FUNCTION, p.uniqueIdentifier, Node.env(block), Node.call(p.createNode(), troot));
-		}
+			return block;
+		});
 		
-		block = Node.call(Unsafe.MUTABLE, Unsafe.DO, Node.call(Unsafe.FUNCTION, set, Node.env(
-			Node.call(Unsafe.FUNCTION, get, Node.env(
-				Node.call(set, Node.call(Unsafe.FUNCTION, root, Node.env(
-					block
-				), Node.call(Unsafe.FUNCTION, rparam, Node.env(
-					Node.call(Unsafe.SCOPE, Node.call(Unsafe.COMPARE, Node.id("root"), rparam, Node.env(
-							rparam
-					), Node.env(
-						Node.call(Unsafe.SCOPE, Node.call(Unsafe.COMPARE, Unsafe.PARENT, rparam, Node.env(
-							parent
-						), Node.env(
-							Node.call(Unsafe.ASSIGN, rparam, genRoot)
-						)))
-					)))
-				))))
-			))
-		)));
+		Node arg = Node.id();
 		
-		return Node.call(Unsafe.FUNCTION, proot, Node.env(block));
+		return Node.call(Unsafe.FUNCTION, proot, Node.env(
+			Node.call(Unsafe.MUTABLE, Node.id(),
+				Node.call(Unsafe.FUNCTION, set, Node.env(
+					Node.call(Unsafe.FUNCTION, get, Node.env(
+						Node.call(Unsafe.DO,
+							Node.call(set, Node.call(Unsafe.FUNCTION, arg, Node.env(
+								Node.call(Node.call(set, out), arg)
+							))),
+							Node.call(Unsafe.FUNCTION, arg, Node.env(Node.call(get, Node.id(), arg)))
+						)
+					))
+				))
+			)
+		));
 	}
-	
+
 	public ResolverVirtual insert (Resolver r) {
 		Resolver[] thispairs = this.getResolvers();
 		

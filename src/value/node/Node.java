@@ -3,6 +3,7 @@ package value.node;
 import java.util.HashMap;
 
 import value.Value;
+import value.node.NodeDelegate.Loader;
 
 public interface Node {
 	public Value run (Value environment);
@@ -23,6 +24,10 @@ public interface Node {
 		}
 		
 		return mem;
+	}
+	
+	public static Node delegate (Loader l) {
+		return new NodeDelegate(l);
 	}
 	
 	public static Node env (Node a) {

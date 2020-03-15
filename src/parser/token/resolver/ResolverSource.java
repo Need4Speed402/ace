@@ -10,39 +10,45 @@ import parser.token.Resolver;
 import parser.token.Token;
 import parser.token.syntax.TokenBase;
 import value.Unsafe;
-import value.Value;
 import value.node.Node;
 
 public class ResolverSource extends Resolver{
-	private final Source source;
+	private final Node source;
 	
 	public ResolverSource (String name, File f) {
 		super(name);
-		this.source = () -> new Node() {
-			private Node cache;
+		
+		this.source = Node.delegate(() -> {
+			System.out.println("Loading: " + f);
+			Stream s;
+			long p1 = System.nanoTime();
 			
-			private Node get () {
-				//System.out.println("Loading: " + f);
-				if (this.cache == null) this.cache = load(f);
-				return this.cache;
+			try {
+				s = new Stream(new FileInputStream(f));
+			} catch (Exception e) {
+				throw new RuntimeException(e);
 			}
 			
-			@Override
-			public Value run(Value environment) {
-				//System.out.println("Running: " + f);
-				return this.get().run(environment);
+			try {
+				Token ast = new TokenBase(s);
+				long p2 = System.nanoTime();
+				Packages.AST_TIME += p2 - p1;
+				
+				Node node = ast.createNode();
+				Packages.NODE_TIME += System.nanoTime() - p2;
+				
+				return node;
+			}catch (Exception e) {
+				System.out.println(f.getAbsolutePath() + ":" + (s.getLine() + 1) + ":" + (s.getCol() + 1) + ": " + e.getMessage());
+				
+				throw e;
 			}
-			
-			@Override
-			public String toString() {
-				return this.get().toString();
-			}
-		};
+		});
 	}
 	
 	public ResolverSource(String name, Node node) {
 		super(name);
-		this.source = () -> node;
+		this.source = node;
 	}
 	
 	@Override
@@ -51,6 +57,7 @@ public class ResolverSource extends Resolver{
 		Node get = Node.id();
 		Node param = Node.id();
 		Node root = Node.id();
+		Node rootparam = Node.id();
 		
 		return Node.call(Unsafe.FUNCTION, root, Node.env(
 			Node.call(Unsafe.MUTABLE, Node.id(), Node.call(Unsafe.FUNCTION, set, Node.env(
@@ -59,7 +66,16 @@ public class ResolverSource extends Resolver{
 						Node.call(Unsafe.DO,
 							Node.call(Unsafe.DO,
 								Node.call(set, Node.call(root, Unsafe.PARENT, Node.id(this.getName()))),
-								Node.call(set, Node.call(Node.env(this.source.get()), root))
+								Node.call(set, Node.call(
+									Node.env(this.source),
+									Node.call(Unsafe.FUNCTION, rootparam, Node.env(
+										Node.call(Unsafe.SCOPE, Node.call(Unsafe.COMPARE, Node.id("root"), rootparam, Node.env(
+											rootparam
+										), Node.env(
+											Node.call(root, rootparam)
+										)))
+									))
+								))
 							),
 							Node.call(get, Node.id(), param)
 						)
@@ -69,36 +85,6 @@ public class ResolverSource extends Resolver{
 		));
 	}
 
-	private interface Source {
-		public Node get ();
-	}
-	
-	public static Node load (File f) {
-		Stream s;
-		long p1 = System.nanoTime();
-		
-		try {
-			s = new Stream(new FileInputStream(f));
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		
-		try {
-			Token ast = new TokenBase(s);
-			long p2 = System.nanoTime();
-			Packages.AST_TIME += p2 - p1;
-			
-			Node node = ast.createNode();
-			Packages.NODE_TIME += System.nanoTime() - p2;
-			
-			return node;
-		}catch (Exception e) {
-			System.out.println(f.getAbsolutePath() + ":" + (s.getLine() + 1) + ":" + (s.getCol() + 1) + ": " + e.getMessage());
-			
-			throw e;
-		}
-	}
-	
 	@Override
 	public String toString() {
 		return Color.cyan(this.getName());
