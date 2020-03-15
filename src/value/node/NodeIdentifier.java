@@ -4,20 +4,12 @@ import parser.Stream;
 import parser.token.syntax.TokenString;
 import value.Value;
 
-public class NodeIdentifier implements Node {
+public class NodeIdentifier implements Node{
 	private static int counter = 0;
-	public final static Value NULL = new Value () {
-		public Value call (Value v) {
-			return NodeIdentifier.NULL;
-		}
-		
-		public String toString () {
-			return "`";
-		}
-	};
-
-	public final int id;
+	public final static Value NULL = p -> NodeIdentifier.NULL;
 	
+	public final int id;
+
 	protected NodeIdentifier() {
 		this.id = ++counter;
 	}
