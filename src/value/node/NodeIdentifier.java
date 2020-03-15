@@ -6,7 +6,16 @@ import value.Value;
 
 public class NodeIdentifier implements Node {
 	private static int counter = 0;
-	
+	public final static Value NULL = new Value () {
+		public Value call (Value v) {
+			return NodeIdentifier.NULL;
+		}
+		
+		public String toString () {
+			return "`";
+		}
+	};
+
 	public final int id;
 	
 	protected NodeIdentifier() {
@@ -18,7 +27,7 @@ public class NodeIdentifier implements Node {
 		return environment.call(new Value () {
 			@Override
 			public Value call(Value v) {
-				return v;
+				return NULL;
 			}
 			
 			@Override
