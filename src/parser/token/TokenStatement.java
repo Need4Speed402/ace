@@ -265,7 +265,14 @@ public class TokenStatement extends TokenProcedure implements Modifier{
 					int index = ident.length() - 1;
 					while (operators.indexOf(ident.charAt(index - 1)) >= 0) index--;
 					
-					Object num = TokenInteger.parseNumber(ident.substring(0, index + 1));
+					Object num;
+					
+					if ("^*!.".indexOf(ident.charAt(index)) >= 0) {
+						num = TokenInteger.parseNumber(ident.substring(0, index + 1));
+					}else{
+						num = TokenInteger.parseNumber(ident.substring(0, index));
+						index--;
+					}
 					
 					if (num != null) {
 						for (int i = 0; i <= index; i++) s.chr();

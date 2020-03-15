@@ -59,14 +59,15 @@ public abstract class TokenProcedure implements Token{
 	public static Token[] readBlock (Stream s, char terminator) {
 		TokenList tokens = new TokenList();
 		
-		boolean semiLegal = false;
-		boolean semiUsed = false;
+		boolean semiLegal = false, semiUsed = false;
 		
 		while (true) {
 			if (!s.hasChr()) {
 				if (terminator != '\0') throw new ParserException("Unexpected end of input");
 				break;
 			}
+			
+			if (s.next(Stream.whitespace)) continue;
 			
 			//comments
 			if (!s.isNext(";;}", ";;)", ";;]", ";;;") && s.next(";;")) {
@@ -81,28 +82,20 @@ public abstract class TokenProcedure implements Token{
 			}
 			
 			if (s.next(';')) {
-				if (semiLegal) {
-					semiLegal = false;
-					semiUsed = true;
-				}else {
-					throw new ParserException("illegal location of semicolon");
-				}
+				if (!semiLegal) throw new ParserException("illegal location of semicolon");
+				semiLegal = false;
+				semiUsed = true;
 				
 				continue;
 			}
 			
 			if (s.next('\n')) {
-				if (semiUsed) {
-					throw new ParserException ("illegal location of semicolon");
-				}
-				
+				if (semiUsed) throw new ParserException ("illegal location of semicolon");
 				semiUsed = false;
 				semiLegal = false;
 				
 				continue;
 			}
-			
-			if (s.next(Stream.whitespace)) continue;
 			
 			if (s.isNext(']', ')', '}')) {
 				char next = s.chr();
