@@ -9,13 +9,12 @@ import parser.Stream;
 import parser.token.Resolver;
 import parser.token.Token;
 import parser.token.syntax.TokenBase;
-import value.Unsafe;
 import value.node.Node;
 
-public class ResolverSource extends Resolver{
+public class Source extends Resolver{
 	private final Node source;
 	
-	public ResolverSource (String name, File f) {
+	public Source (String name, File f) {
 		super(name);
 		
 		this.source = Node.delegate(() -> {
@@ -46,7 +45,7 @@ public class ResolverSource extends Resolver{
 		});
 	}
 	
-	public ResolverSource(String name, Node node) {
+	public Source(String name, Node node) {
 		super(name);
 		this.source = node;
 	}

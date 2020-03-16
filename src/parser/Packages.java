@@ -3,10 +3,11 @@ package parser;
 import java.io.File;
 
 import parser.token.Token;
-import parser.token.resolver.ResolverFile;
-import parser.token.resolver.ResolverSource;
-import parser.token.resolver.ResolverVirtual;
-import value.Unsafe;
+import parser.token.resolver.Directory;
+import parser.token.resolver.Source;
+import parser.token.resolver.Unsafe;
+import parser.token.resolver.Virtual;
+import value.DefaultEnironment;
 import value.node.Node;
 
 public class Packages {
@@ -38,17 +39,17 @@ public class Packages {
 			name = name.substring(0, name.lastIndexOf('.'));
 		}
 		
-		Token r = new ResolverVirtual ("root",
-			Unsafe.createUnsafe(),
-			new ResolverFile("std", new File("D:\\documents\\eclipse\\SimpleAceInterpreter\\src\\ace")).insert(new ResolverSource("root", Node.call(Node.id("unsafe"), Node.id("root")))),
-			new ResolverFile("import", start.getParentFile()).insert(new ResolverSource("root", Node.call(Node.id("std"), Node.id("root"))))
+		Token r = new Virtual ("root",
+			new Unsafe (),
+			new Directory("std", new File("D:\\documents\\eclipse\\SimpleAceInterpreter\\src\\ace")).insert(new Source("root", Node.call(Node.id("unsafe"), Node.id("root")))),
+			new Directory("import", start.getParentFile()).insert(new Source("root", Node.call(Node.id("std"), Node.id("root"))))
 		);
 		
 		//System.out.println(r);
 		
 		Node n = Node.call(r.createNode(), Unsafe.IDENTITY, Node.id("import"), Node.id(name), Node.id("`"));
 		
-		n.run(Unsafe.DEFAULT_ENVIRONMENT);
+		n.run(new DefaultEnironment());
 		
 		/*Packages.file(args[0]);
 		

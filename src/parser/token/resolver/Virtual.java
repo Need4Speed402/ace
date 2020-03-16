@@ -4,14 +4,13 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import parser.token.Resolver;
-import value.Unsafe;
 import value.node.Node;
 import value.node.NodeIdentifier;
 
-public class ResolverVirtual extends Resolver {
+public class Virtual extends Resolver {
 	protected final Resolver[] resolvers;
 	
-	public ResolverVirtual (String name, Resolver ... resolvers) {
+	public Virtual (String name, Resolver ... resolvers) {
 		super(name);
 		this.resolvers = resolvers;
 	}
@@ -128,7 +127,7 @@ public class ResolverVirtual extends Resolver {
 		));
 	}
 
-	public ResolverVirtual insert (Resolver r) {
+	public Virtual insert (Resolver r) {
 		Resolver[] thispairs = this.getResolvers();
 		
 		for (int i = 0; i < thispairs.length; i++) {
@@ -137,16 +136,16 @@ public class ResolverVirtual extends Resolver {
 			if (pair.getName().equals(r.getName())) {
 				Resolver[] pairs = new Resolver[thispairs.length];
 				System.arraycopy(thispairs, 0, pairs, 0, thispairs.length);
-				pairs[i] = ((ResolverVirtual) pair).insert(r);
+				pairs[i] = ((Virtual) pair).insert(r);
 				
-				return new ResolverVirtual(this.getName(), pairs);
+				return new Virtual(this.getName(), pairs);
 			}
 		}
 		
 		Resolver[] pairs = new Resolver[thispairs.length + 1];
 		System.arraycopy(thispairs, 0, pairs, 0, thispairs.length);
 		pairs[thispairs.length] = r;
-		return new ResolverVirtual(this.getName(), pairs);
+		return new Virtual(this.getName(), pairs);
 	}
 	
 	@Override

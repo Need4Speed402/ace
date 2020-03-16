@@ -8,15 +8,15 @@ import parser.Stream;
 import parser.token.Resolver;
 import parser.token.syntax.TokenStatement;
 
-public class ResolverFile extends ResolverVirtual{
+public class Directory extends Virtual{
 	private File root;
 	
-	public ResolverFile(String name, File root, Resolver ... resolvers) {
+	public Directory(String name, File root, Resolver ... resolvers) {
 		super(name, resolvers);
 		this.root = root;
 	}
 	
-	public ResolverFile(String name, File root) {
+	public Directory(String name, File root) {
 		super(name);
 		this.root = root;
 	}
@@ -46,13 +46,13 @@ public class ResolverFile extends ResolverVirtual{
 					}
 				}
 				
-				pairs.add(new ResolverSource(name, file));
+				pairs.add(new Source(name, file));
 			}
 		}
 		
 		for (File file : files) {
 			if (file.isDirectory()) {
-				pairs.add(new ResolverFile(file.getName(), file));
+				pairs.add(new Directory(file.getName(), file));
 			}
 		}
 		
