@@ -1,8 +1,8 @@
 package parser.token.syntax;
 
-import value.node.Node;
 import parser.Stream;
 import parser.token.Token;
+import value.Value;
 
 public class TokenEnvironment extends TokenProcedure {
 	public TokenEnvironment (Stream s) {
@@ -40,7 +40,7 @@ public class TokenEnvironment extends TokenProcedure {
 	}
 	
 	@Override
-	public Node createNode() {
-		return Node.call(Node.id("Environment"), super.createNode());
+	public Value createNode() {
+		return Value.call(Value.id("Environment"), super.createNode());
 	}
 }

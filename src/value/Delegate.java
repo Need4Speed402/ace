@@ -1,23 +1,23 @@
-package value.node;
+package value;
 
 import value.Value;
 
-public class NodeDelegate implements Node {
-	private Node cache;
+public class Delegate implements Value {
+	private Value cache;
 	private final Loader loader;
 	
-	protected NodeDelegate (Loader loader) {
+	protected Delegate (Loader loader) {
 		this.loader = loader;
 	}
 	
-	private Node get () {
+	private Value get () {
 		if (this.cache == null) this.cache = this.loader.load();
 		return this.cache;
 	}
 	
 	@Override
-	public Value run(Value environment) {
-		return this.get().run(environment);
+	public Value call(Value environment) {
+		return this.get().call(environment);
 	}
 	
 	@Override
@@ -26,6 +26,6 @@ public class NodeDelegate implements Node {
 	}
 	
 	public interface Loader {
-		public Node load();
+		public Value load();
 	}
 }

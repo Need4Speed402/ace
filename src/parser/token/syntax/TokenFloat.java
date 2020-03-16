@@ -2,9 +2,9 @@ package parser.token.syntax;
 
 import java.math.BigDecimal;
 
-import value.node.Node;
 import parser.Color;
 import parser.token.Token;
+import value.Value;
 
 public class TokenFloat implements Token{
 	BigDecimal decimal;
@@ -14,7 +14,7 @@ public class TokenFloat implements Token{
 	}
 
 	@Override
-	public Node createNode() {
+	public Value createNode() {
 		throw new RuntimeException("not implemented");
 	}
 	

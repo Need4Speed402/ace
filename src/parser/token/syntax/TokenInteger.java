@@ -3,10 +3,10 @@ package parser.token.syntax;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import value.node.Node;
 import parser.Color;
 import parser.Stream;
 import parser.token.Token;
+import value.Value;
 
 public class TokenInteger implements Token{
 	private final BooleanArray number;
@@ -20,8 +20,8 @@ public class TokenInteger implements Token{
 	}
 	
 	@Override
-	public Node createNode() {
-		return Node.call(Node.id("Integer"), this.number.toNode());
+	public Value createNode() {
+		return Value.call(Value.id("Integer"), this.number.toNode());
 	}
 	
 	public static Object readNum (Stream ss, boolean integer) {
@@ -192,11 +192,11 @@ public class TokenInteger implements Token{
 			return array;
 		}
 		
-		public Node toNode () {
-			Node[] values = new Node[this.length];
+		public Value toNode () {
+			Value[] values = new Value[this.length];
 			
 			for (int i = 0; i < values.length; i++) {
-				values[i] = Node.id(this.array[i] ? "true" : "false");
+				values[i] = Value.id(this.array[i] ? "true" : "false");
 			}
 			
 			return TokenProcedure.createBlock(values);

@@ -8,7 +8,7 @@ import parser.token.resolver.Source;
 import parser.token.resolver.Unsafe;
 import parser.token.resolver.Virtual;
 import value.DefaultEnironment;
-import value.node.Node;
+import value.Value;
 
 public class Packages {
 	public static final boolean RUNTIME_STATS = true;
@@ -41,15 +41,15 @@ public class Packages {
 		
 		Token r = new Virtual ("root",
 			new Unsafe (),
-			new Directory("std", new File("D:\\documents\\eclipse\\SimpleAceInterpreter\\src\\ace")).insert(new Source("root", Node.call(Node.id("unsafe"), Node.id("root")))),
-			new Directory("import", start.getParentFile()).insert(new Source("root", Node.call(Node.id("std"), Node.id("root"))))
+			new Directory("std", new File("D:\\documents\\eclipse\\SimpleAceInterpreter\\src\\ace")).insert(new Source("root", Value.call(Value.id("unsafe"), Value.id("root")))),
+			new Directory("import", start.getParentFile()).insert(new Source("root", Value.call(Value.id("std"), Value.id("root"))))
 		);
 		
 		//System.out.println(r);
 		
-		Node n = Node.call(r.createNode(), Unsafe.IDENTITY, Node.id("import"), Node.id(name), Node.id("`"));
+		Value n = Value.call(r.createNode(), Unsafe.IDENTITY, Value.id("import"), Value.id(name), Value.id("`"));
 		
-		n.run(new DefaultEnironment());
+		n.call(new DefaultEnironment());
 		
 		/*Packages.file(args[0]);
 		

@@ -1,10 +1,10 @@
 package parser.token.syntax;
 
-import value.node.Node;
 import parser.Color;
 import parser.Stream;
 import parser.token.Modifier;
 import parser.token.Token;
+import value.Value;
 
 public class TokenIdentifier implements Token, Modifier{
 	private final String id;
@@ -30,8 +30,8 @@ public class TokenIdentifier implements Token, Modifier{
 	}
 	
 	@Override
-	public Node createNode() {
-		return Node.id(this.id);
+	public Value createNode() {
+		return Value.id(this.id);
 	}
 	
 	@Override

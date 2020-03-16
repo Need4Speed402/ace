@@ -1,10 +1,10 @@
 package parser.token.syntax;
 
-import value.node.Node;
 import parser.ParserException;
 import parser.Stream;
 import parser.TokenList;
 import parser.token.Token;
+import value.Value;
 
 public abstract class TokenProcedure implements Token{
 	private Token[] tokens;
@@ -41,20 +41,20 @@ public abstract class TokenProcedure implements Token{
 	}
 	
 	@Override
-	public Node createNode () {
-		Node[] nodes = new Node[this.tokens.length];
+	public Value createNode () {
+		Value[] nodes = new Value[this.tokens.length];
 		for (int i = 0; i < nodes.length; i++) nodes[i] = this.tokens[i].createNode();
 		return createBlock(nodes);
 	}
 	
-	public static Node createBlock (Node ... nodes) {
-		Node current = Node.env(Node.id("`"));
+	public static Value createBlock (Value ... nodes) {
+		Value current = Value.env(Value.id("`"));
 		
 		for (int i = nodes.length - 1; i >= 0; i--) {
-			current = Node.env(Node.call(Node.id("``"), current, nodes[i]));
+			current = Value.env(Value.call(Value.id("``"), current, nodes[i]));
 		}
 		
-		return Node.call(Node.id("Procedure"), current);
+		return Value.call(Value.id("Procedure"), current);
 	}
 	
 	public static Token[] readBlock (Stream s, char terminator) {
