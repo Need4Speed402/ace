@@ -1,12 +1,12 @@
-package value;
+package value.node;
 
 import value.Value;
 
-public class Call implements Value{
-	private Value function;
-	private Value argument;
+public class NodeCall implements Node{
+	private Node function;
+	private Node argument;
 	
-	protected Call (Value function, Value argument) {
+	protected NodeCall (Node function, Node argument) {
 		if (function == null || argument == null) throw new NullPointerException();
 		
 		this.function = function;
@@ -14,9 +14,9 @@ public class Call implements Value{
 	}
 	
 	@Override
-	public Value call(Value environment) {
-		Value vf = this.function.call(environment);
-		Value vp = this.argument.call(environment);
+	public Value run(Value environment) {
+		Value vf = this.function.run(environment);
+		Value vp = this.argument.run(environment);
 		
 		return vf.call(vp);
 	}
@@ -28,9 +28,9 @@ public class Call implements Value{
 	
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof Call) {
-			Value f = ((Call) obj).function;
-			Value a = ((Call) obj).argument;
+		if (obj instanceof NodeCall) {
+			Node f = ((NodeCall) obj).function;
+			Node a = ((NodeCall) obj).argument;
 			
 			return f.equals(this.function) && a.equals(this.argument);
 		}

@@ -1,7 +1,7 @@
 package parser.token.syntax;
 
+import value.node.Node;
 import parser.Stream;
-import value.Value;
 
 public class TokenBase extends TokenProcedure{
 	public TokenBase(Stream s) {
@@ -9,7 +9,7 @@ public class TokenBase extends TokenProcedure{
 	}
 	
 	@Override
-	public Value createNode() {
-		return Value.call(Value.id("Package"), super.createNode());
+	public Node createNode() {
+		return Node.call(Node.id("Package"), super.createNode());
 	}
 }

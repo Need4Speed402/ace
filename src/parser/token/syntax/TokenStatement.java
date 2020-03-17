@@ -4,12 +4,12 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 
+import value.node.Node;
 import parser.ParserException;
 import parser.Stream;
 import parser.TokenList;
 import parser.token.Modifier;
 import parser.token.Token;
-import value.Value;
 
 public class TokenStatement extends TokenProcedure implements Modifier{
 	public static final String operators = "= ` ., @#\\ ?~ |&! :<> +- */% ^$";
@@ -189,7 +189,7 @@ public class TokenStatement extends TokenProcedure implements Modifier{
 	}
 	
 	@Override
-	public Value createNode() {
+	public Node createNode() {
 		Token[] tokens = this.getTokens();
 		
 		if (tokens.length == 1) {
@@ -209,8 +209,8 @@ public class TokenStatement extends TokenProcedure implements Modifier{
 		}
 		
 		@Override
-		public Value createNode () {
-			return Value.call(this.function.createNode(), this.param.createNode());
+		public Node createNode () {
+			return Node.call(this.function.createNode(), this.param.createNode());
 		}
 		
 		@Override

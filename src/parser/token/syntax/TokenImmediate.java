@@ -1,7 +1,7 @@
 package parser.token.syntax;
 
 import parser.token.Token;
-import value.Value;
+import value.node.Node;
 
 public class TokenImmediate implements Token{
 	private final Token first, second;
@@ -12,8 +12,8 @@ public class TokenImmediate implements Token{
 	}
 	
 	@Override
-	public Value createNode() {
-		return Value.call(this.first.createNode(), this.second.createNode());
+	public Node createNode() {
+		return Node.call(this.first.createNode(), this.second.createNode());
 	}
 
 	@Override

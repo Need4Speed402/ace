@@ -4,7 +4,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import parser.token.Resolver;
-import value.Value;
+import value.node.Node;
+import value.node.NodeIdentifier;
 
 public class Virtual extends Resolver {
 	protected final Resolver[] resolvers;
@@ -19,13 +20,13 @@ public class Virtual extends Resolver {
 	}
 	
 	@Override
-	public Value createNode() {
-		Value proot = Value.id();
+	public Node createNode() {
+		Node proot = Node.id();
 		
-		Value set = Value.id();
-		Value get = Value.id();
+		Node set = Node.id();
+		Node get = Node.id();
 		
-		Value out = Value.delegate(() -> {
+		Node out = Node.delegate(() -> {
 			IdentifierResolver pairRoot = null;
 			IdentifierResolver[] pairs;
 			
@@ -50,55 +51,55 @@ public class Virtual extends Resolver {
 				pairs = Arrays.copyOf(pairs, len);
 			}
 			
-			Value genRoot, parent;
+			Node genRoot, parent;
 			
 			if (this.getName().equals("root")) {
-				genRoot = Value.call(get, Value.id());
+				genRoot = Node.call(get, Node.id());
 				
 				if (pairRoot != null) {
-					parent = Value.call(get, Value.id(), Value.id("root"));
+					parent = Node.call(get, Node.id(), Node.id("root"));
 				}else{
 					parent = proot;
 				}
 			}else if (pairRoot != null) {
-				genRoot = Value.call(get, Value.id(), Value.id("root"));
-				parent = Value.call(proot, Unsafe.PARENT, Value.id(this.getName()));
+				genRoot = Node.call(get, Node.id(), Node.id("root"));
+				parent = Node.call(proot, Unsafe.PARENT, Node.id(this.getName()));
 			} else {
 				genRoot = proot;
-				parent = Value.call(proot, Unsafe.PARENT, Value.id(this.getName()));
+				parent = Node.call(proot, Unsafe.PARENT, Node.id(this.getName()));
 			}
 			
-			Value rel = Value.id();
-			Value block = Value.call(parent, rel);
+			Node rel = Node.id();
+			Node block = Node.call(parent, rel);
 			
 			for (IdentifierResolver p : pairs) {
-				block = Value.call(Unsafe.SCOPE, Value.call(Unsafe.COMPARE, rel, p.identifier, Value.env(
+				block = Node.call(Unsafe.SCOPE, Node.call(Unsafe.COMPARE, rel, p.identifier, Node.env(
 					p.uniqueIdentifier
-				), Value.env(
+				), Node.env(
 					block
 				)));
 			}
 			
-			block = Value.call(Unsafe.FUNCTION, rel, Value.env(block));
+			block = Node.call(Unsafe.FUNCTION, rel, Node.env(block));
 			
 			for (IdentifierResolver p : pairs) {
-				Value root, tparent;
-				Value param = Value.id();
+				Node root, tparent;
+				Node param = Node.id();
 				
 				if (p == pairRoot) {
 					tparent = proot;
-					root = Value.call(proot, param);
+					root = Node.call(proot, param);
 				}else {
 					tparent = parent;
-					root = Value.call(Unsafe.ASSIGN, param, Value.call(genRoot, param));
+					root = Node.call(Unsafe.ASSIGN, param, Node.call(genRoot, param));
 				}
 				
-				block = Value.call(Unsafe.FUNCTION, p.uniqueIdentifier, Value.env(block), Value.call(
+				block = Node.call(Unsafe.FUNCTION, p.uniqueIdentifier, Node.env(block), Node.call(
 					p.createNode(),
-					Value.call(Unsafe.FUNCTION, param, Value.env(
-						Value.call(Unsafe.SCOPE, Value.call(Unsafe.COMPARE, Unsafe.PARENT, param, Value.env(
+					Node.call(Unsafe.FUNCTION, param, Node.env(
+						Node.call(Unsafe.SCOPE, Node.call(Unsafe.COMPARE, Unsafe.PARENT, param, Node.env(
 							tparent
-						), Value.env(
+						), Node.env(
 							root
 						)))
 					))
@@ -108,17 +109,17 @@ public class Virtual extends Resolver {
 			return block;
 		});
 		
-		Value arg = Value.id();
+		Node arg = Node.id();
 		
-		return Value.call(Unsafe.FUNCTION, proot, Value.env(
-			Value.call(Unsafe.MUTABLE, Value.id(),
-				Value.call(Unsafe.FUNCTION, set, Value.env(
-					Value.call(Unsafe.FUNCTION, get, Value.env(
-						Value.call(Unsafe.DO,
-							Value.call(set, Value.call(Unsafe.FUNCTION, arg, Value.env(
-								Value.call(Value.call(set, out), arg)
+		return Node.call(Unsafe.FUNCTION, proot, Node.env(
+			Node.call(Unsafe.MUTABLE, Node.id(),
+				Node.call(Unsafe.FUNCTION, set, Node.env(
+					Node.call(Unsafe.FUNCTION, get, Node.env(
+						Node.call(Unsafe.DO,
+							Node.call(set, Node.call(Unsafe.FUNCTION, arg, Node.env(
+								Node.call(Node.call(set, out), arg)
 							))),
-							Value.call(Unsafe.FUNCTION, arg, Value.env(Value.call(get, Value.id(), arg)))
+							Node.call(Unsafe.FUNCTION, arg, Node.env(Node.call(get, Node.id(), arg)))
 						)
 					))
 				))
@@ -187,19 +188,19 @@ public class Virtual extends Resolver {
 	}
 	
 	private static class IdentifierResolver extends Resolver {
-		public final Value uniqueIdentifier = Value.id();
-		public final Value identifier;
+		public final NodeIdentifier uniqueIdentifier = Node.id();
+		public final NodeIdentifier identifier;
 		public final Resolver parent;
 		
 		public IdentifierResolver(Resolver parent) {
 			super(parent.getName());
 			this.parent = parent;
 			
-			this.identifier = Value.id(parent.getName());
+			this.identifier = Node.id(parent.getName());
 		}
 		
 		@Override
-		public Value createNode() {
+		public Node createNode() {
 			return this.parent.createNode();
 		}
 	}

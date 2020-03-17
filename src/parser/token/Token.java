@@ -1,7 +1,7 @@
 package parser.token;
 
-import value.Value;
+import value.node.Node;
 
 public interface Token {
-	public Value createNode ();
+	public Node createNode ();
 }

@@ -1,9 +1,9 @@
 package parser.token.syntax;
 
+import value.node.Node;
 import parser.Color;
 import parser.token.Modifier;
 import parser.token.Token;
-import value.Value;
 
 public class TokenOperatorTrailing implements Token, Modifier{
 	private final Token token;
@@ -24,8 +24,8 @@ public class TokenOperatorTrailing implements Token, Modifier{
 	}
 	
 	@Override
-	public Value createNode() {
-		return Value.call(this.token.createNode(), Value.id('`' + this.operator));
+	public Node createNode() {
+		return Node.call(this.token.createNode(), Node.id('`' + this.operator));
 	}
 	
 	@Override

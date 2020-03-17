@@ -1,7 +1,7 @@
 package parser.token.syntax;
 
+import value.node.Node;
 import parser.Stream;
-import value.Value;
 
 public class TokenArray extends TokenProcedure{
 	public TokenArray(Stream s) {
@@ -20,7 +20,7 @@ public class TokenArray extends TokenProcedure{
 	}
 	
 	@Override
-	public Value createNode() {
-		return Value.call(Value.id("Array"), super.createNode());
+	public Node createNode() {
+		return Node.call(Node.id("Array"), super.createNode());
 	}
 }

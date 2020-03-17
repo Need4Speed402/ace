@@ -1,21 +1,21 @@
-package value;
+package value.node;
 
 import parser.Stream;
 import parser.token.syntax.TokenString;
 import value.Value;
 
-public class Identifier implements Value{
+public class NodeIdentifier implements Node{
 	private static int counter = 0;
-	public final static Value NULL = p -> Identifier.NULL;
+	public final static Value NULL = p -> NodeIdentifier.NULL;
 	
 	public final int id;
 
-	protected Identifier() {
+	protected NodeIdentifier() {
 		this.id = ++counter;
 	}
 	
 	@Override
-	public Value call(Value environment) {
+	public Value run(Value environment) {
 		return environment.call(new Value () {
 			@Override
 			public Value call(Value v) {
@@ -29,14 +29,14 @@ public class Identifier implements Value{
 			
 			@Override
 			public String toString() {
-				return "Identifier(" + Identifier.this.toString() + ")";
+				return "Identifier(" + NodeIdentifier.this.toString() + ")";
 			}
 		});
 	}
 	
 	@Override
 	public String toString() {
-		String name = Value.ids_rev.get(this);
+		String name = Node.ids_rev.get(this);
 		if (name == null) name = Integer.toString(this.id);
 		
 		boolean isSpecial = name.isEmpty();
@@ -63,8 +63,8 @@ public class Identifier implements Value{
 	
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof Identifier) {
-			return ((Identifier) obj).id == this.id;
+		if (obj instanceof NodeIdentifier) {
+			return ((NodeIdentifier) obj).id == this.id;
 		}
 		
 		return false;

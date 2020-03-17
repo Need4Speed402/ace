@@ -1,9 +1,9 @@
 package parser.token.syntax;
 
+import value.node.Node;
 import parser.Stream;
 import parser.token.Modifier;
 import parser.token.Token;
-import value.Value;
 
 public class TokenScope extends TokenProcedure implements Modifier{
 	public TokenScope (Stream s) {
@@ -26,8 +26,8 @@ public class TokenScope extends TokenProcedure implements Modifier{
 	}
 	
 	@Override
-	public Value createNode() {
-		return Value.call(Value.id("Scope"), super.createNode());
+	public Node createNode() {
+		return Node.call(Node.id("Scope"), super.createNode());
 	}
 	
 	@Override

@@ -1,17 +1,17 @@
-package value;
+package value.node;
 
 import parser.token.syntax.TokenEnvironment;
 import value.Value;
 
-public class Environment implements Value{
-	private final Value contents;
+public class NodeEnvironment implements Node{
+	private final Node contents;
 	
-	protected Environment(Value contents) {
+	protected NodeEnvironment(Node contents) {
 		this.contents = contents;
 	}
 	
-	public Value call(Value environment) {
-		return var -> this.contents.call(env -> var.call(environment.call(env)));
+	public Value run(Value environment) {
+		return var -> this.contents.run(env -> var.call(environment.call(env)));
 	}
 	
 	@Override
@@ -21,8 +21,8 @@ public class Environment implements Value{
 	
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof Environment) {
-			return ((Environment) obj).contents.equals(obj);
+		if (obj instanceof NodeEnvironment) {
+			return ((NodeEnvironment) obj).contents.equals(obj);
 		}
 		
 		return false;

@@ -5,13 +5,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import value.node.Node;
 import parser.Color;
 import parser.ParserException;
 import parser.Stream;
 import parser.TokenList;
 import parser.token.Token;
 import parser.unicode.Unicode;
-import value.Value;
 
 public class TokenString extends TokenProcedure{
 	public static HashMap<String, String> unicodeNames = Unicode.getLookup();
@@ -21,25 +21,25 @@ public class TokenString extends TokenProcedure{
 		super(tokens);
 	}
 	
-	public static Value createStringElement (String s){
-		Value[] string = new Value[s.length()];
+	public static Node createStringElement (String s){
+		Node[] string = new Node[s.length()];
 		
 		for (int ii = 0; ii < string.length; ii++) {
-			string[ii] = Value.call(Value.id("Integer"), new TokenInteger.BooleanArray(s.charAt(ii)).toNode());
+			string[ii] = Node.call(Node.id("Integer"), new TokenInteger.BooleanArray(s.charAt(ii)).toNode());
 		}
 		
 		return TokenProcedure.createBlock(string);
 	}
 	
 	@Override
-	public Value createNode() {
-		Value stack = null;
+	public Node createNode() {
+		Node stack = null;
 		
 		for (Token t : this.getTokens()) {
 			if (stack == null) {
 				stack = t.createNode();
 			}else {
-				stack = Value.call(stack, Value.id("+"), t.createNode());
+				stack = Node.call(stack, Node.id("+"), t.createNode());
 			}
 		}
 		
@@ -79,8 +79,8 @@ public class TokenString extends TokenProcedure{
 		}
 		
 		@Override
-		public Value createNode() {
-			return Value.call(Value.id("String"), super.createNode());
+		public Node createNode() {
+			return Node.call(Node.id("String"), super.createNode());
 		}
 		
 		@Override
@@ -103,8 +103,8 @@ public class TokenString extends TokenProcedure{
 		}
 		
 		@Override
-		public Value createNode() {
-			return Value.call(Value.id("String"), createStringElement(this.text));
+		public Node createNode() {
+			return Node.call(Node.id("String"), createStringElement(this.text));
 		}
 		
 		@Override

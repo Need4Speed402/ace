@@ -1,8 +1,8 @@
 package parser.token.syntax;
 
+import value.node.Node;
 import parser.Color;
 import parser.token.Token;
-import value.Value;
 
 public class TokenOperatorLeading implements Token{
 	private final Token token;
@@ -19,7 +19,7 @@ public class TokenOperatorLeading implements Token{
 	}
 	
 	@Override
-	public Value createNode() {
-		return Value.call(this.token.createNode(), Value.id(this.operator + '`'));
+	public Node createNode() {
+		return Node.call(this.token.createNode(), Node.id(this.operator + '`'));
 	}
 }
