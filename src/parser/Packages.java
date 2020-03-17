@@ -7,7 +7,7 @@ import parser.token.resolver.Directory;
 import parser.token.resolver.Source;
 import parser.token.resolver.Unsafe;
 import parser.token.resolver.Virtual;
-import value.DefaultEnironment;
+import value.DefaultEnvironment;
 import value.node.Node;
 
 public class Packages {
@@ -49,7 +49,7 @@ public class Packages {
 		
 		Node n = Node.call(r.createNode(), Unsafe.IDENTITY, Node.id("import"), Node.id(name), Node.id("`"));
 		
-		n.run(new DefaultEnironment());
+		DefaultEnvironment.run(n);
 		
 		/*Packages.file(args[0]);
 		

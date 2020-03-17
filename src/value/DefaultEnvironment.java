@@ -6,7 +6,11 @@ import static parser.token.resolver.Unsafe.CONSOLE;
 import static parser.token.resolver.Unsafe.FUNCTION;
 import static parser.token.resolver.Unsafe.MUTABLE;
 
-public class DefaultEnironment implements Value{
+import value.node.Node;
+
+public class DefaultEnvironment implements Value {
+	private DefaultEnvironment () {}
+	
 	public static final Value TRUE = p1 -> p2 -> p1;
 	public static final Value FALSE = p1 -> p2 -> p2;
 	
@@ -60,5 +64,9 @@ public class DefaultEnironment implements Value{
 		}
 		
 		return denv;
+	}
+	
+	public static void run (Node root) {
+		root.run(new DefaultEnvironment());
 	}
 }
