@@ -1,5 +1,6 @@
 package value.node;
 
+import parser.Promise;
 import parser.Stream;
 import parser.token.syntax.TokenString;
 import value.Value;
@@ -23,8 +24,8 @@ public class NodeIdentifier implements Node{
 			}
 			
 			@Override
-			public int getID() {
-				return id;
+			public Promise<Integer> getID() {
+				return new Promise<Integer>(id);
 			}
 			
 			@Override

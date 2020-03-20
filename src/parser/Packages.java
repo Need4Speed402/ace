@@ -7,7 +7,7 @@ import parser.token.resolver.Directory;
 import parser.token.resolver.Source;
 import parser.token.resolver.Unsafe;
 import parser.token.resolver.Virtual;
-import value.DefaultEnvironment;
+import value.ValueDefaultEnv;
 import value.node.Node;
 
 public class Packages {
@@ -41,15 +41,16 @@ public class Packages {
 		
 		Token r = new Virtual ("root",
 			new Unsafe (),
-			new Directory("std", new File("D:\\documents\\eclipse\\SimpleAceInterpreter\\src\\ace")).insert(new Source("root", Node.call(Node.id("unsafe"), Node.id("root")))),
-			new Directory("import", start.getParentFile()).insert(new Source("root", Node.call(Node.id("std"), Node.id("root"))))
+			//new Directory("std", new File("D:\\documents\\eclipse\\SimpleAceInterpreter\\src\\ace")).insert(new Source("root", Node.call(Node.id("unsafe"), Node.id("root")))),
+			//new Directory("import", start.getParentFile()).insert(new Source("root", Node.call(Node.id("std"), Node.id("root"))))
+			new Virtual("import", new Source(name, Node.call(Node.id("unsafe"), Node.id("console"), Node.id("hello world"))))
 		);
 		
 		//System.out.println(r);
 		
 		Node n = Node.call(r.createNode(), Unsafe.IDENTITY, Node.id("import"), Node.id(name), Node.id("`"));
 		
-		DefaultEnvironment.run(n);
+		ValueDefaultEnv.run(n);
 		
 		/*Packages.file(args[0]);
 		
