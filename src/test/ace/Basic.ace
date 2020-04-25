@@ -1,4 +1,5 @@
 test {
+	name 'simple print'
 	case {
 		[console] hello
 	}
@@ -8,6 +9,7 @@ test {
 }
 
 test {
+	name 'print inside function'
 	case {
 		[root Function] void {
 			[console] hello
@@ -19,6 +21,7 @@ test {
 }
 
 test {
+	name 'print inside scope'
 	case {
 		[root Scope] {
 			[console] hello
@@ -30,6 +33,7 @@ test {
 }
 
 test {
+	name 'print inside function using arg'
 	case {
 		[root Function] arg {
 			[console] arg
@@ -37,5 +41,53 @@ test {
 	}
 	expect "
 		hello`n
+	`"
+}
+
+test {
+	name 'do case'
+	case {
+		[root ``] ([console] hello) ([console] world)
+	}
+	expect "
+		hello
+		world
+		
+	`"
+}
+
+test {
+	name 'nested do cases'
+	case {
+		[root ``] (
+			[root ``] (
+				[root ``] (
+					[root ``] ([console] hello) ([console] world)
+				) ([console] world)
+			) ([console] world)
+		) ([console] world)
+	}
+	expect "
+		hello
+		world
+		world
+		world
+		world
+		
+	`"
+}
+
+test {
+	name "complex thing that dosen't work`"
+	case {
+		[root Function] message {
+			[root Function] void {
+				[console] message
+			} void
+		} hello
+	}
+	expect "
+		hello
+		
 	`"
 }

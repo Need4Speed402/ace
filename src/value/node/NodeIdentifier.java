@@ -74,7 +74,7 @@ public class NodeIdentifier implements Node{
 		}
 		
 		if (isSpecial) {
-			return TokenString.readString (new Stream (name), '\0').toString();
+			return new TokenString (name).toString();
 		}else {
 			return name;
 		}

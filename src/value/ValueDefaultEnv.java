@@ -60,7 +60,6 @@ public class ValueDefaultEnv implements Value {
 		});
 		
 		this.put(Unsafe.CONSOLE, p -> {
-			System.out.println(p);
 			return p.getID(id -> {
 				return new ValueEffect(p, p.getEffects(), new EffectPrint(NodeIdentifier.asString(id)));
 			});

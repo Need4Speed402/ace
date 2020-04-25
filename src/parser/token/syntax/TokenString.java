@@ -5,13 +5,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import value.node.Node;
 import parser.Color;
 import parser.ParserException;
 import parser.Stream;
 import parser.TokenList;
 import parser.token.Token;
 import parser.unicode.Unicode;
+import value.node.Node;
 
 public class TokenString extends TokenProcedure{
 	public static HashMap<String, String> unicodeNames = Unicode.getLookup();
@@ -19,6 +19,10 @@ public class TokenString extends TokenProcedure{
 
 	public TokenString (Token[] tokens) {
 		super(tokens);
+	}
+	
+	public TokenString(String value) {
+		super(new Token[] {new StringSegment(value)});
 	}
 	
 	public static Node createStringElement (String s){

@@ -3,7 +3,11 @@ package parser;
 import java.io.File;
 import java.io.IOException;
 
+import parser.token.Token;
+import parser.token.resolver.Directory;
+import parser.token.resolver.Source;
 import parser.token.resolver.Unsafe;
+import parser.token.resolver.Virtual;
 import test.Test;
 import value.ValueDefaultEnv;
 import value.node.Node;
@@ -46,30 +50,13 @@ public class Packages {
 				throw new RuntimeException("Program entry not ace source code");
 			}
 			
-			/*Token r = new Virtual ("root",
+			Token r = new Virtual ("root",
 				new Unsafe (),
-				//new Directory("std", new File("D:\\documents\\eclipse\\SimpleAceInterpreter\\src\\ace")).insert(new Source("root", Node.call(Node.id("unsafe"), Node.id("root")))),
-				//new Directory("import", start.getParentFile()).insert(new Source("root", Node.call(Node.id("std"), Node.id("root"))))
-				new Virtual("import", new Source(name, Node.call(Node.id("unsafe"), Node.id("console"), Node.id("hello world"))))
-			);*/
+				new Directory("std", new File("D:\\documents\\eclipse\\SimpleAceInterpreter\\src\\ace")).insert(new Source("root", Node.call(Node.id("unsafe"), Node.id("root")))),
+				new Directory("import", start.getParentFile()).insert(new Source("root", Node.call(Node.id("std"), Node.id("root"))))
+			);
 			
-			//System.out.println(r);
-			
-			//Node n = Node.call(r.createNode(), Unsafe.IDENTITY, Node.id("import"), Node.id(name), Node.id("`"));
-			
-			/*Node n = Node.call(Unsafe.MUTABLE, Node.id("hello"), Node.call(Unsafe.FUNCTION, Node.id("set"), Node.env(
-					Node.call(Unsafe.FUNCTION, Node.id("get"), Node.env(
-							Node.call(Unsafe.DO, Node.call(Unsafe.CONSOLE, Node.call(Node.id("get"), Node.id())), Node.call(Unsafe.CONSOLE, Node.call(Node.id("get"), Node.id())))
-					))
-			)));*/
-			
-			Node n = Node.call(Unsafe.FUNCTION, Node.id(), Node.env(Node.call(Unsafe.CONSOLE, Node.id("get"))), Node.id());
-			
-			n = Node.call(Unsafe.FUNCTION, Node.id("get"), Node.env(n), Node.id("otherthing"));
-			
-			//Node n = Node.call(Unsafe.DO, Node.call(Unsafe.CONSOLE, Node.id("get")), Node.call(Unsafe.DO, Node.call(Unsafe.CONSOLE, Node.id("get")), Node.call(Unsafe.CONSOLE, Node.id("get"))));
-			//System.out.println(n);
-			ValueDefaultEnv.run(new value.effect.Runtime(), n);
+			ValueDefaultEnv.run(new value.effect.Runtime(), Node.call(r.createNode(), Node.id("import"), Node.id(name), Node.id("`")));
 			
 			/*Packages.file(args[0]);
 			
