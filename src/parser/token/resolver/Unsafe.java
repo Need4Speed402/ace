@@ -4,11 +4,11 @@ import value.node.Node;
 import value.node.NodeIdentifier;
 
 public class Unsafe extends Virtual {
-	public static final NodeIdentifier FUNCTION = Node.id();
-	public static final NodeIdentifier COMPARE = Node.id();
-	public static final NodeIdentifier ASSIGN = Node.id();
+	public static final NodeIdentifier FUNCTION = Node.id("{function}");
+	public static final NodeIdentifier COMPARE = Node.id("{compare}");
+	public static final NodeIdentifier ASSIGN = Node.id("{assign}");
 	public static final NodeIdentifier MUTABLE = Node.id();
-	public static final NodeIdentifier CONSOLE = Node.id();
+	public static final NodeIdentifier CONSOLE = Node.id("{console}");
 	
 	public static final NodeIdentifier PARENT = Node.id();
 	
@@ -17,7 +17,7 @@ public class Unsafe extends Virtual {
 	
 	public static final Node IDENTITY = Node.call(FUNCTION, TEMP1, Node.env(TEMP1));
 	public static final Node SCOPE = Node.call(FUNCTION, TEMP2, Node.env(Node.call(TEMP2, IDENTITY)));
-	public static final Node DO = Node.call(FUNCTION, Node.id(), Node.env(IDENTITY));
+	public static final Node DO = Node.call(FUNCTION, TEMP2, Node.env(IDENTITY));
 	
 	public Unsafe() {
 		super("unsafe",

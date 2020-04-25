@@ -114,7 +114,7 @@ public enum Color {
 			Section s = old == null ? sections[i] : sections[i].negative(old.props);
 
 			b.append(s.backApply(props));
-			//old = s;
+			old = s;
 		}
 		
 		b.append(delimiter + "[0;0m");

@@ -68,15 +68,13 @@ public abstract class TokenProcedure implements Token{
 				break;
 			}
 			
-			if (s.next(Stream.whitespace)) continue;
-			
 			//comments
 			if (!s.isNext(";;}", ";;)", ";;]", ";;;") && s.next(";;")) {
 				if (!s.hasChr()) break;
 				if (s.isNext(Stream.whitespace)) {
 					while (s.hasChr() && !s.isNext('\n')) s.chr();
 				}else{
-					new TokenStatement(s);
+					new TokenExpression(s);
 				}
 				
 				continue;
@@ -98,6 +96,8 @@ public abstract class TokenProcedure implements Token{
 				continue;
 			}
 			
+			if (s.next(Stream.whitespace)) continue;
+			
 			if (s.isNext(']', ')', '}')) {
 				char next = s.chr();
 				
@@ -108,7 +108,7 @@ public abstract class TokenProcedure implements Token{
 				}
 			}
 			
-			tokens.push(new TokenStatement(s));
+			tokens.push(new TokenExpression(s));
 			semiLegal = true;
 			semiUsed = false;
 		}

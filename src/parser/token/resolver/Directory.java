@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 import parser.Stream;
 import parser.token.Resolver;
-import parser.token.syntax.TokenStatement;
+import parser.token.syntax.TokenExpression;
 
 public class Directory extends Virtual{
 	private File root;
@@ -39,7 +39,7 @@ public class Directory extends Virtual{
 				for (int i = 0; i < name.length(); i++) {
 					char c = name.charAt(i);
 					
-					if ((i == 0 || i == name.length()) && TokenStatement.operators.indexOf(c) >= 0) {
+					if ((i == 0 || i == name.length()) && TokenExpression.operators.indexOf(c) >= 0) {
 						continue main;
 					}else if (new String(Stream.whitespace).indexOf(c) >= 0 || "(){}[];\"'".indexOf(c) >= 0) {
 						continue main;

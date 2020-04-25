@@ -1,95 +1,92 @@
 package value;
 
-import parser.token.resolver.Unsafe;
+import java.util.HashMap;
 
-import parser.Promise;
+import parser.token.resolver.Unsafe;
+import value.effect.Effect;
+import value.effect.EffectGet;
+import value.effect.EffectPrint;
+import value.effect.EffectSet;
 import value.node.Node;
+import value.node.NodeIdentifier;
 
 public class ValueDefaultEnv implements Value {
-	private ValueDefaultEnv () {}
-	
 	public static final Value TRUE = p1 -> p2 -> p1;
 	public static final Value FALSE = p1 -> p2 -> p2;
 	
-	public static final Value COMPARE = v1 -> v2 -> {
-		ValueDelegate ret = new ValueDelegate();
-		
-		v1.getID().then(v1id -> {
-			v2.getID().then(v2id -> {
-				ret.resolve(v1id == v2id ? TRUE : FALSE);
-			});
+	private ValueDefaultEnv () {
+		this.put(Unsafe.COMPARE, v1 -> v2 -> {
+			return v1.getID(v1id -> v2.getID(v2id -> {
+				return v1id == v2id ? TRUE : FALSE;
+			}));
 		});
 		
-		return ret;
-	};
-	
-	public static final Value FUNCTION = ident -> body -> arg -> body.call(env -> {
-		ValueDelegate ret = new ValueDelegate();
+		this.put(Unsafe.FUNCTION, ident -> ident.getID(identid -> body -> {
+			return ValueEffect.wrap(body, new ValueFunction(probe -> body.call(penv -> penv.getID(envid -> identid == envid ? probe : penv))));
+		}));
 		
-		ident.getID().then(identid -> {
-			env.getID().then(envid -> {
-				ret.resolve(identid == envid ? arg : env);
-			});
+		this.put(Unsafe.ASSIGN, name -> value -> new Value () {
+			@Override
+			public Value call (Value v) {
+				return value.call(v);
+			}
+			
+			@Override
+			public Value getID (Getter getter) {
+				return name.getID(getter);
+			}
+			
+			@Override
+			public Value resolve(ValueProbe probe, Value value) {
+				return value.resolve(probe, value);
+			}
+			
+			@Override
+			public String toString() {
+				return "Assignment(" + name.toString() + ") -> " + value.toString();
+			}
 		});
 		
-		return ret;
-	});
+		this.put(Unsafe.MUTABLE, init -> {
+			Memory ret = new Memory();
+			
+			return new ValueEffect(v -> v
+				.call(p -> new ValueEffect(p, p.getEffects(), new EffectSet(ret, init)))
+				.call(p -> {
+					ValueProbe u = new ValueProbe();
+					return new ValueEffect(u, p.getEffects(), new EffectGet(ret, u));
+				})
+			, new EffectSet(ret, init));
+		});
+		
+		this.put(Unsafe.CONSOLE, p -> {
+			System.out.println(p);
+			return p.getID(id -> {
+				return new ValueEffect(p, p.getEffects(), new EffectPrint(NodeIdentifier.asString(id)));
+			});
+		});
+	}
 	
-	public static class Mutable implements Value {
-		private Value value;
-		
-		public Mutable (Value value) {
-			this.value = value;
-		}
-		
-		@Override
-		public Value call(Value v) {
-			return v.call(p -> this.value = p).call(p -> this.value);
-		}
+	private final HashMap<Integer, Value> env = new HashMap<>();
+	
+	private void put (NodeIdentifier ident, Value value) {
+		env.put(ident.id, value);
 	}
 
 	@Override
 	public Value call(Value denv) {
-		ValueDelegate ret = new ValueDelegate();
-		
-		denv.getID().then(id -> {
-			if (id == Unsafe.FUNCTION.id) {
-				ret.resolve(FUNCTION);
-			}else if (id == Unsafe.COMPARE.id) {
-				ret.resolve(COMPARE);
-			}else if (id == Unsafe.ASSIGN.id) {
-				ret.resolve(name -> value -> new Value () {
-					@Override
-					public Value call (Value v) {
-						return value.call(v);
-					}
-					
-					@Override
-					public Promise<Integer> getID () {
-						return name.getID();
-					}
-					
-					@Override
-					public String toString() {
-						return "Assignment(" + name.toString() + ") -> " + value.toString();
-					}
-				});
-			}else if (id == Unsafe.MUTABLE.id) {
-				ret.resolve(init -> new Mutable(init));
-			}else if (id == Unsafe.CONSOLE.id) {
-				ret.resolve(p -> {
-					System.out.println(p);
-					return p;
-				});
-			}else {
-				ret.resolve(denv);
-			}
+		Value out = denv.getID(id -> {
+			return this.env.getOrDefault(id, denv);
 		});
 		
-		return ret;
+		return out;
 	}
 	
-	public static void run (Node root) {
-		root.run(new ValueDefaultEnv());
+	public static void run (value.effect.Runtime runtime, Node root) {
+		/*Value probe = new ValueProbe();
+		System.out.println(probe);
+		System.out.println(root.run(probe));*/
+		
+		Effect.runAll(runtime, root.run(new ValueDefaultEnv()));
 	}
 }

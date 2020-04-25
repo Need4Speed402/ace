@@ -1,13 +1,25 @@
 package value;
 
-import parser.Promise;
+import value.effect.Effect;
 
 public interface Value {
-	public static final Promise<Integer> DEFAULT_ID = new Promise<Integer>(0);
+	public final Effect[] NO_EFFECTS = new Effect [] {};
 	
 	public Value call (Value v);
 	
-	public default Promise<Integer> getID () {
-		return DEFAULT_ID;
+	public default Value getID (Getter getter) {
+		return getter.resolved(0);
+	}
+	
+	public default Value resolve (ValueProbe probe, Value value) {
+		return this;
+	}
+	
+	public default Effect[] getEffects () {
+		return NO_EFFECTS;
+	}
+	
+	public interface Getter {
+		public Value resolved (int value);
 	}
 }

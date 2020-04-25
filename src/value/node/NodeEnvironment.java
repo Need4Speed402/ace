@@ -2,6 +2,8 @@ package value.node;
 
 import parser.token.syntax.TokenEnvironment;
 import value.Value;
+import value.ValueEffect;
+import value.ValueFunction;
 
 public class NodeEnvironment implements Node{
 	private final Node contents;
@@ -11,7 +13,7 @@ public class NodeEnvironment implements Node{
 	}
 	
 	public Value run(Value environment) {
-		return var -> this.contents.run(env -> var.call(environment.call(env)));
+		return new ValueFunction(probe -> this.contents.run(var -> ValueEffect.wrap(var, probe.call(environment.call(ValueEffect.clear(var))))));
 	}
 	
 	@Override

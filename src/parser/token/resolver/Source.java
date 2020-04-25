@@ -50,6 +50,10 @@ public class Source extends Resolver{
 		this.source = node;
 	}
 	
+	public Node getSource() {
+		return source;
+	}
+	
 	@Override
 	public Node createNode() {
 		Node set = Node.id();

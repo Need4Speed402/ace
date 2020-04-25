@@ -19,6 +19,18 @@ public class Virtual extends Resolver {
 		return resolvers;
 	}
 	
+	public Resolver getResolver (String name) {
+		Resolver[] resolvers = this.getResolvers();
+		
+		for (int i = 0; i < resolvers.length; i++) {
+			if (resolvers[i].getName().equals(name)) {
+				return resolvers[i];
+			}
+		}
+		
+		return null;
+	}
+	
 	@Override
 	public Node createNode() {
 		Node proot = Node.id();
@@ -165,9 +177,6 @@ public class Virtual extends Resolver {
 			
 			if (last) b.append('\u2514');
 			else b.append('\u251C');
-			
-			//b.append(' ').append(entry.name).append('\n');
-			//b.append(last ? "  " : "\u2502 ");
 			
 			String val = entry.toString();
 			

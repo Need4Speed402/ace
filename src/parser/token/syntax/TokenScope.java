@@ -34,8 +34,8 @@ public class TokenScope extends TokenProcedure implements Modifier{
 	public boolean isModifier() {
 		Token[] tokens = this.getTokens();
 		if (tokens.length != 1) return false;
-		if (!(tokens[0] instanceof TokenStatement)) return false;
+		if (!(tokens[0] instanceof TokenExpression)) return false;
 		
-		return ((TokenStatement) tokens[0]).isModifier();
+		return ((TokenExpression) tokens[0]).isModifier();
 	}
 }

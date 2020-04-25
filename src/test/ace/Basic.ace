@@ -1,0 +1,41 @@
+test {
+	case {
+		[console] hello
+	}
+	expect "
+		hello`n
+	`"
+}
+
+test {
+	case {
+		[root Function] void {
+			[console] hello
+		} whatever
+	}
+	expect "
+		hello`n
+	`"
+}
+
+test {
+	case {
+		[root Scope] {
+			[console] hello
+		}
+	}
+	expect "
+		hello`n
+	`"
+}
+
+test {
+	case {
+		[root Function] arg {
+			[console] arg
+		} hello
+	}
+	expect "
+		hello`n
+	`"
+}

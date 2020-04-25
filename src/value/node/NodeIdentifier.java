@@ -1,13 +1,13 @@
 package value.node;
 
-import parser.Promise;
 import parser.Stream;
 import parser.token.syntax.TokenString;
 import value.Value;
+import value.ValueEffect;
 
 public class NodeIdentifier implements Node{
 	private static int counter = 0;
-	public final static Value NULL = p -> NodeIdentifier.NULL;
+	public final static Value NULL = p -> new ValueEffect(NodeIdentifier.NULL, p.getEffects());
 	
 	public final int id;
 
@@ -20,25 +20,43 @@ public class NodeIdentifier implements Node{
 		return environment.call(new Value () {
 			@Override
 			public Value call(Value v) {
-				return NULL;
+				return NULL.call(v);
 			}
 			
 			@Override
-			public Promise<Integer> getID() {
-				return new Promise<Integer>(id);
+			public Value getID(Getter getter) {
+				return getter.resolved(id);
 			}
 			
 			@Override
 			public String toString() {
-				return "Identifier(" + NodeIdentifier.this.toString() + ")";
+				return "Identifier(" + asString(id) + ")";
 			}
 		});
 	}
 	
 	@Override
 	public String toString() {
-		String name = Node.ids_rev.get(this);
-		if (name == null) name = Integer.toString(this.id);
+		return asString(this.id);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof NodeIdentifier) {
+			return ((NodeIdentifier) obj).id == this.id;
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return this.id;
+	}
+	
+	public static String asString (int id) {
+		String name = Node.ids_rev.get(id);
+		if (name == null) name = Integer.toString(id);
 		
 		boolean isSpecial = name.isEmpty();
 		
@@ -60,19 +78,5 @@ public class NodeIdentifier implements Node{
 		}else {
 			return name;
 		}
-	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof NodeIdentifier) {
-			return ((NodeIdentifier) obj).id == this.id;
-		}
-		
-		return false;
-	}
-	
-	@Override
-	public int hashCode() {
-		return this.id;
 	}
 }

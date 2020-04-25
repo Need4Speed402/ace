@@ -11,13 +11,13 @@ import parser.TokenList;
 import parser.token.Modifier;
 import parser.token.Token;
 
-public class TokenStatement extends TokenProcedure implements Modifier{
+public class TokenExpression extends TokenProcedure implements Modifier{
 	public static final String operators = "= ` ., @#\\ ?~ |&! :<> +- */% ^$";
 	public static final char[] ops = operators.replaceAll(" ", "").toCharArray();
 	public static final int[] operatorValues;
 	
-	public TokenStatement (Stream s) {
-		super(TokenStatement.readStatement(s));
+	public TokenExpression (Stream s) {
+		super(TokenExpression.readStatement(s));
 	}
 	
 	static {
@@ -229,7 +229,7 @@ public class TokenStatement extends TokenProcedure implements Modifier{
 			if (s.isNext(")]}".toCharArray())) break;
 			if (s.next(Stream.whitespace)) continue;
 			
-			tokens.push(TokenStatement.readImmediates(s));
+			tokens.push(TokenExpression.readImmediates(s));
 		}
 		
 		if (tokens.size() == 0) throw new ParserException("tokens size cannot be 0");

@@ -12,7 +12,7 @@ public interface Node {
 	public static final HashMap<Node, NodeEnvironment> envs = new HashMap<>();
 	
 	public static final HashMap<String, NodeIdentifier> ids = new HashMap<>();
-	public static final HashMap<NodeIdentifier, String> ids_rev = new HashMap<>();
+	public static final HashMap<Integer, String> ids_rev = new HashMap<>();
 
 	public static NodeCall call (Node a, Node b) {
 		NodeCall c = new NodeCall(a, b);
@@ -59,7 +59,7 @@ public interface Node {
 		if (mem == null) {
 			mem = Node.id();
 			ids.put(ident, mem);
-			ids_rev.put(mem, ident);
+			ids_rev.put(mem.id, ident);
 		}
 		
 		return mem;
