@@ -50,7 +50,7 @@ public enum Color {
 	public static String bgBlack (String r) { return apply(r, BG_BLACK); }
 	public static String bgWhite (String r) { return apply(r, BG_WHITE); }
 	
-	private static final char delimiter = '\u001B';
+	public static final char delimiter = '\u001B';
 
 	public final Type type;
 	public final String value;

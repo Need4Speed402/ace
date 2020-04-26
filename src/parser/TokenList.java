@@ -1,12 +1,13 @@
 package parser;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import parser.token.Token;
 import parser.token.syntax.TokenImmediate;
 
-public class TokenList {
+public class TokenList implements Iterable<Token> {
 	private final List<Token> tokens;
 	
 	public TokenList () {
@@ -73,5 +74,10 @@ public class TokenList {
 		}
 		
 		return ret;
+	}
+
+	@Override
+	public Iterator<Token> iterator() {
+		return this.tokens.iterator();
 	}
 }

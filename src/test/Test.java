@@ -25,6 +25,7 @@ public class Test {
 	private final String name;
 	private final Node body;
 	private final String expected;
+	private String result;
 	
 	public Test (String name, Node body, String expected) {
 		this.name = name;
@@ -33,21 +34,27 @@ public class Test {
 	}
 	
 	public String getName() {
-		return name;
+		return this.name;
 	}
 	
-	public String run () {
-		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-		Runtime r = new Runtime(new PrintStream(bytes));
-		ValueDefaultEnv.run(r, this.body);
-		
-		String computed = Charset.forName("UTF8").decode(ByteBuffer.wrap(bytes.toByteArray())).toString();
-		
-		if (this.expected.equals(computed)) {
-			return null;
-		}else {
-			return "Failed test: " + new TokenString(this.getName()).toString() + " got:\n" + computed + "\nbut expected:\n" + this.expected;
+	public String getExpected() {
+		return this.expected;
+	}
+	
+	public boolean isSuccessful () {
+		return this.getResult().equals(this.getExpected());
+	}
+	
+	public String getResult () {
+		if (this.result == null) {
+			ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+			Runtime r = new Runtime(new PrintStream(bytes));
+			ValueDefaultEnv.run(r, this.body);
+			
+			this.result = Charset.forName("UTF8").decode(ByteBuffer.wrap(bytes.toByteArray())).toString();
 		}
+		
+		return this.result;
 	}
 	
 	public static Test[] parseTest (File file) throws IOException {
@@ -120,25 +127,88 @@ public class Test {
 		return list.toArray();
 	}
 	
+	private static class SLink {
+		public final int value;
+		public final SLink next;
+		public final int length;
+		
+		public SLink (int value, SLink next) {
+			this.value = value;
+			this.next = next;
+			this.length = (next == null ? 0 : next.length) + 1;
+		}
+		
+		@Override
+		public String toString() {
+			return this.toString("");
+		}
+		
+		public String toString(String padding) {
+			StringBuilder b = new StringBuilder(this.length * 2);
+			SLink current = this;
+			
+			int lastClass = 0;
+			
+			b.append(padding);
+			
+			while (current != null) {
+				int c = current.value >> 8;
+		
+				if (c != lastClass) {
+					b.append(Color.delimiter).append('[').append(c).append("m");
+					lastClass = c;
+				}
+				
+				b.append((char) (current.value & 0xFF));
+				
+				if ((current.value & 0xFF) == '\n') {
+					b.append(padding);
+				}
+				
+				current = current.next;
+			}
+			
+			b.append(Color.delimiter).append("[0m");
+			return b.toString();
+		}
+	}
+	
+	private static SLink dif (String a, String b, int ai, int bi) {
+		if (ai >= a.length() && bi >= b.length()) {
+			return null;
+		}else if (ai >= a.length()) {
+			return new SLink(b.charAt(bi) + 0x1F00, dif(a, b, ai, bi + 1));
+		}else if (bi >= b.length()) {
+			return new SLink(a.charAt(ai) + 0x2000, dif(a, b, ai + 1, bi));
+		}else if (a.charAt(ai) == b.charAt(bi)) {
+			return new SLink(a.charAt(ai), dif(a, b, ai + 1, bi + 1));
+		}else {
+			SLink p1 = dif(a, b, ai + 1, bi);
+			SLink p2 = dif(a, b, ai, bi + 1);
+			
+			if (p1.length < p2.length) {
+				return new SLink(a.charAt(ai) + 0x2000, p1);
+			}else {
+				return new SLink(b.charAt(bi) + 0x1F00, p2);
+			}
+		}
+	}
+	
 	public static void test (Test[] tests) {
-		int passed = 0, failed = 0;
-		StringBuilder failMessage = new StringBuilder();
+		TestList failed = new TestList();
 		
 		for (int i = 0; i < tests.length; i++) {
-			String test = tests[i].run();
-			
-			if (test == null) {
-				passed++;
-			}else {
-				failed++;
-				failMessage.append(test).append('\n');
+			if (!tests[i].isSuccessful()) {
+				failed.push(tests[i]);
 			}
 		}
 		
+		System.out.println(Color.green(Integer.toString(tests.length - failed.size())) + " passed and " + Color.red(Integer.toString(failed.size())) + " failed");
 		
-		
-		System.out.println(Color.green(Integer.toString(passed)) + " passed and " + Color.red(Integer.toBinaryString(failed)) + " failed");
-		if (failMessage.length() != 0) System.out.println(failMessage);
+		for (Test test : failed) {
+			System.out.println(Color.bgRed(Color.white(" FAILED ")) + Color.bgBlack(new TokenString(test.getName()).toString()));
+			System.out.println(dif(test.getExpected(), test.getResult(), 0, 0).toString(Color.bgRed(" ") + " "));
+		}
 	}
 	
 	public static void test (File directory) throws IOException{

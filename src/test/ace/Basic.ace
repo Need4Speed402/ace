@@ -4,7 +4,8 @@ test {
 		[console] hello
 	}
 	expect "
-		hello`n
+		hello
+		
 	`"
 }
 
@@ -16,7 +17,8 @@ test {
 		} whatever
 	}
 	expect "
-		hello`n
+		hello
+		
 	`"
 }
 
@@ -28,7 +30,88 @@ test {
 		}
 	}
 	expect "
-		hello`n
+		hello
+		
+	`"
+}
+
+test {
+	name 'function alias'
+	case {
+		[root Function] print {
+			(print hello) (print world)
+		} ([root Function] message {
+			[console] message
+		})
+	}
+	expect "
+		hello
+		world
+		
+	`"
+}
+
+test {
+	name 'effects in void paramater'
+	case {
+		[root Function] void {whatever} ([console] hello)
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'effects in environment'
+	case {
+		{void} ([console] hello)
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'effects in enviroment call'
+	case {
+		{lol lol} ([root Function] void {[console] hello})
+	}
+	expect "
+		hello
+		hello
+		
+	`"
+}
+
+test {
+	name 'effects in enviroment call with indirection'
+	case {
+		[root Function] msg {
+			{lol lol} ([root Function] void {[console] msg})
+		} hello
+	}
+	expect "
+		hello
+		hello
+		
+	`"
+}
+
+test {
+	name 'function alias with do'
+	case {
+		[root Function] print {
+			[root ``] (print hello) (print world)
+		} ([root Function] message {
+			[console] message
+		})
+	}
+	expect "
+		hello
+		world
+		
 	`"
 }
 

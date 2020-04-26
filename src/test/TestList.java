@@ -1,9 +1,10 @@
 package test;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-public class TestList {
+public class TestList implements Iterable<Test>{
 	private final List<Test> tests;
 	
 	public TestList () {
@@ -52,5 +53,10 @@ public class TestList {
 	
 	public void set (int i, Test t) {
 		this.tests.set(i, t);
+	}
+
+	@Override
+	public Iterator<Test> iterator() {
+		return this.tests.iterator();
 	}
 }

@@ -1,8 +1,5 @@
 package value;
 
-import java.util.Arrays;
-
-import value.effect.Effect;
 import value.node.Node;
 
 public class ValueFunction implements Value{
@@ -32,11 +29,6 @@ public class ValueFunction implements Value{
 		}
 		
 		return this.root;
-	}
-	
-	@Override
-	public Effect[] getEffects() {
-		return this.getRoot().getEffects();
 	}
 	
 	public Value call (Value v) {
