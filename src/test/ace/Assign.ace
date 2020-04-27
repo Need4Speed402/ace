@@ -1,0 +1,10 @@
+test {
+	name 'effects in assign name'
+	case {
+		[assign] (console hello)
+	}
+	expect "
+		hello
+		
+	`"
+}

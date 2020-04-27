@@ -11,21 +11,23 @@ import value.node.Node;
 import value.node.NodeIdentifier;
 
 public class ValueDefaultEnv implements Value {
+	private static ValueDefaultEnv instance = new ValueDefaultEnv();
+	
 	public static final Value TRUE = p1 -> p2 -> p1;
 	public static final Value FALSE = p1 -> p2 -> p2;
 	
 	private ValueDefaultEnv () {
-		this.put(Unsafe.COMPARE, v1 -> v2 -> {
-			return v1.getID(v1id -> v2.getID(v2id -> {
+		this.put(Unsafe.COMPARE, v1 -> ValueEffect.wrap(v1, v2 -> {
+			return ValueEffect.wrap(v2, v1.getID(v1id -> v2.getID(v2id -> {
 				return v1id == v2id ? TRUE : FALSE;
-			}));
-		});
-		
-		this.put(Unsafe.FUNCTION, ident -> ident.getID(identid -> body -> {
-			return ValueEffect.wrap(body, new ValueFunction(probe -> body.call(penv -> penv.getID(envid -> identid == envid ? probe : penv))));
+			})));
 		}));
 		
-		this.put(Unsafe.ASSIGN, name -> value -> new Value () {
+		this.put(Unsafe.FUNCTION, ident -> ValueEffect.wrap(ident, ident.getID(identid -> body -> {
+			return ValueEffect.wrap(body, new ValueFunction(probe -> body.call(penv -> penv.getID(envid -> identid == envid ? probe : penv))));
+		})));
+		
+		this.put(Unsafe.ASSIGN, name -> ValueEffect.wrap(name, value -> ValueEffect.wrap(value, new Value () {
 			@Override
 			public Value call (Value v) {
 				return value.call(v);
@@ -45,23 +47,23 @@ public class ValueDefaultEnv implements Value {
 			public String toString() {
 				return "Assignment(" + name.toString() + ") -> " + value.toString();
 			}
-		});
+		})));
 		
 		this.put(Unsafe.MUTABLE, init -> {
 			Memory ret = new Memory();
 			
 			return new ValueEffect(v -> v
-				.call(p -> new ValueEffect(p, p.getEffects(), new EffectSet(ret, init)))
+				.call(p -> new ValueEffect(p, p, new EffectSet(ret, init)))
 				.call(p -> {
 					ValueProbe u = new ValueProbe();
-					return new ValueEffect(u, p.getEffects(), new EffectGet(ret, u));
+					return new ValueEffect(u, p, new EffectGet(ret, u));
 				})
 			, new EffectSet(ret, init));
 		});
 		
 		this.put(Unsafe.CONSOLE, p -> {
 			return p.getID(id -> {
-				return new ValueEffect(p, p.getEffects(), new EffectPrint(NodeIdentifier.asString(id)));
+				return new ValueEffect(p, p, new EffectPrint(NodeIdentifier.asString(id)));
 			});
 		});
 	}
@@ -86,6 +88,6 @@ public class ValueDefaultEnv implements Value {
 		System.out.println(probe);
 		System.out.println(root.run(probe));*/
 		
-		Effect.runAll(runtime, root.run(new ValueDefaultEnv()));
+		Effect.runAll(runtime, root.run(instance));
 	}
 }

@@ -30,9 +30,7 @@ public interface Effect {
 	
 	public static Value runAll (Runtime runtime, Value root) {
 		Effect[] effects = root.getEffects();
-		if (root instanceof ValueEffect) {
-			root = ((ValueEffect) root).getParent();
-		}
+		root = ValueEffect.clear(root);
 		
 		for (int i = 0; i < effects.length; i++) {
 			root = effects[i].run(runtime, root);

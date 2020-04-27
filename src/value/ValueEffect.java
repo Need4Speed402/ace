@@ -4,26 +4,43 @@ import value.effect.Effect;
 
 public class ValueEffect implements Value{
 	private final Value parent;
-	private final Effect[] effects;
+	private final Value[] effects;
 	
 	public ValueEffect(Value parent) {
-		this.parent = unwrap(parent);
-		this.effects = Value.NO_EFFECTS;
+		this(parent, new Value[] {});
 	}
 	
 	public ValueEffect(Value parent, Effect ... effects) {
+		this(parent, new Value () {
+			@Override
+			public Effect[] getEffects() {
+				return effects;
+			}
+			
+			@Override
+			public Value call(Value v) {
+				return null;
+			}
+		});
+	}
+	
+	public ValueEffect(Value parent, Value inherit, Effect effect) {
+		this(parent, inherit, new Value () {
+			@Override
+			public Effect[] getEffects() {
+				return new Effect[] { effect };
+			}
+			
+			@Override
+			public Value call(Value v) {
+				return null;
+			}
+		});
+	}
+	
+	public ValueEffect (Value parent, Value ... effects) {
 		this.parent = unwrap(parent);
 		this.effects = effects;
-	}
-	
-	public ValueEffect (Value parent, Effect[] inherit, Effect ... effects) {
-		this.parent = unwrap(parent);
-		this.effects = Effect.join(inherit, effects);
-	}
-	
-	public ValueEffect (Value parent, Effect[] ... effects) {
-		this.parent = unwrap(parent);
-		this.effects = Effect.join(effects);
 	}
 	
 	private Value unwrap (Value p) {
@@ -37,29 +54,35 @@ public class ValueEffect implements Value{
 	@Override
 	public Value call(Value v) {
 		Value c = this.parent.call(v);
-		return new ValueEffect(c, this.getEffects(), c.getEffects());
+		return new ValueEffect(c, this, c);
 	}
 	
 	@Override
 	public Value getID(Getter getter) {
 		Value c = this.parent.getID(getter);
-		return new ValueEffect(c, this.getEffects(), c.getEffects());
+		return c;//new ValueEffect(c, this, c);
 	}
 	
 	@Override
 	public Value resolve(ValueProbe probe, Value value) {
-		Value c = this.parent.resolve(probe, value);
+		Value[] resolved = new Value[this.effects.length];
 		
-		return new ValueEffect(c, this.getEffects(), c.getEffects());
+		for (int i = 0; i < this.effects.length; i++) {
+			resolved[i] = this.effects[i].resolve(probe, value);
+		}
+		
+		return new ValueEffect(this.parent.resolve(probe, value), resolved);
 	}
 	
 	@Override
 	public Effect[] getEffects() {
-		return this.effects;
-	}
-	
-	public Value getParent () {
-		return this.parent;
+		Effect[][] effects = new Effect[this.effects.length][];
+		
+		for (int i = 0; i < this.effects.length; i++) {
+			effects[i] = this.effects[i].getEffects();
+		}
+		
+		return Effect.join(effects);
 	}
 	
 	@Override
@@ -77,22 +100,10 @@ public class ValueEffect implements Value{
 	}
 	
 	public static Value wrap (Value v, Value v2) {
-		Effect[] effects = v.getEffects();
-		
-		if (effects.length == 0) {
-			return v2;
-		}else {
-			return new ValueEffect(v2, effects, v2.getEffects());
-		}
+		return new ValueEffect(v2, v, v2);
 	}
 	
 	public static Value clear (Value v) {
-		Effect[] effects = v.getEffects();
-		
-		if (effects.length == 0) {
-			return v;
-		}else {
-			return new ValueEffect(v);
-		}
+		return new ValueEffect(v);
 	}
 }

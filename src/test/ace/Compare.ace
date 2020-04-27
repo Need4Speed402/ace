@@ -1,0 +1,78 @@
+test {
+	name 'basic test succcess'
+	case {
+		[console] (
+			[compare] a a true false
+		)
+	}
+	expect "
+		true
+		
+	`"
+}
+
+test {
+	name 'basic test fail'
+	case {
+		[console] (
+			[compare] a b true false
+		)
+	}
+	expect "
+		false
+		
+	`"
+}
+
+test {
+	name 'effects in single identifier'
+	case {
+		[compare] ([console] hello)
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'effects in compared identifiers'
+	case {
+		[compare] ([console] hello) ([console] world)
+	}
+	expect "
+		hello
+		world
+		
+	`"
+}
+
+test {
+	name 'effects in compared identifiers success'
+	case {
+		[console] (
+			[compare] ([console] hello) ([console] hello) true false
+		)
+	}
+	expect "
+		hello
+		hello
+		true
+		
+	`"
+}
+
+test {
+	name 'effects in compared identifiers failure'
+	case {
+		[console] (
+			[compare] ([console] hello) ([console] world) true false
+		)
+	}
+	expect "
+		hello
+		world
+		false
+		
+	`"
+}

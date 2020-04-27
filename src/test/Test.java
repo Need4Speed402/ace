@@ -9,6 +9,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
 import parser.Color;
+import parser.Packages;
 import parser.ParserException;
 import parser.Stream;
 import parser.token.Token;
@@ -163,6 +164,7 @@ public class Test {
 				
 				if ((current.value & 0xFF) == '\n') {
 					b.append(padding);
+					b.append(Color.delimiter).append('[').append(lastClass).append("m");
 				}
 				
 				current = current.next;
@@ -197,13 +199,17 @@ public class Test {
 	public static void test (Test[] tests) {
 		TestList failed = new TestList();
 		
+		long start = System.nanoTime();
+		
 		for (int i = 0; i < tests.length; i++) {
 			if (!tests[i].isSuccessful()) {
 				failed.push(tests[i]);
 			}
 		}
 		
-		System.out.println(Color.green(Integer.toString(tests.length - failed.size())) + " passed and " + Color.red(Integer.toString(failed.size())) + " failed");
+		long duration = System.nanoTime() - start;
+		
+		System.out.println(Color.green(Integer.toString(tests.length - failed.size())) + " passed and " + Color.red(Integer.toString(failed.size())) + " failed in " + Packages.formatTime(duration));
 		
 		for (Test test : failed) {
 			System.out.println(Color.bgRed(Color.white(" FAILED ")) + Color.bgBlack(new TokenString(test.getName()).toString()));

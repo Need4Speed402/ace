@@ -10,6 +10,18 @@ test {
 }
 
 test {
+	name 'effects in print message'
+	case {
+		[console] ([console] hello)
+	}
+	expect "
+		hello
+		hello
+		
+	`"
+}
+
+test {
 	name 'print inside function'
 	case {
 		[root Function] void {
@@ -47,6 +59,17 @@ test {
 	expect "
 		hello
 		world
+		
+	`"
+}
+
+test {
+	name 'effects in function name'
+	case {
+		[root Function] ([console] hello)
+	}
+	expect "
+		hello
 		
 	`"
 }
@@ -161,7 +184,7 @@ test {
 }
 
 test {
-	name "complex thing that dosen't work`"
+	name 'nested effects with indirection'
 	case {
 		[root Function] message {
 			[root Function] void {
