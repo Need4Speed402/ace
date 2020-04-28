@@ -1,5 +1,7 @@
 package value;
 
+import java.util.Arrays;
+
 import value.effect.Effect;
 
 public class ValueEffect implements Value{
@@ -11,31 +13,11 @@ public class ValueEffect implements Value{
 	}
 	
 	public ValueEffect(Value parent, Effect ... effects) {
-		this(parent, new Value () {
-			@Override
-			public Effect[] getEffects() {
-				return effects;
-			}
-			
-			@Override
-			public Value call(Value v) {
-				return null;
-			}
-		});
+		this(parent, new EffectWrapper(effects));
 	}
 	
 	public ValueEffect(Value parent, Value inherit, Effect effect) {
-		this(parent, inherit, new Value () {
-			@Override
-			public Effect[] getEffects() {
-				return new Effect[] { effect };
-			}
-			
-			@Override
-			public Value call(Value v) {
-				return null;
-			}
-		});
+		this(parent, inherit, new EffectWrapper(new Effect[] {effect}));
 	}
 	
 	public ValueEffect (Value parent, Value ... effects) {
@@ -65,13 +47,18 @@ public class ValueEffect implements Value{
 	
 	@Override
 	public Value resolve(ValueProbe probe, Value value) {
+		Value c = this.parent.resolve(probe, value);
 		Value[] resolved = new Value[this.effects.length];
 		
 		for (int i = 0; i < this.effects.length; i++) {
-			resolved[i] = this.effects[i].resolve(probe, value);
+			if (this.effects[i] == this.parent) {
+				resolved[i] = c;
+			}else {
+				resolved[i] = this.effects[i].resolve(probe, value);
+			}
 		}
 		
-		return new ValueEffect(this.parent.resolve(probe, value), resolved);
+		return new ValueEffect(c, resolved);
 	}
 	
 	@Override
@@ -105,5 +92,28 @@ public class ValueEffect implements Value{
 	
 	public static Value clear (Value v) {
 		return new ValueEffect(v);
+	}
+	
+	private static class EffectWrapper implements Value {
+		private final Effect[] effects;
+		
+		public EffectWrapper(Effect[] effects) {
+			this.effects = effects;
+		}
+		
+		@Override
+		public Effect[] getEffects() {
+			return this.effects;
+		}
+		
+		@Override
+		public Value call(Value v) {
+			throw new RuntimeException("EffectWrapper is only used for its effects, this cannot be called");
+		}
+		
+		@Override
+		public String toString() {
+			return super.toString() + " " + Arrays.toString(this.effects);
+		}
 	}
 }

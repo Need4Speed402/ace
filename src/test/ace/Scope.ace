@@ -1,0 +1,63 @@
+test {
+	name 'test [root Scope]'
+	case {
+		[root Scope] {
+			[console] hello
+		}
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'nested [root Scope]'
+	case {
+		[root Scope] {
+			[root Scope] {
+				[root Scope] {
+					[root Scope] {
+						[console] hello
+					}
+				}
+			}
+		}
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name '[root Scope] preserving identifier'
+	case {
+		[console] ([root Scope] {
+			hello
+		})
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name '[root Scope] preserving identifier nested'
+	case {
+		[console] ([root Scope] {
+			[root Scope] {
+				[root Scope] {
+					[root Scope] {
+						hello
+					}
+				}
+			}
+		})
+	}
+	expect "
+		hello
+		
+	`"
+}

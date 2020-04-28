@@ -7,7 +7,7 @@ import value.ValueEffect;
 
 public class NodeIdentifier implements Node{
 	private static int counter = 0;
-	public final static Value NULL = p -> new ValueEffect(NodeIdentifier.NULL, p.getEffects());
+	public final static Value NULL = p -> new ValueEffect(NodeIdentifier.NULL, p);
 	
 	public final int id;
 

@@ -58,11 +58,7 @@ public class Test {
 		return this.result;
 	}
 	
-	public static Test[] parseTest (File file) throws IOException {
-		return parseTest(file.getName(), new TokenBase(new Stream(new FileInputStream(file))));
-	}
-	
-	public static Test[] parseTest (String defName, TokenBlock scope) throws IOException {
+	public static Test[] parseTest (String defName, TokenBlock scope) {
 		Token[] tokens = scope.getElements();
 		
 		TokenScope testCase = null;
@@ -112,20 +108,20 @@ public class Test {
 		return list.toArray();
 	}
 	
-	public static Test[] directory (File directory) throws IOException{
-		File[] files = directory.listFiles();
-		
-		TestList list = new TestList();
-		
-		for (File f : files) {
-			if (f.isDirectory()) {
+	public static Test[] directory (File file) throws IOException{
+		if (file.isDirectory()) {
+			File[] files = file.listFiles();
+			
+			TestList list = new TestList();
+			
+			for (File f : files) {
 				list.push(directory(f));
-			}else {
-				list.push(parseTest(f));
 			}
+			
+			return list.toArray();
+		}else {
+			return Test.parseTest(file.getName(), new TokenBase(new Stream(new FileInputStream(file))));
 		}
-		
-		return list.toArray();
 	}
 	
 	private static class SLink {

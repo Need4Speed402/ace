@@ -1,5 +1,6 @@
 package value;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 import parser.token.resolver.Unsafe;
@@ -36,11 +37,6 @@ public class ValueDefaultEnv implements Value {
 			@Override
 			public Value getID (Getter getter) {
 				return name.getID(getter);
-			}
-			
-			@Override
-			public Value resolve(ValueProbe probe, Value value) {
-				return value.resolve(probe, value);
 			}
 			
 			@Override

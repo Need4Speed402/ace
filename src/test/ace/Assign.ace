@@ -1,7 +1,52 @@
 test {
 	name 'effects in assign name'
 	case {
-		[assign] (console hello)
+		[assign] ([console] hello)
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'effects in assign value'
+	case {
+		[assign] void ([console] hello)
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'effects in assign name and value'
+	case {
+		[assign] ([console] hello) ([console] world)
+	}
+	expect "
+		hello
+		world
+		
+	`"
+}
+
+test {
+	name 'assign inherits value correctly'
+	case {
+		[console] ([assign] hello world)
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'assign still inhibits behavior of value'
+	case {
+		[root Scope] ([assign] hello {[console] hello})
 	}
 	expect "
 		hello

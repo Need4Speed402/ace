@@ -13,6 +13,8 @@ public interface Effect {
 			len += arrays[i].length;
 		}
 		
+		if (len == 0) return Value.NO_EFFECTS;
+		
 		Effect[] effects = new Effect[len];
 		
 		int offset = 0;

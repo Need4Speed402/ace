@@ -1,0 +1,51 @@
+test {
+	name 'basic identity'
+	case {
+		{
+			[console] hello
+		} [root Procedure]
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'basic identity nested'
+	case {
+		{
+			{
+				{
+					{
+						[console] hello
+					} [root Procedure]
+				} [root Procedure]
+			} [root Procedure]
+		} [root Procedure]
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'basic identity nested with do'
+	case {
+		{
+			[root ``] ([console] hello) ({
+				{
+					{
+						[console] world
+					} [root Procedure]
+				} [root Procedure]
+			} [root Procedure])
+		} [root Procedure]
+	}
+	expect "
+		hello
+		world
+		
+	`"
+}
