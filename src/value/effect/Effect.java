@@ -4,6 +4,8 @@ import value.Value;
 import value.ValueEffect;
 
 public interface Effect {
+	public final Effect[] NO_EFFECTS = new Effect [] {};
+	
 	public Value run (Runtime runtime, Value root);
 	
 	public static Effect[] join (Effect[] ... arrays) {
@@ -13,7 +15,7 @@ public interface Effect {
 			len += arrays[i].length;
 		}
 		
-		if (len == 0) return Value.NO_EFFECTS;
+		if (len == 0) return NO_EFFECTS;
 		
 		Effect[] effects = new Effect[len];
 		
@@ -31,11 +33,14 @@ public interface Effect {
 	}
 	
 	public static Value runAll (Runtime runtime, Value root) {
-		Effect[] effects = root.getEffects();
-		root = ValueEffect.clear(root);
-		
-		for (int i = 0; i < effects.length; i++) {
-			root = effects[i].run(runtime, root);
+		if (root instanceof ValueEffect) {
+			Effect[] effects = ((ValueEffect) root).getEffects();
+			
+			root = ValueEffect.clear(root);
+			
+			for (int i = 0; i < effects.length; i++) {
+				root = effects[i].run(runtime, root);
+			}
 		}
 		
 		return root;

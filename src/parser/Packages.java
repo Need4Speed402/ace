@@ -23,17 +23,22 @@ public class Packages {
 	public static long RUN_TIME = 0;
 	
 	public static String formatTime (long time) {
+		String error = Double.toString((time % 1000000L) / 1000000.0);
+		
 		String out = Long.toString(time / 1000000L);
 		
 		for (int i = out.length() - 3; i > 0; i -= 3) {
 			out = out.substring(0, i) + ',' + out.substring(i);
 		}
 		
-		return out + " ms";
+		return out + error.substring(1, Math.min(error.length(), 4)) + " ms";
 	}
 	
 	public static void main(String[] args) throws IOException{
-		if (args.length == 1) {
+		if (args.length == 0) {
+			System.out.println("No input");
+			return;
+		}else if (args.length == 1) {
 			args = new String[] {"run", args[0]};
 		}
 		

@@ -6,67 +6,63 @@ import value.effect.Effect;
 
 public class ValueEffect implements Value{
 	private final Value parent;
-	private final Value[] effects;
+	private final EffectNode effects;
 	
 	public ValueEffect(Value parent) {
-		this(parent, new Value[] {});
+		this(parent, (EffectNode) null);
 	}
 	
 	public ValueEffect(Value parent, Effect ... effects) {
-		this(parent, new EffectWrapper(effects));
+		this(parent, new EffectNodeList(null, effects));
 	}
 	
-	public ValueEffect(Value parent, Value inherit, Effect effect) {
-		this(parent, inherit, new EffectWrapper(new Effect[] {effect}));
+	public ValueEffect(Value parent, Value ... values) {
+		this(parent, EffectNodeValue.create(null, values));
 	}
 	
-	public ValueEffect (Value parent, Value ... effects) {
-		this.parent = unwrap(parent);
-		this.effects = effects;
+	public ValueEffect(Value parent, Value value, Effect effect) {
+		this(parent, EffectNodeValue.create(new EffectNodeList(null, new Effect[] {effect}), value));
 	}
 	
-	private Value unwrap (Value p) {
-		while (p instanceof ValueEffect) {
-			p = ((ValueEffect) p).parent;
-		}
+	private ValueEffect (Value parent, EffectNode effects) {
+		if (parent instanceof ValueEffect) throw new RuntimeException("ValueEffect cannot inherit from another ValueEffect");
 		
-		return p;
+		this.parent = parent;
+		this.effects = effects;
 	}
 	
 	@Override
 	public Value call(Value v) {
 		Value c = this.parent.call(v);
-		return new ValueEffect(c, this, c);
+		return new ValueEffect(clear(c), this, c);
 	}
 	
 	@Override
 	public Value getID(Getter getter) {
 		Value c = this.parent.getID(getter);
-		return c;//new ValueEffect(c, this, c);
+		return new ValueEffect(clear(c), this, c);
 	}
 	
 	@Override
 	public Value resolve(ValueProbe probe, Value value) {
 		Value c = this.parent.resolve(probe, value);
-		Value[] resolved = new Value[this.effects.length];
 		
-		for (int i = 0; i < this.effects.length; i++) {
-			if (this.effects[i] == this.parent) {
-				resolved[i] = c;
-			}else {
-				resolved[i] = this.effects[i].resolve(probe, value);
-			}
+		if (this.effects == null) {
+			return new ValueEffect(c);
+		}else {
+			return new ValueEffect(c, this.effects.resolve(probe, value));
 		}
-		
-		return new ValueEffect(c, resolved);
 	}
 	
-	@Override
 	public Effect[] getEffects() {
+		if (this.effects == null) return Effect.NO_EFFECTS;
+		
 		Effect[][] effects = new Effect[this.effects.length][];
+		EffectNode current = this.effects;
 		
 		for (int i = 0; i < this.effects.length; i++) {
-			effects[i] = this.effects[i].getEffects();
+			effects[i] = current.getEffects();
+			current = current.next;
 		}
 		
 		return Effect.join(effects);
@@ -76,44 +72,126 @@ public class ValueEffect implements Value{
 	public String toString() {
 		StringBuilder b = new StringBuilder();
 		b.append(super.toString() + "\n|-");
-		ValueProbe.append(this.parent.toString(), this.effects.length == 0 ? "  " : "| ", b);
+		ValueProbe.append(this.parent.toString(), this.effects == null ? "  " : "| ", b);
 		
-		for (int i = 0; i < this.effects.length; i++) {
+		EffectNode current = this.effects;
+		
+		while (current != null) {
 			b.append("\n|-");
-			ValueProbe.append(this.effects[i].toString(), i + 1 == this.effects.length ? "  " : "| ", b);
+			ValueProbe.append(current.toString(), current.next == null ? "  " : "| ", b);
+			current = current.next;
 		}
 		
 		return b.toString();
 	}
 	
 	public static Value wrap (Value v, Value v2) {
-		return new ValueEffect(v2, v, v2);
+		if (v instanceof ValueEffect) {
+			return new ValueEffect(clear(v2), v, v2);
+		}else {
+			return v2;
+		}
 	}
 	
 	public static Value clear (Value v) {
-		return new ValueEffect(v);
+		if (v instanceof ValueEffect) {
+			return ((ValueEffect) v).parent;
+		}else {
+			return v;
+		}
 	}
 	
-	private static class EffectWrapper implements Value {
-		private final Effect[] effects;
+	private static abstract class EffectNode {
+		public final EffectNode next;
+		private final int length;
 		
-		public EffectWrapper(Effect[] effects) {
-			this.effects = effects;
+		public EffectNode (EffectNode next) {
+			this.next = next;
+			this.length = (this.next == null ? 0 : this.next.length) + 1;
+		}
+		
+		public abstract Effect[] getEffects();
+		public abstract EffectNode resolve (ValueProbe probe, Value value);
+		public abstract EffectNode rebind (EffectNode root);
+	}
+	
+	private static class EffectNodeValue extends EffectNode {
+		public final Value value;
+		
+		public EffectNodeValue (EffectNode next, Value value) {
+			super(next);
+			this.value = value;
+		}
+		
+		@Override
+		public EffectNode resolve(ValueProbe probe, Value value) {
+			return EffectNodeValue.create(this.next == null ? null : this.next.resolve(probe, value), this.value.resolve(probe, value));
+		}
+		
+		@Override
+		public EffectNode rebind(EffectNode root) {
+			return new EffectNodeValue(this.next == null ? root : this.next.rebind(root), this.value);
 		}
 		
 		@Override
 		public Effect[] getEffects() {
-			return this.effects;
+			if (this.value instanceof ValueEffect) {
+				return ((ValueEffect) this.value).getEffects();
+			}else {
+				return Effect.NO_EFFECTS;
+			}
 		}
 		
-		@Override
-		public Value call(Value v) {
-			throw new RuntimeException("EffectWrapper is only used for its effects, this cannot be called");
+		public static EffectNode create (EffectNode current, Value ... values) {
+			for (int i = values.length - 1; i >= 0; i--) {
+				if (values[i] instanceof ValueEffect) {
+					EffectNode inode = ((ValueEffect) values[i]).effects;
+					
+					if (current == null) {
+						current = inode;
+					}else if (inode != null) {
+						current = inode.rebind(current);
+					}
+				}else {
+					current = new EffectNodeValue(current, values[i]);
+				}
+			}
+			
+			return current;
 		}
 		
 		@Override
 		public String toString() {
-			return super.toString() + " " + Arrays.toString(this.effects);
+			return this.value.toString();
+		}
+	}
+	
+	public static class EffectNodeList extends EffectNode {
+		public final Effect[] list;
+		
+		public EffectNodeList (EffectNode node, Effect[] list) {
+			super(node);
+			this.list = list;
+		}
+		
+		@Override
+		public EffectNode resolve(ValueProbe probe, Value value) {
+			return new EffectNodeList(this.next == null ? null : this.next.resolve(probe, value), this.list);
+		}
+		
+		@Override
+		public EffectNode rebind(EffectNode root) {
+			return new EffectNodeList(this.next == null ? root : this.next.rebind(root), this.list);
+		}
+		
+		@Override
+		public Effect[] getEffects() {
+			return this.list;
+		}
+		
+		@Override
+		public String toString() {
+			return Arrays.toString(this.list);
 		}
 	}
 }

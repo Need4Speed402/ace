@@ -27,11 +27,18 @@ public class Test {
 	private final Node body;
 	private final String expected;
 	private String result;
+	private long duration;
 	
 	public Test (String name, Node body, String expected) {
 		this.name = name;
 		this.body = body;
 		this.expected = expected;
+	}
+	
+	public long getDuration() {
+		this.getResult();
+		
+		return this.duration;
 	}
 	
 	public String getName() {
@@ -48,11 +55,19 @@ public class Test {
 	
 	public String getResult () {
 		if (this.result == null) {
-			ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-			Runtime r = new Runtime(new PrintStream(bytes));
-			ValueDefaultEnv.run(r, this.body);
-			
-			this.result = Charset.forName("UTF8").decode(ByteBuffer.wrap(bytes.toByteArray())).toString();
+			try {
+				ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+				Runtime r = new Runtime(new PrintStream(bytes));
+				
+				long start = System.nanoTime();
+				ValueDefaultEnv.run(r, this.body);
+				
+				this.duration = System.nanoTime() - start;
+				this.result = Charset.forName("UTF8").decode(ByteBuffer.wrap(bytes.toByteArray())).toString();
+			}catch (Throwable e) {
+				e.printStackTrace();
+				this.result = e.toString();
+			}
 		}
 		
 		return this.result;
@@ -195,25 +210,27 @@ public class Test {
 	public static void test (Test[] tests) {
 		TestList failed = new TestList();
 		
-		long start = System.nanoTime();
+		long time = 0;
 		
-		for (int i = 0; i < tests.length; i++) {
-			if (!tests[i].isSuccessful()) {
-				failed.push(tests[i]);
+		for (Test test : tests) {
+			if (!test.isSuccessful()) {
+				failed.push(test);
+			}else {
+				System.out.println(Color.bgGreen(Color.white(" PASSED ")) + new TokenString(test.getName()).toString() + " in " + Packages.formatTime(test.getDuration()));
 			}
+			
+			time += test.getDuration();
 		}
-		
-		long duration = System.nanoTime() - start;
-		
-		System.out.println(Color.green(Integer.toString(tests.length - failed.size())) + " passed and " + Color.red(Integer.toString(failed.size())) + " failed in " + Packages.formatTime(duration));
 		
 		for (Test test : failed) {
-			System.out.println(Color.bgRed(Color.white(" FAILED ")) + Color.bgBlack(new TokenString(test.getName()).toString()));
+			System.out.println(Color.bgRed(Color.white(" FAILED ")) + new TokenString(test.getName()).toString() + " in " + Packages.formatTime(test.getDuration()));
 			System.out.println(dif(test.getExpected(), test.getResult(), 0, 0).toString(Color.bgRed(" ") + " "));
 		}
+		
+		System.out.println(Color.green(Integer.toString(tests.length - failed.size())) + " passed and " + Color.red(Integer.toString(failed.size())) + " failed in " + Packages.formatTime(time));
 	}
 	
-	public static void test (File directory) throws IOException{
+	public static void test (File directory) throws IOException {
 		test(directory(directory));
 	}
 }

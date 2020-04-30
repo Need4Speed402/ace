@@ -1,10 +1,6 @@
 package value;
 
-import value.effect.Effect;
-
 public interface Value {
-	public final Effect[] NO_EFFECTS = new Effect [] {};
-	
 	public Value call (Value v);
 	
 	public default Value getID (Getter getter) {
@@ -13,10 +9,6 @@ public interface Value {
 	
 	public default Value resolve (ValueProbe probe, Value value) {
 		return this;
-	}
-	
-	public default Effect[] getEffects () {
-		return NO_EFFECTS;
 	}
 	
 	public interface Getter {

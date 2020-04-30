@@ -1,6 +1,8 @@
 package value;
 
-import java.util.Arrays;
+import static value.ValueEffect.clear;
+import static value.ValueEffect.wrap;
+
 import java.util.HashMap;
 
 import parser.token.resolver.Unsafe;
@@ -18,17 +20,17 @@ public class ValueDefaultEnv implements Value {
 	public static final Value FALSE = p1 -> p2 -> p2;
 	
 	private ValueDefaultEnv () {
-		this.put(Unsafe.COMPARE, v1 -> ValueEffect.wrap(v1, v2 -> {
-			return ValueEffect.wrap(v2, v1.getID(v1id -> v2.getID(v2id -> {
+		this.put(Unsafe.COMPARE, v1 -> wrap(v1, v2 -> {
+			return wrap(v2, clear(v1).getID(v1id -> clear(v2).getID(v2id -> {
 				return v1id == v2id ? TRUE : FALSE;
 			})));
 		}));
 		
-		this.put(Unsafe.FUNCTION, ident -> ValueEffect.wrap(ident, ident.getID(identid -> body -> {
-			return ValueEffect.wrap(body, new ValueFunction(probe -> body.call(penv -> penv.getID(envid -> identid == envid ? probe : penv))));
-		})));
+		this.put(Unsafe.FUNCTION, ident -> ident.getID(identid -> body -> {
+			return wrap(body, new ValueFunction(probe -> clear(body).call(penv -> penv.getID(envid -> identid == envid ? probe : penv))));
+		}));
 		
-		this.put(Unsafe.ASSIGN, name -> ValueEffect.wrap(name, value -> ValueEffect.wrap(value, new Value () {
+		this.put(Unsafe.ASSIGN, name -> wrap(name, value -> ValueEffect.wrap(value, new Value () {
 			@Override
 			public Value call (Value v) {
 				return value.call(v);
@@ -59,7 +61,7 @@ public class ValueDefaultEnv implements Value {
 		
 		this.put(Unsafe.CONSOLE, p -> {
 			return p.getID(id -> {
-				return new ValueEffect(p, p, new EffectPrint(NodeIdentifier.asString(id)));
+				return new ValueEffect(clear(p), new EffectPrint(NodeIdentifier.asString(id)));
 			});
 		});
 	}
@@ -83,6 +85,8 @@ public class ValueDefaultEnv implements Value {
 		/*Value probe = new ValueProbe();
 		System.out.println(probe);
 		System.out.println(root.run(probe));*/
+		
+		//System.out.println(root.run(instance));
 		
 		Effect.runAll(runtime, root.run(instance));
 	}

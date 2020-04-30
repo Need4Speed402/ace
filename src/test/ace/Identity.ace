@@ -12,6 +12,25 @@ test {
 }
 
 test {
+	name 'basic identity nested preserve identifier'
+	case {
+		[console] ({
+			{
+				{
+					{
+						hello
+					} [root Procedure]
+				} [root Procedure]
+			} [root Procedure]
+		} [root Procedure])
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
 	name 'basic identity nested'
 	case {
 		{

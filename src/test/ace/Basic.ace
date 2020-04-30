@@ -64,6 +64,33 @@ test {
 }
 
 test {
+	name 'environment alias'
+	case {
+		{
+			hello
+		} [console]
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'environment alias multiple'
+	case {
+		{
+			hello world
+		} [console]
+	}
+	expect "
+		hello
+		world
+		
+	`"
+}
+
+test {
 	name 'effects in function name'
 	case {
 		[root Function] ([console] hello)
@@ -95,6 +122,20 @@ test {
 		
 	`"
 }
+
+test {
+	name 'multiple effects in environment'
+	case {
+		{void void void} ([console] hello)
+	}
+	expect "
+		hello
+		hello
+		hello
+		
+	`"
+}
+
 
 test {
 	name 'effects in enviroment call'
