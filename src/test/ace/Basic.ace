@@ -115,7 +115,7 @@ test {
 test {
 	name 'effects in environment'
 	case {
-		{void} ([console] hello)
+		{void} ([root Function] void {[console] hello})
 	}
 	expect "
 		hello
@@ -126,7 +126,7 @@ test {
 test {
 	name 'multiple effects in environment'
 	case {
-		{void void void} ([console] hello)
+		{void void void} ([root Function] void {[console] hello})
 	}
 	expect "
 		hello
@@ -136,6 +136,16 @@ test {
 	`"
 }
 
+test {
+	name 'single effect used multiple times'
+	case {
+		{void void void} ([console] hello)
+	}
+	expect "
+		hello
+		
+	`"
+}
 
 test {
 	name 'effects in enviroment call'
