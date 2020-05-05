@@ -98,7 +98,7 @@ public class ValueProbe implements Value {
 		public Value resolve(ValueProbe probe, Value value) {
 			Value ret = this.parent.resolve(probe, value).getID(this.getter);
 			
-			if (!(ret instanceof ValueProbe)) {
+			if (!(ret instanceof Identifier)) {
 				ret = ret.resolve(probe, value);
 			}
 			
