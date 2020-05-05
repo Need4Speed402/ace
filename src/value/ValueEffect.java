@@ -33,30 +33,32 @@ public class ValueEffect implements Value{
 	
 	@Override
 	public Value call(Value v) {
-		Value c = this.parent.call(v);
-		return new ValueEffect(clear(c), this, c);
+		Value c = this.parent.call(clear(v));
+		
+		return new ValueEffect(clear(c), this, v, c);
 	}
 	
 	@Override
 	public Value getID(Getter getter) {
 		Value c = this.parent.getID(getter);
+		
 		return new ValueEffect(clear(c), this, c);
 	}
 	
 	@Override
 	public Value resolve(ValueProbe probe, Value value) {
-		Value c = this.parent.resolve(probe, value);
+		Value pr = clear(this.parent.resolve(probe, value));
 		
 		if (this.effects == null) {
-			return new ValueEffect(c);
+			return new ValueEffect(pr);
 		}else {
-			return new ValueEffect(c, this.effects.resolve(probe, value));
+			return new ValueEffect(pr, this.effects.resolve(probe, value));
 		}
 	}
 	
+	@Override
 	public Effect[] getEffects() {
 		if (this.effects == null) return Effect.NO_EFFECTS;
-		
 		Effect[][] effects = new Effect[this.effects.length][];
 		EffectNode current = this.effects;
 		
@@ -86,19 +88,24 @@ public class ValueEffect implements Value{
 	}
 	
 	public static Value wrap (Value v, Value v2) {
-		if (v instanceof ValueEffect) {
+		if (v instanceof ValueEffect || v instanceof ValueProbe) {
 			return new ValueEffect(clear(v2), v, v2);
 		}else {
+			//return new ValueEffect(clear(v2), v2);
 			return v2;
 		}
 	}
 	
 	public static Value clear (Value v) {
 		if (v instanceof ValueEffect) {
-			return ((ValueEffect) v).parent;
-		}else {
-			return v;
+			v = ((ValueEffect) v).parent;
 		}
+		
+		if (v instanceof ValueProbe) {
+			v = ((ValueProbe) v).clear();
+		}
+		
+		return v;
 	}
 	
 	private static abstract class EffectNode {
@@ -135,11 +142,7 @@ public class ValueEffect implements Value{
 		
 		@Override
 		public Effect[] getEffects() {
-			if (this.value instanceof ValueEffect) {
-				return ((ValueEffect) this.value).getEffects();
-			}else {
-				return Effect.NO_EFFECTS;
-			}
+			return this.value.getEffects();
 		}
 		
 		public static EffectNode create (EffectNode current, Value ... values) {

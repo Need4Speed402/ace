@@ -1,5 +1,7 @@
 package value;
 
+import value.effect.Effect;
+
 public interface Value {
 	public Value call (Value v);
 	
@@ -9,6 +11,10 @@ public interface Value {
 	
 	public default Value resolve (ValueProbe probe, Value value) {
 		return this;
+	}
+	
+	public default Effect[] getEffects () {
+		return Effect.NO_EFFECTS;
 	}
 	
 	public interface Getter {

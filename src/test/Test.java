@@ -66,7 +66,7 @@ public class Test {
 				this.result = Charset.forName("UTF8").decode(ByteBuffer.wrap(bytes.toByteArray())).toString();
 			}catch (Throwable e) {
 				e.printStackTrace();
-				this.result = e.toString();
+				this.result = "";
 			}
 		}
 		
@@ -225,6 +225,7 @@ public class Test {
 		for (Test test : failed) {
 			System.out.println(Color.bgRed(Color.white(" FAILED ")) + new TokenString(test.getName()).toString() + " in " + Packages.formatTime(test.getDuration()));
 			System.out.println(dif(test.getExpected(), test.getResult(), 0, 0).toString(Color.bgRed(" ") + " "));
+			//System.out.println(test.getResult());
 		}
 		
 		System.out.println(Color.green(Integer.toString(tests.length - failed.size())) + " passed and " + Color.red(Integer.toString(failed.size())) + " failed in " + Packages.formatTime(time));

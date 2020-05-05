@@ -33,16 +33,14 @@ public interface Effect {
 	}
 	
 	public static Value runAll (Runtime runtime, Value root) {
-		if (root instanceof ValueEffect) {
-			Effect[] effects = ((ValueEffect) root).getEffects();
-			
-			root = ValueEffect.clear(root);
-			
-			for (int i = 0; i < effects.length; i++) {
-				root = effects[i].run(runtime, root);
-			}
-		}
+		Effect[] effects = root.getEffects();
 		
+		root = ValueEffect.clear(root);
+		
+		for (int i = 0; i < effects.length; i++) {
+			root = effects[i].run(runtime, root);
+		}
+				
 		return root;
 	}
 }

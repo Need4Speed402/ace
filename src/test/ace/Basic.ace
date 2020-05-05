@@ -91,6 +91,30 @@ test {
 }
 
 test {
+	name 'calling function that was passed to console'
+	case {
+		([console] ([root Function] void {[console] hello})) void
+	}
+	expect "
+		0
+		hello
+		
+	`"
+}
+
+test {
+	name 'calling function that was passed to console with indirection'
+	case {
+		([console] ([root Function] message {[console] message})) hello
+	}
+	expect "
+		0
+		hello
+		
+	`"
+}
+
+test {
 	name 'effects in function name'
 	case {
 		[root Function] ([console] hello)

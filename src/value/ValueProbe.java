@@ -10,6 +10,19 @@ public class ValueProbe implements Value {
 		}
 	}
 	
+	public Value clear () {
+		ValueProbe parent = this;
+		
+		return new ValueProbe () {
+			@Override
+			public Value resolve(ValueProbe probe, Value value) {
+				Value v = parent.resolve(probe, value);
+				
+				return ValueEffect.clear(v);
+			}
+		};
+	}
+	
 	@Override
 	public Value call (Value arg) {
 		return new Call(this, arg);
@@ -55,9 +68,9 @@ public class ValueProbe implements Value {
 		public Value resolve(ValueProbe probe, Value value) {
 			Value ret = this.parent.resolve(probe, value).call(this.argument.resolve(probe, value));
 			
-			if (!(ret instanceof ValueProbe)) {
+			/*if (!(ret instanceof ValueProbe)) {
 				ret = ret.resolve(probe, value);
-			}
+			}*/
 			
 			return ret;
 		}
