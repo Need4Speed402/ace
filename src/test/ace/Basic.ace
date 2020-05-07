@@ -148,7 +148,7 @@ test {
 }
 
 test {
-	name 'multiple effects in environment'
+	name 'immutable effects in environment call'
 	case {
 		{void void void} ([root Function] void {[console] hello})
 	}
@@ -161,23 +161,43 @@ test {
 }
 
 test {
-	name 'single effect used multiple times'
+	name 'immutable effect, dependent effect in environment combination'
 	case {
-		{void void void} ([console] hello)
+		{one two three} ([root Function] msg {[root ``] ([console] hello) ([console] msg)})
 	}
 	expect "
+		hello
+		one
+		hello
+		two
+		hello
+		three
+		
+	`"
+}
+
+test {
+	name 'immutable effect, dependent effect in environment opposite combination'
+	case {
+		{one two three} ([root Function] msg {[root ``] ([console] msg) ([console] hello)})
+	}
+	expect "
+		one
+		hello
+		two
+		hello
+		three
 		hello
 		
 	`"
 }
 
 test {
-	name 'effects in enviroment call'
+	name 'single effect used multiple times'
 	case {
-		{lol lol} ([root Function] void {[console] hello})
+		{void void void} ([console] hello)
 	}
 	expect "
-		hello
 		hello
 		
 	`"
@@ -269,6 +289,125 @@ test {
 	}
 	expect "
 		hello
+		
+	`"
+}
+
+test {
+	name 'nested effects with indirection print last'
+	case {
+		[console] ([root Function] message {
+			[root Function] void {
+				message
+			} void
+		} hello)
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'nested function arguments'
+	case {
+		([root Function] msg1 {
+			([root Function] msg2 {
+				[console] msg1 ([console] msg2)
+			})
+		}) hello world
+	}
+	expect "
+		hello
+		world
+		
+	`"
+}
+
+test {
+	name 'nested function arguments with do'
+	case {
+		([root Function] msg1 {
+			([root Function] msg2 {
+				[root ``] ([console] msg1) ([console] msg2)
+			})
+		}) hello world
+	}
+	expect "
+		hello
+		world
+		
+	`"
+}
+
+test {
+	name 'nested function arguments print indirection'
+	case {
+		([root Function] print {
+			([root Function] msg1 {
+				([root Function] msg2 {
+					print msg1 (print msg2)
+				})
+			})
+		}) [console] hello world
+	}
+	expect "
+		hello
+		world
+		
+	`"
+}
+
+test {
+	name 'nested function arguments print indirection with do'
+	case {
+		([root Function] print {
+			([root Function] msg1 {
+				([root Function] msg2 {
+					[root ``] (print msg1) (print msg2)
+				})
+			})
+		}) [console] hello world
+	}
+	expect "
+		hello
+		world
+		
+	`"
+}
+
+test {
+	name 'nested function arguments msg indirection'
+	case {
+		([root Function] identity {
+			([root Function] msg1 {
+				([root Function] msg2 {
+					[console] (msg1 identity) ([console] (msg2 identity))
+				})
+			}) {hello} {world}
+		}) ([root Function] msg {msg})
+	}
+	expect "
+		hello
+		world
+		
+	`"
+}
+
+test {
+	name 'nested function arguments msg indirection with do'
+	case {
+		([root Function] identity {
+			([root Function] msg1 {
+				([root Function] msg2 {
+					[root ``] ([console] (msg1 identity)) ([console] (msg2 identity))
+				})
+			}) {hello} {world}
+		}) ([root Function] msg {msg})
+	}
+	expect "
+		hello
+		world
 		
 	`"
 }
