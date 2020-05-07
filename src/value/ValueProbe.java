@@ -66,23 +66,19 @@ public class ValueProbe implements Value {
 		
 		@Override
 		public Value resolve(ValueProbe probe, Value value) {
-			Value ret = this.parent.resolve(probe, value).call(this.argument.resolve(probe, value));
-			
-			/*if (!(ret instanceof ValueProbe)) {
-				ret = ret.resolve(probe, value);
-			}*/
-			
-			return ret;
+			return this.parent.resolve(probe, value).call(this.argument.resolve(probe, value));
 		}
 	}
 	
 	public static class Identifier extends ValueProbe {
 		public final Value parent;
 		public final Getter getter;
+		public final Resolve[] resolves;
 		
-		public Identifier (Value parent, Getter getter) {
+		public Identifier (Value parent, Getter getter, Resolve ... resolves) {
 			this.parent = parent;
 			this.getter = getter;
+			this.resolves = resolves;
 		}
 		
 		@Override
@@ -96,13 +92,30 @@ public class ValueProbe implements Value {
 		
 		@Override
 		public Value resolve(ValueProbe probe, Value value) {
-			Value ret = this.parent.resolve(probe, value).getID(this.getter);
+			Value presolved = this.parent.resolve(probe, value);
 			
-			if (!(ret instanceof Identifier)) {
-				ret = ret.resolve(probe, value);
+			//the parent is a probe, that means we still don't know enough info to know the id of this value.
+			if (presolved instanceof ValueProbe) {
+				return new Identifier(presolved, getter);
+			}else {
+				Value ret = presolved.getID(this.getter);
+				
+				for (int i = 0; i < this.resolves.length; i++) {
+					ret = ret.resolve(this.resolves[i].probe, this.resolves[i].value);
+				}
+				
+				return ret.resolve(probe, value);
 			}
-			
-			return ret;
+		}
+	}
+	
+	public static class Resolve {
+		public final Value value;
+		public final ValueProbe probe;
+		
+		public Resolve(ValueProbe probe, Value value) {
+			this.probe = probe;
+			this.value = value;
 		}
 	}
 }
