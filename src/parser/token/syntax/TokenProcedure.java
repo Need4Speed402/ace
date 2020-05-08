@@ -6,11 +6,15 @@ import parser.Stream;
 import parser.TokenList;
 import parser.token.Token;
 
-public abstract class TokenProcedure implements Token{
+public class TokenProcedure implements Token{
 	private Token[] tokens;
 	
 	public TokenProcedure (Token[] tokens) {
 		this.tokens = tokens;
+	}
+	
+	public TokenProcedure (Stream s, char terminator) {
+		this.tokens = readBlock(s, terminator);
 	}
 	
 	public int getLength () {

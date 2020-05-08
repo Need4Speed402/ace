@@ -94,7 +94,7 @@ public class ValueProbe implements Value {
 			
 			//the parent is a probe, that means we still don't know enough info to know the id of this value.
 			if (presolved instanceof ValueProbe) {
-				return new Identifier(presolved, getter);
+				return new Identifier(presolved, this.getter);
 			}else {
 				return presolved.getID(this.getter).resolve(probe, value);
 			}
