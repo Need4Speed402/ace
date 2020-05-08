@@ -30,7 +30,7 @@ public class ValueDefaultEnv implements Value {
 			return wrap(body, new ValueFunction(probe -> clear(body).call(penv -> penv.getID(envid -> identid == envid ? probe : penv))));
 		}));
 		
-		this.put(Unsafe.ASSIGN, name -> wrap(name, value -> ValueEffect.wrap(value, new ValueAssign(name, value))));
+		this.put(Unsafe.ASSIGN, name -> wrap(name, value -> wrap(value, new ValueAssign(clear(name), clear(value)))));
 		
 		this.put(Unsafe.MUTABLE, init -> {
 			Memory ret = new Memory();

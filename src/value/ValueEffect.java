@@ -91,7 +91,6 @@ public class ValueEffect implements Value{
 		if (v instanceof ValueEffect || v instanceof ValueProbe) {
 			return new ValueEffect(clear(v2), v, v2);
 		}else {
-			//return new ValueEffect(clear(v2), v2);
 			return v2;
 		}
 	}
@@ -102,10 +101,17 @@ public class ValueEffect implements Value{
 		}
 		
 		if (v instanceof ValueProbe) {
-			v = ((ValueProbe) v).clear();
+			Value parent = v;
+			
+			return new ValueProbe () {
+				@Override
+				public Value resolve(ValueProbe probe, Value value) {
+					return clear(parent.resolve(probe, value));
+				}
+			};
+		}else {
+			return v;
 		}
-		
-		return v;
 	}
 	
 	private static abstract class EffectNode {
