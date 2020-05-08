@@ -89,3 +89,70 @@ test {
 		
 	`"
 }
+
+test {
+	name 'assign both params from function'
+	case {
+		([root Function] param {
+			([root Function] extend {
+				[console] ([assign] param extend) [console]
+			})
+		}) hello {world}
+	}
+	expect "
+		hello
+		world
+		
+	`"
+}
+
+test {
+	name 'assign both params from function environment wrap'
+	case {
+		([root Function] param {
+			([root Function] extend {
+				[console] ([assign] param {extend}) [console]
+			})
+		}) hello world
+	}
+	expect "
+		hello
+		world
+		
+	`"
+}
+
+test {
+	name 'simple assign and compare success'
+	case {
+		[console] ([compare] ([assign] hello world) ([assign] hello world) true false)
+	}
+	expect "
+		true
+		
+	`"
+}
+
+test {
+	name 'simple assign and compare failure'
+	case {
+		[console] ([compare] ([assign] hello world) ([assign] world hello) true false)
+	}
+	expect "
+		false
+		
+	`"
+}
+
+test {
+	name 'simple assign and compare common value'
+	case {
+		[console] ([root Function] param {
+			[compare] ([assign] param void) ([assign] param void) true false
+		} hello)
+	}
+	expect "
+		true
+		
+	`"
+}

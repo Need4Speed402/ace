@@ -140,3 +140,16 @@ test {
 		
 	`"
 }
+
+test {
+	name 'compare common identifier'
+	case {
+		[console] ([root Function] param {
+			[compare] param param true false
+		} hello)
+	}
+	expect "
+		true
+		
+	`"
+}
