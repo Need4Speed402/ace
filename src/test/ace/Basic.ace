@@ -411,3 +411,113 @@ test {
 		
 	`"
 }
+
+test {
+	name 'simple callback function'
+	case {
+		([root Function] callback {
+			callback hello
+		}) [console]
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'deferred callback function'
+	case {
+		([root Function] callback {
+			callback hello
+		}) ([root Function] message {
+			[console] message
+		})
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'deferred callback function print indirection'
+	case {
+		([root Function] print {
+			([root Function] callback {
+				callback hello
+			}) ([root Function] message {
+				print message
+			})	
+		}) [console]
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'deferred callback function double print indirection'
+	case {
+		([root Function] print {
+			([root Function] callback {
+				callback hello
+			}) ([root Function] message {
+				print message
+			})	
+		}) (([root Function]) msg {
+			[console] msg
+		})
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'deferred callback function nested print indirection'
+	case {
+		([root Function] print1 {
+			([root Function] print2 {
+				([root Function] print3 {
+					([root Function] print {
+						([root Function] callback {
+							callback hello
+						}) ([root Function] message {
+							print message
+						})	
+					}) (([root Function]) msg {
+						print3 msg
+					})
+				}) (([root Function]) msg {
+					print2 msg
+				})
+			}) (([root Function]) msg {
+				print1 msg
+			})
+		}) (([root Function]) msg {
+			[console] msg
+		})
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'remap identifier'
+	case {
+		([root Function] ident {
+			([root Function] ident {
+				[console] message
+			})
+		}) message not_message
+	}
+	expect "
+		not_message
+		
+	`"
+}

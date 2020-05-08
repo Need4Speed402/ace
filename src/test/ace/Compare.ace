@@ -76,3 +76,67 @@ test {
 		
 	`"
 }
+
+test {
+	name 'compare unknown values success'
+	case {
+		[console] (([root Function] a {
+			([root Function] b {
+				[compare] a b true false
+			})
+		}) hello hello)
+	}
+	expect "
+		true
+		
+	`"
+}
+
+test {
+	name 'compare unknown values success'
+	case {
+		[console] (([root Function] a {
+			([root Function] b {
+				[compare] a b true false
+			})
+		}) hello world)
+	}
+	expect "
+		false
+		
+	`"
+}
+
+test {
+	name 'compare unknown values success compare indirection'
+	case {
+		([root Function] compare {
+			[console] (([root Function] a {
+				([root Function] b {
+					compare a b true false
+				})
+			}) hello hello)
+		}) [compare]
+	}
+	expect "
+		true
+		
+	`"
+}
+
+test {
+	name 'compare unknown values success compare indirection'
+	case {
+		([root Function] compare {
+			[console] (([root Function] a {
+				([root Function] b {
+					compare a b true false
+				})
+			}) hello world)
+		}) [compare]
+	}
+	expect "
+		false
+		
+	`"
+}
