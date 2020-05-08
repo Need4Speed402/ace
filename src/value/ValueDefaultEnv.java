@@ -30,22 +30,7 @@ public class ValueDefaultEnv implements Value {
 			return wrap(body, new ValueFunction(probe -> clear(body).call(penv -> penv.getID(envid -> identid == envid ? probe : penv))));
 		}));
 		
-		this.put(Unsafe.ASSIGN, name -> wrap(name, value -> ValueEffect.wrap(value, new Value () {
-			@Override
-			public Value call (Value v) {
-				return value.call(v);
-			}
-			
-			@Override
-			public Value getID (Getter getter) {
-				return name.getID(getter);
-			}
-			
-			@Override
-			public String toString() {
-				return "Assignment(" + name.toString() + ") -> " + value.toString();
-			}
-		})));
+		this.put(Unsafe.ASSIGN, name -> wrap(name, value -> ValueEffect.wrap(value, new ValueAssign(name, value))));
 		
 		this.put(Unsafe.MUTABLE, init -> {
 			Memory ret = new Memory();
