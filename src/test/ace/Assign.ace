@@ -53,3 +53,39 @@ test {
 		
 	`"
 }
+
+test {
+	name 'assign identifier indirection'
+	case {
+		[console] ([assign] ([root Function] void {param} void) root)
+	}
+	expect "
+		param
+		
+	`"
+}
+
+test {
+	name 'assign full test'
+	case {
+		[console] ([assign] hello {world}) [console]
+	}
+	expect "
+		hello
+		world
+		
+	`"
+}
+
+test {
+	name 'assign from function param'
+	case {
+		[console] (([root Function] param {
+			[assign] param void
+		}) stuff)
+	}
+	expect "
+		stuff
+		
+	`"
+}

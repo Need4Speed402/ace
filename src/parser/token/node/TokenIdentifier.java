@@ -1,7 +1,5 @@
 package parser.token.node;
 
-import java.util.Arrays;
-
 import parser.ParserException;
 import parser.Stream;
 import parser.token.Token;
