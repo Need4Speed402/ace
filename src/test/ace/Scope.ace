@@ -1,3 +1,17 @@
+
+test {
+	name 'print inside scope'
+	case {
+		[root Scope] {
+			[console] hello
+		}
+	}
+	expect "
+		hello
+		
+	`"
+}
+
 test {
 	name 'test [root Scope]'
 	case {

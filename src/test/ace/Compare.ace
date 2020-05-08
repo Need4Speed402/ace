@@ -93,7 +93,7 @@ test {
 }
 
 test {
-	name 'compare unknown values success'
+	name 'compare unknown values failure'
 	case {
 		[console] (([root Function] a {
 			([root Function] b {
@@ -125,7 +125,7 @@ test {
 }
 
 test {
-	name 'compare unknown values success compare indirection'
+	name 'compare unknown values failure compare indirection'
 	case {
 		([root Function] compare {
 			[console] (([root Function] a {

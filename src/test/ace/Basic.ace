@@ -35,19 +35,6 @@ test {
 }
 
 test {
-	name 'print inside scope'
-	case {
-		[root Scope] {
-			[console] hello
-		}
-	}
-	expect "
-		hello
-		
-	`"
-}
-
-test {
 	name 'function alias'
 	case {
 		[root Function] print {
@@ -156,6 +143,31 @@ test {
 		hello
 		hello
 		hello
+		
+	`"
+}
+
+test {
+	name 'multiple effects used multiple times'
+	case {
+		([root Function] do {
+			(do void)
+			(do void)
+			(do void)
+			(do void)
+		}) ([root Function] void {
+			[root ``] ([console] hello) ([console] world)
+		})
+	}
+	expect "
+		hello
+		world
+		hello
+		world
+		hello
+		world
+		hello
+		world
 		
 	`"
 }

@@ -43,7 +43,7 @@ public class TokenIdentifier implements Token{
 		
 		while (s.hasChr()) {
 			if (s.isNext(Stream.whitespace)) break;
-			if (s.isNext("[{()}]\"';".toCharArray())) break;
+			if (s.isNext("[{()}]\"'".toCharArray())) break;
 			b.append(s.chr());
 		}
 		
