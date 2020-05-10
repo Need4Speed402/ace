@@ -3,12 +3,10 @@ package value.node;
 import parser.Stream;
 import parser.token.syntax.TokenString;
 import value.Value;
-import value.ValueEffect;
+import value.ValueIdentifier;
 
 public class NodeIdentifier implements Node{
 	private static int counter = 0;
-	public final static Value NULL = p -> new ValueEffect(NodeIdentifier.NULL, p);
-	
 	public final int id;
 
 	protected NodeIdentifier() {
@@ -17,22 +15,7 @@ public class NodeIdentifier implements Node{
 	
 	@Override
 	public Value run(Value environment) {
-		return environment.call(new Value () {
-			@Override
-			public Value call(Value v) {
-				return NULL.call(v);
-			}
-			
-			@Override
-			public Value getID(Getter getter) {
-				return getter.resolved(id);
-			}
-			
-			@Override
-			public String toString() {
-				return "Identifier(" + asString(id) + ")";
-			}
-		});
+		return environment.call(new ValueIdentifier(this.id));
 	}
 	
 	@Override

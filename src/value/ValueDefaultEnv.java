@@ -6,8 +6,6 @@ import static value.ValueEffect.wrap;
 import java.util.HashMap;
 
 import parser.token.resolver.Unsafe;
-import value.effect.Effect;
-import value.effect.EffectGet;
 import value.effect.EffectPrint;
 import value.effect.EffectSet;
 import value.node.Node;
@@ -33,15 +31,12 @@ public class ValueDefaultEnv implements Value {
 		this.put(Unsafe.ASSIGN, name -> wrap(name, value -> wrap(value, new ValueAssign(clear(name), clear(value)))));
 		
 		this.put(Unsafe.MUTABLE, init -> {
-			Memory ret = new Memory();
+			ValueProbe probe = new ValueProbe();
 			
 			return new ValueEffect(v -> v
-				.call(p -> new ValueEffect(p, p, new EffectSet(ret, init)))
-				.call(p -> {
-					ValueProbe u = new ValueProbe();
-					return new ValueEffect(u, p, new EffectGet(ret, u));
-				})
-			, new EffectSet(ret, init));
+				.call(p -> new ValueEffect(p, p, new EffectSet(probe, p)))
+				.call(p -> new ValueEffect(probe, p))
+			, new EffectSet(probe, init));
 		});
 		
 		this.put(Unsafe.CONSOLE, p -> {
@@ -73,6 +68,6 @@ public class ValueDefaultEnv implements Value {
 		
 		//System.out.println(root.run(instance));
 		
-		Effect.runAll(runtime, root.run(instance));
+		runtime.run(root.run(instance));
 	}
 }

@@ -1,7 +1,5 @@
 package value;
 
-import value.effect.Effect;
-
 public interface Value {
 	public Value call (Value v);
 	
@@ -13,8 +11,8 @@ public interface Value {
 		return this;
 	}
 	
-	public default Effect[] getEffects () {
-		return Effect.NO_EFFECTS;
+	public default boolean canCreateEffects () {
+		return false;
 	}
 	
 	public interface Getter {

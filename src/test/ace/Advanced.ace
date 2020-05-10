@@ -1,0 +1,322 @@
+test {
+	name 'simple callback function'
+	case {
+		([root Function] callback {
+			callback hello
+		}) [console]
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'deferred callback function'
+	case {
+		([root Function] callback {
+			callback hello
+		}) ([root Function] message {
+			[console] message
+		})
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'deferred callback function print indirection'
+	case {
+		([root Function] print {
+			([root Function] callback {
+				callback hello
+			}) ([root Function] message {
+				print message
+			})	
+		}) [console]
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'deferred callback function double print indirection'
+	case {
+		([root Function] print {
+			([root Function] callback {
+				callback hello
+			}) ([root Function] message {
+				print message
+			})	
+		}) (([root Function]) msg {
+			[console] msg
+		})
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'deferred callback function nested print indirection'
+	case {
+		([root Function] print1 {
+			([root Function] print2 {
+				([root Function] print3 {
+					([root Function] print {
+						([root Function] callback {
+							callback hello
+						}) ([root Function] message {
+							print message
+						})	
+					}) (([root Function]) msg {
+						print3 msg
+					})
+				}) (([root Function]) msg {
+					print2 msg
+				})
+			}) (([root Function]) msg {
+				print1 msg
+			})
+		}) (([root Function]) msg {
+			[console] msg
+		})
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'remap identifier'
+	case {
+		([root Function] ident {
+			([root Function] ident {
+				[console] message
+			})
+		}) message not_message
+	}
+	expect "
+		not_message
+		
+	`"
+}
+
+test {
+	name 'remap in enviroment'
+	case {
+		{
+			stdout hello
+		} ([root Function] env {
+			[compare] env stdout [console] env
+		})
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'wrap environment'
+	case {
+		([root Function] wrap {
+			wrap {
+				[console] hello
+			} void
+		}) ([root Function] env {[root Function] void {[root Scope] env}})
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'remap in enviroment multiple'
+	case {
+		{
+			stdout hello
+			(stdouttwice world)
+		} ([root Function] env {
+			[root Scope] ([compare] env stdout {[console]} {
+				[root Scope] ([compare] env stdouttwice {
+					[root Function] message {
+						[console] message
+						([console] message)
+					}
+				} {env})
+			})
+		})
+	}
+	expect "
+		hello
+		world
+		world
+		
+	`"
+}
+
+test {
+	name 'remap in enviroment multiple with wrap'
+	case {
+		([root Function] wrap {
+			{
+				stdout hello
+				(stdouttwice world)
+			} ([root Function] env {
+				[compare] env stdout (wrap {[console]}) (
+					[compare] env stdouttwice (wrap {
+						[root Function] message {
+							[console] message
+							([console] message)
+						}
+					}) (wrap {env})
+				) void
+			})
+		}) ([root Function] env {[root Function] void {[root Scope] env}})
+	}
+	expect "
+		hello
+		world
+		world
+		
+	`"
+}
+
+test {
+	name 'remap in enviroment multiple with wrap nested'
+	case {
+		([root Function] wrap {
+			{
+				{
+					stdout hello
+					(stdouttwice world)
+				} ([root Function] env {
+					[compare] env stdouttwice (wrap {
+						[root Function] message {
+							[console] message
+							([console] message)
+						}
+					}) (wrap {env}) void
+				})
+			} ([root Function] env {
+				[compare] env stdout (wrap {[console]}) (wrap {env}) void
+			})
+		}) ([root Function] env {[root Function] void {[root Scope] env}})
+	}
+	expect "
+		hello
+		world
+		world
+		
+	`"
+}
+
+test {
+	name 'remap in enviroment multiple with wrap nested thrice'
+	case {
+		([root Function] wrap {
+			{
+				{
+					{
+						stdout hello
+						(stdouttwice world)
+						(stdoutthrice !!!)
+					} ([root Function] env {
+						[compare] env stdoutthrice (wrap {
+							[root Function] message {
+								[console] message
+								([console] message)
+								([console] message)
+							}
+						}) (wrap {env}) void
+					})
+				} ([root Function] env {
+					[compare] env stdouttwice (wrap {
+						[root Function] message {
+							[console] message
+							([console] message)
+						}
+					}) (wrap {env}) void
+				})
+			} ([root Function] env {
+				[compare] env stdout (wrap {[console]}) (wrap {env}) void
+			})
+		}) ([root Function] env {[root Function] void {[root Scope] env}})
+	}
+	expect "
+		hello
+		world
+		world
+		!!!
+		!!!
+		!!!
+		
+	`"
+}
+
+test {
+	name 'remap in enviroment multiple with wrap nested quad'
+	case {
+		([root Function] wrap {
+			{
+				{
+					{
+						{
+							stdout hello
+							(stdouttwice wide)
+							(stdoutthrice world)
+							(stdoutquad !!!)
+						} ([root Function] env {
+							[compare] env stdoutquad (wrap {
+								[root Function] message {
+									[console] message
+									([console] message)
+									([console] message)
+									([console] message)
+								}
+							}) (wrap {env}) void
+						})
+					} ([root Function] env {
+						[compare] env stdoutthrice (wrap {
+							[root Function] message {
+								[console] message
+								([console] message)
+								([console] message)
+							}
+						}) (wrap {env}) void
+					})
+				} ([root Function] env {
+					[compare] env stdouttwice (wrap {
+						[root Function] message {
+							[console] message
+							([console] message)
+						}
+					}) (wrap {env}) void
+				})
+			} ([root Function] env {
+				[compare] env stdout (wrap {[console]}) (wrap {env}) void
+			})
+		}) ([root Function] env {[root Function] void {[root Scope] env}})
+	}
+	expect "
+		hello
+		wide
+		wide
+		world
+		world
+		world
+		!!!
+		!!!
+		!!!
+		!!!
+		
+	`"
+}

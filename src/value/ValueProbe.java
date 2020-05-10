@@ -11,6 +11,11 @@ public class ValueProbe implements Value {
 	}
 	
 	@Override
+	public boolean canCreateEffects() {
+		return true;
+	}
+	
+	@Override
 	public Value call (Value arg) {
 		return new Call(this, arg);
 	}
@@ -81,10 +86,33 @@ public class ValueProbe implements Value {
 			
 			//the parent is a probe, that means we still don't know enough info to know the id of this value.
 			if (presolved instanceof ValueProbe) {
-				return new Identifier(presolved, this.getter);
-			}else {
+				return presolved.getID(this.getter);
+			} else {
+				/*
+				 * if there was enough information to resolve the id, sometimes the handler for the id can return a probe that
+				 * depends on the very thing we are resolving now. For good measure, we resolve for the information we are
+				 * currently working with.
+				 */
 				return presolved.getID(this.getter).resolve(probe, value);
 			}
+		}
+	}
+	
+	public static class Resolve {
+		public final Value value;
+		public final ValueProbe probe;
+		
+		public Resolve(ValueProbe probe, Value value) {
+			this.probe = probe;
+			this.value = value;
+		}
+		
+		public Resolve useValue (Value value) {
+			return new Resolve(this.probe, value);
+		}
+		
+		public Resolve useProbe (ValueProbe probe) {
+			return new Resolve (probe, this.value);
 		}
 	}
 }

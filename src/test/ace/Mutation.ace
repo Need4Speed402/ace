@@ -1,0 +1,122 @@
+test {
+	name 'create mutable and use value'
+	case {
+		[Mutable] hello ([root Function] set {[root Function] get {
+			[console] (get void)
+		}})
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'create mutable and use value twice'
+	case {
+		[Mutable] hello ([root Function] set {[root Function] get {
+			[console] (get void)
+			([console] (get void))
+		}})
+	}
+	expect "
+		hello
+		hello
+		
+	`"
+}
+
+test {
+	name 'create mutable reset and then use'
+	case {
+		[Mutable] hello ([root Function] set {[root Function] get {
+			[root ``] (set world) ([console] (get void))
+		}})
+	}
+	expect "
+		world
+		
+	`"
+}
+
+test {
+	name 'create mutable use reset use'
+	case {
+		[Mutable] hello ([root Function] set {[root Function] get {
+			[root ``] (set world) ([console] (get void))
+			([root ``] (set !!) ([console] (get void)))
+		}})
+	}
+	expect "
+		world
+		!!
+		
+	`"
+}
+
+test {
+	name 'two concurrent mutable instances'
+	case {
+		[Mutable] hello ([root Function] set1 {[root Function] get1 {
+			[Mutable] world ([root Function] set2 {[root Function] get2 {
+				([console] (get1 void)) ([console] (get2 void))
+			}})
+		}})
+	}
+	expect "
+		hello
+		world
+		
+	`"
+}
+
+test {
+	name 'two concurrent mutable instances, mutate one'
+	case {
+		[Mutable] hello ([root Function] set1 {[root Function] get1 {
+			[Mutable] world ([root Function] set2 {[root Function] get2 {
+				[root ``] (set2 hello) (([console] (get1 void)) ([console] (get2 void)))
+			}})
+		}})
+	}
+	expect "
+		hello
+		hello
+		
+	`"
+}
+
+test {
+	name 'two concurrent mutable instances, mutate both'
+	case {
+		[Mutable] hello ([root Function] set1 {[root Function] get1 {
+			[Mutable] world ([root Function] set2 {[root Function] get2 {
+				[root ``] ((set2 hello) (set1 world)) (([console] (get1 void)) ([console] (get2 void)))
+			}})
+		}})
+	}
+	expect "
+		world
+		hello
+		
+	`"
+}
+
+test {
+	name 'create mutable use reset use common indirection'
+	case {
+		[Mutable] hello ([root Function] set {[root Function] get {
+			[root Function] print {
+				[root ``] (set world) (print void)
+				([root ``] (set !!) (print void))
+			} ([root Function] void {
+				[console] (get void)
+			})
+		}})
+	}
+	expect "
+		world
+		!!
+		
+	`"
+}

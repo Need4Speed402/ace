@@ -1,5 +1,6 @@
 package value;
 
+import value.ValueProbe.Resolve;
 import value.node.Node;
 
 public class ValueFunction implements Value{
@@ -51,15 +52,5 @@ public class ValueFunction implements Value{
 		ValueProbe.append(this.getRoot().toString(), "  ", b);
 		
 		return b.toString();
-	}
-	
-	public static class Resolve {
-		public final Value value;
-		public final ValueProbe probe;
-		
-		public Resolve(ValueProbe probe, Value value) {
-			this.probe = probe;
-			this.value = value;
-		}
 	}
 }

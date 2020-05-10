@@ -55,18 +55,21 @@ public class Test {
 	
 	public String getResult () {
 		if (this.result == null) {
+			ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+			Runtime r = new Runtime(new PrintStream(bytes));
+			
+			long start = System.nanoTime();
+			
 			try {
-				ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-				Runtime r = new Runtime(new PrintStream(bytes));
-				
-				long start = System.nanoTime();
 				ValueDefaultEnv.run(r, this.body);
 				
 				this.duration = System.nanoTime() - start;
 				this.result = Charset.forName("UTF8").decode(ByteBuffer.wrap(bytes.toByteArray())).toString();
 			}catch (Throwable e) {
-				e.printStackTrace();
+				this.duration = System.nanoTime() - start;
 				this.result = "";
+				
+				e.printStackTrace();
 			}
 		}
 		

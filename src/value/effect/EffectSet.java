@@ -1,24 +1,23 @@
 package value.effect;
 
-import value.Memory;
 import value.Value;
+import value.ValueProbe;
 
 public class EffectSet implements Effect{
-	private final Memory ref;
 	private final Value value;
+	private final ValueProbe probe;
 	
-	public EffectSet (Memory ref, Value value) {
-		this.ref = ref;
+	public EffectSet (ValueProbe probe, Value value) {
+		this.probe = probe;
 		this.value = value;
 	}
 	
-	public Value run(Runtime runtime, Value root) {
-		ref.value = this.value;
-		return root;
+	public void run(Runtime runtime, Value root) {
+		runtime.setResolve(this.probe, this.value);
 	}
 	
 	@Override
 	public String toString() {
-		return super.toString() + " " + this.value;
+		return "Set " + this.probe + " = " + this.value;
 	}
 }

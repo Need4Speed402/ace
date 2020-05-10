@@ -10,9 +10,8 @@ public class EffectPrint implements Effect {
 	}
 	
 	@Override
-	public Value run(Runtime runtime, Value root) {
+	public void run(Runtime runtime, Value root) {
 		runtime.out.println(this.message);
-		return root;
 	}
 	
 	@Override
