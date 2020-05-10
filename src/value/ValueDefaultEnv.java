@@ -14,8 +14,8 @@ import value.node.NodeIdentifier;
 public class ValueDefaultEnv implements Value {
 	private static ValueDefaultEnv instance = new ValueDefaultEnv();
 	
-	public static final Value TRUE = p1 -> p2 -> p1;
-	public static final Value FALSE = p1 -> p2 -> p2;
+	public static final Value TRUE = p1 -> wrap(p1, p2 -> wrap(p2, clear(p1)));
+	public static final Value FALSE = p1 -> wrap(p1, p2 -> p2);
 	
 	private ValueDefaultEnv () {
 		this.put(Unsafe.COMPARE, v1 -> wrap(v1, v2 -> {
