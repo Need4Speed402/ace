@@ -1,5 +1,7 @@
 package value;
 
+import parser.Color;
+
 public class ValueProbe implements Value {
 	@Override
 	public Value resolve(ValueProbe probe, Value value) {
@@ -25,17 +27,6 @@ public class ValueProbe implements Value {
 		return new Identifier(this, getter);
 	}
 	
-	public static void append(String s, String padding, StringBuilder b) {
-		for (int i = 0; i < s.length(); i++) {
-			char c = s.charAt(i);
-			b.append(c);
-			
-			if (c == '\n') {
-				b.append(padding);
-			}
-		}
-	}
-	
 	public static class Call extends ValueProbe {
 		public final Value parent;
 		public final Value argument;
@@ -48,10 +39,10 @@ public class ValueProbe implements Value {
 		@Override
 		public String toString() {
 			StringBuilder b = new StringBuilder();
-			b.append(super.toString() + "\n|-");
-			append(this.parent.toString(), "| ", b);
+			b.append(super.toString() + "\n");
+			b.append(Color.indent(this.parent.toString(), "| ", "|-"));
 			b.append("\n|-");
-			append(this.argument.toString(), "  ", b);
+			b.append(Color.indent(this.argument.toString(), "  ", "|-"));
 			
 			return b.toString();
 		}
@@ -74,8 +65,8 @@ public class ValueProbe implements Value {
 		@Override
 		public String toString() {
 			StringBuilder b = new StringBuilder();
-			b.append(super.toString() + "\n|-");
-			append(this.parent.toString(), "  ", b);
+			b.append(super.toString() + "\n");
+			b.append(Color.indent(this.parent.toString(), "  ", "|-"));
 			
 			return b.toString();
 		}

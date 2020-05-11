@@ -1,8 +1,9 @@
 package parser.token.syntax;
 
-import value.node.Node;
+import parser.Color;
 import parser.Stream;
 import parser.token.Token;
+import value.node.Node;
 
 public class TokenEnvironment extends TokenProcedure {
 	public TokenEnvironment (Stream s) {
@@ -13,29 +14,12 @@ public class TokenEnvironment extends TokenProcedure {
 		super(contents);
 	}
 	
-	public static String indent (String s) {
-		StringBuilder ss = new StringBuilder();
-		ss.append("  ");
-		
-		for (int i = 0; i < s.length(); i++) {
-			char c = s.charAt(i);
-			
-			if (c == '\n') {
-				ss.append('\n').append("  ");
-			}else {
-				ss.append(c);
-			}
-		}
-		
-		return ss.toString();
-	}
-	
 	@Override
 	public String toString () {
 		if (this.getLength() <= 1) {
 			return "{" + TokenProcedure.toString(this, '\n') + "}";
 		}else {
-			return "{\n" + indent(TokenProcedure.toString(this, '\n')) + "\n}";
+			return "{\n" + Color.indent(TokenProcedure.toString(this, '\n')) + "\n}";
 		}
 	}
 	

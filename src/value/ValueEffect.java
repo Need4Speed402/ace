@@ -1,5 +1,6 @@
 package value;
 
+import parser.Color;
 import value.effect.Effect;
 
 public class ValueEffect implements Value{
@@ -66,14 +67,14 @@ public class ValueEffect implements Value{
 	@Override
 	public String toString() {
 		StringBuilder b = new StringBuilder();
-		b.append(super.toString() + "\n|-");
-		ValueProbe.append(this.parent.toString(), this.effects == null ? "  " : "| ", b);
+		b.append(super.toString() + "\n");
+		b.append(Color.indent(this.parent.toString(), this.effects == null ? "  " : "| ", "|-"));
 		
 		EffectNode current = this.effects;
 		
 		while (current != null) {
-			b.append("\n|-");
-			ValueProbe.append(current.toString(), current.next == null ? "  " : "| ", b);
+			b.append("\n");
+			b.append(Color.indent(current.toString(), this.effects == null ? "  " : "| ", "|-"));
 			current = current.next;
 		}
 		

@@ -1,5 +1,6 @@
 package value;
 
+import parser.Color;
 import value.ValueProbe.Resolve;
 import value.node.Node;
 
@@ -48,8 +49,8 @@ public class ValueFunction implements Value{
 	@Override
 	public String toString() {
 		StringBuilder b = new StringBuilder();
-		b.append(super.toString() + " -> " + this.probe.toString() + "\n|-");
-		ValueProbe.append(this.getRoot().toString(), "  ", b);
+		b.append(super.toString() + " -> " + this.probe.toString() + "\n");
+		b.append(Color.indent(this.getRoot().toString(), "  ", "|-"));
 		
 		return b.toString();
 	}

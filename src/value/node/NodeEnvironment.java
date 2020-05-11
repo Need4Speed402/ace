@@ -1,6 +1,6 @@
 package value.node;
 
-import parser.token.syntax.TokenEnvironment;
+import parser.Color;
 import value.Value;
 import value.ValueEffect;
 import value.ValueFunction;
@@ -18,7 +18,7 @@ public class NodeEnvironment implements Node{
 	
 	@Override
 	public String toString() {
-		return "{\n" + TokenEnvironment.indent(this.contents.toString()) + "\n}";
+		return "{\n" + Color.indent(this.contents.toString()) + "\n}";
 	}
 	
 	@Override

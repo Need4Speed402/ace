@@ -217,4 +217,25 @@ public enum Color {
 	private enum Type {
 		MODIFIER, FOREGROUND, BACKGROUND
 	}
+	
+	public static String indent (String s) {
+		return indent(s, "  ", "  ");
+	}
+	
+	public static String indent (String s, String prefix, String lineappend) {
+		StringBuilder ss = new StringBuilder();
+		ss.append(prefix);
+		
+		for (int i = 0; i < s.length(); i++) {
+			char c = s.charAt(i);
+			
+			if (c == '\n') {
+				ss.append('\n').append(lineappend);
+			}else {
+				ss.append(c);
+			}
+		}
+		
+		return ss.toString();
+	}
 }

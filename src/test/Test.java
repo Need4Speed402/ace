@@ -219,14 +219,14 @@ public class Test {
 			if (!test.isSuccessful()) {
 				failed.push(test);
 			}else {
-				System.out.println(Color.bgGreen(Color.white(" PASSED ")) + new TokenString(test.getName()).toString() + " in " + Packages.formatTime(test.getDuration()));
+				System.out.println(Color.bgGreen(Color.white(" PASS ")) + new TokenString(test.getName()).toString() + " in " + Packages.formatTime(test.getDuration()));
 			}
 			
 			time += test.getDuration();
 		}
 		
 		for (Test test : failed) {
-			System.out.println(Color.bgRed(Color.white(" FAILED ")) + new TokenString(test.getName()).toString() + " in " + Packages.formatTime(test.getDuration()));
+			System.out.println(Color.bgRed(Color.white(" FAIL ")) + new TokenString(test.getName()).toString() + " in " + Packages.formatTime(test.getDuration()));
 			System.out.println(dif(test.getExpected(), test.getResult(), 0, 0).toString(Color.bgRed(" ") + " "));
 			//System.out.println(test.getResult());
 		}

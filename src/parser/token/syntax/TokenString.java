@@ -94,7 +94,7 @@ public class TokenString extends TokenProcedure{
 			}else if (this.getTokens().length == 1) {
 				return "(" + Color.reset(this.getTokens()[0].toString()) + ")";
 			}else {
-				return "(\n" + Color.reset(TokenEnvironment.indent(TokenProcedure.toString(this, '\n'))) + "\n)";
+				return "(\n" + Color.reset(Color.indent(TokenProcedure.toString(this, '\n'))) + "\n)";
 			}
 		}
 	}
