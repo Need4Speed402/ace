@@ -68,13 +68,13 @@ public class ValueEffect implements Value{
 	public String toString() {
 		StringBuilder b = new StringBuilder();
 		b.append(super.toString() + "\n");
-		b.append(Color.indent(this.parent.toString(), this.effects == null ? "  " : "| ", "|-"));
+		b.append(Color.indent(this.parent.toString(), "|-", this.effects == null ? "  " : "| "));
 		
 		EffectNode current = this.effects;
 		
 		while (current != null) {
 			b.append("\n");
-			b.append(Color.indent(current.toString(), this.effects == null ? "  " : "| ", "|-"));
+			b.append(Color.indent(current.toString(), "|-", current.next == null ? "  " : "| "));
 			current = current.next;
 		}
 		

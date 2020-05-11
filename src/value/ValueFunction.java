@@ -50,7 +50,7 @@ public class ValueFunction implements Value{
 	public String toString() {
 		StringBuilder b = new StringBuilder();
 		b.append(super.toString() + " -> " + this.probe.toString() + "\n");
-		b.append(Color.indent(this.getRoot().toString(), "  ", "|-"));
+		b.append(Color.indent(this.getRoot().toString(), "|-", "  "));
 		
 		return b.toString();
 	}

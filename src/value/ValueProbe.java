@@ -40,9 +40,9 @@ public class ValueProbe implements Value {
 		public String toString() {
 			StringBuilder b = new StringBuilder();
 			b.append(super.toString() + "\n");
-			b.append(Color.indent(this.parent.toString(), "| ", "|-"));
-			b.append("\n|-");
-			b.append(Color.indent(this.argument.toString(), "  ", "|-"));
+			b.append(Color.indent(this.parent.toString(), "|-", "| "));
+			b.append("\n");
+			b.append(Color.indent(this.argument.toString(), "|-", "  "));
 			
 			return b.toString();
 		}
@@ -66,7 +66,7 @@ public class ValueProbe implements Value {
 		public String toString() {
 			StringBuilder b = new StringBuilder();
 			b.append(super.toString() + "\n");
-			b.append(Color.indent(this.parent.toString(), "  ", "|-"));
+			b.append(Color.indent(this.parent.toString(), "|-", "  "));
 			
 			return b.toString();
 		}
