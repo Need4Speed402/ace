@@ -4,11 +4,10 @@ import java.io.PrintStream;
 
 import value.Value;
 import value.ValueEffect;
-import value.ValueProbe;
 import value.ValueEffect.EffectNode;
 import value.ValueEffect.EffectNodeList;
 import value.ValueEffect.EffectNodeValue;
-import value.ValueProbe.Resolve;
+import value.ValueProbe;
 
 public class Runtime {
 	public final PrintStream out;
@@ -52,9 +51,47 @@ public class Runtime {
 				}
 				
 				if (v instanceof ValueEffect) {
-					current = ((ValueEffect) v).getEffects().rebind(current);
+					//System.out.println(v);
+					EffectNode effects = ((ValueEffect) v).getEffects();
+					
+					if (effects != null) {
+						current = effects.rebind(current);
+					}
 				}
 			}
+		}
+	}
+	
+	public static class Resolve {
+		public final Value value;
+		public final ValueProbe probe;
+		
+		public final Resolve next;
+		
+		public Resolve(ValueProbe probe, Value value) {
+			this(null, probe, value);
+		}
+		
+		public Resolve (Resolve next, ValueProbe probe, Value value){
+			this.next = next;
+			this.probe = probe;
+			this.value = value;
+		}
+		
+		public Resolve useValue (Value value) {
+			return new Resolve(this.probe, value);
+		}
+		
+		public Resolve useProbe (ValueProbe probe) {
+			return new Resolve (probe, this.value);
+		}
+		
+		public Value resolve (Value v) {
+			if (this.next != null) {
+				v = this.next.resolve(v);
+			}
+			
+			return v.resolve(this.probe, this.value);
 		}
 	}
 }

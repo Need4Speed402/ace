@@ -33,15 +33,19 @@ public class ValueDefaultEnv implements Value {
 		this.put(Unsafe.MUTABLE, init -> {
 			ValueProbe probe = new ValueProbe();
 			
-			return new ValueEffect(v -> v
-				.call(p -> new ValueEffect(p, p, new EffectSet(probe, p)))
-				.call(p -> new ValueEffect(probe, p))
-			, new EffectSet(probe, init));
+			return new ValueEffect(
+				v -> v
+					.call(p -> new ValueEffect(p, p, new EffectSet(probe, clear(p))))
+					.call(p -> new ValueEffect(probe, p)),
+				init,
+				new EffectSet(probe, clear(init))
+			);
 		});
 		
 		this.put(Unsafe.CONSOLE, p -> {
 			return p.getID(id -> {
-				return new ValueEffect(clear(p), new EffectPrint(NodeIdentifier.asString(id)));
+				//System.out.println("resolving: " + p);
+				return new ValueEffect(p, new EffectPrint(NodeIdentifier.asString(id)));
 			});
 		});
 	}
@@ -55,6 +59,7 @@ public class ValueDefaultEnv implements Value {
 	@Override
 	public Value call(Value denv) {
 		Value out = denv.getID(id -> {
+			//System.out.println(id);
 			return this.env.getOrDefault(id, denv);
 		});
 		
@@ -64,7 +69,9 @@ public class ValueDefaultEnv implements Value {
 	public static void run (value.effect.Runtime runtime, Node root) {
 		/*Value probe = new ValueProbe();
 		System.out.println(probe);
-		System.out.println(root.run(probe));*/
+		Value gen = root.run(probe);
+		System.out.println("generated");
+		System.out.println(gen);*/
 		
 		//System.out.println(root.run(instance));
 		

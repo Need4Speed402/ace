@@ -27,6 +27,14 @@ public class ValueProbe implements Value {
 		return new Identifier(this, getter);
 	}
 	
+	public Value callClear (Value arg) {
+		return new Call (new ValueEffect(this), arg);
+	}
+	
+	public Value getIDClear (Getter getter) {
+		return new Identifier(new ValueEffect(this), getter);
+	}
+	
 	public static class Call extends ValueProbe {
 		public final Value parent;
 		public final Value argument;
@@ -73,37 +81,9 @@ public class ValueProbe implements Value {
 		
 		@Override
 		public Value resolve(ValueProbe probe, Value value) {
-			Value presolved = this.parent.resolve(probe, value);
-			
-			//the parent is a probe, that means we still don't know enough info to know the id of this value.
-			if (presolved instanceof ValueProbe) {
-				return presolved.getID(this.getter);
-			} else {
-				/*
-				 * if there was enough information to resolve the id, sometimes the handler for the id can return a probe that
-				 * depends on the very thing we are resolving now. For good measure, we resolve for the information we are
-				 * currently working with.
-				 */
-				return presolved.getID(this.getter).resolve(probe, value);
-			}
-		}
-	}
-	
-	public static class Resolve {
-		public final Value value;
-		public final ValueProbe probe;
-		
-		public Resolve(ValueProbe probe, Value value) {
-			this.probe = probe;
-			this.value = value;
-		}
-		
-		public Resolve useValue (Value value) {
-			return new Resolve(this.probe, value);
-		}
-		
-		public Resolve useProbe (ValueProbe probe) {
-			return new Resolve (probe, this.value);
+			return this.parent.resolve(probe, value).getID(id -> {
+				return this.getter.resolved(id).resolve(probe, value);
+			});
 		}
 	}
 }

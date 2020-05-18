@@ -24,7 +24,9 @@ public class ValueEffect implements Value{
 	}
 	
 	private ValueEffect (Value parent, EffectNode effects) {
-		if (parent instanceof ValueEffect) throw new RuntimeException("ValueEffect cannot inherit from another ValueEffect");
+		if (parent instanceof ValueEffect) {
+			parent = ((ValueEffect) parent).parent;
+		}
 		
 		this.parent = parent;
 		this.effects = effects;
@@ -32,26 +34,38 @@ public class ValueEffect implements Value{
 	
 	@Override
 	public Value call(Value v) {
-		Value c = this.parent.call(clear(v));
-		//System.out.println(this);
-		return new ValueEffect(clear(c), this, v, c);
+		Value c;
+		
+		if (this.parent instanceof ValueProbe) {
+			c = ((ValueProbe) this.parent).callClear(v);
+		}else {
+			c = this.parent.call(v);
+		}
+		
+		return wrap(this, c);
 	}
 	
 	@Override
 	public Value getID(Getter getter) {
-		Value c = this.parent.getID(getter);
+		Value c;
 		
-		return new ValueEffect(clear(c), this, c);
+		if (this.parent instanceof ValueProbe) {
+			c = ((ValueProbe) this.parent).getIDClear(getter);
+		}else {
+			c = this.parent.getID(getter);
+		}
+		
+		return wrap(this, c);
 	}
 	
 	@Override
 	public Value resolve(ValueProbe probe, Value value) {
-		Value pr = clear(this.parent.resolve(probe, value));
+		Value pr = this.parent.resolve(probe, value);
 		
 		if (this.effects == null) {
 			return new ValueEffect(pr);
 		}else {
-			return new ValueEffect(pr, this.effects.resolve(probe, value));
+			return new ValueEffect(pr, this.effects.resolve(probe, value, this.parent, pr));
 		}
 	}
 	
@@ -83,46 +97,17 @@ public class ValueEffect implements Value{
 	
 	public static Value wrap (Value v, Value v2) {
 		if (v.canCreateEffects()) {
-			return new ValueEffect(clear(v2), v, v2);
+			return new ValueEffect(v2, v, v2);
 		}else {
 			return v2;
 		}
 	}
 	
 	public static Value clear (Value v) {
-		if (v instanceof ValueEffect) {
-			v = ((ValueEffect) v).parent;
-		}
-		
-		if (v instanceof Clear) {
-			return v;
-		}else if (v instanceof ValueProbe) {
-			return new Clear((ValueProbe) v);
+		if (v.canCreateEffects()) {
+			return new ValueEffect(v);
 		}else {
 			return v;
-		}
-	}
-	
-	private static class Clear extends ValueProbe {
-		private final ValueProbe parent;
-		
-		public Clear (ValueProbe parent) {
-			this.parent = parent;
-		}
-		
-		@Override
-		public Value resolve(ValueProbe probe, Value value) {
-			return clear(this.parent.resolve(probe, value));
-		}
-		
-		@Override
-		public boolean canCreateEffects() {
-			return false;
-		}
-		
-		@Override
-		public String toString() {
-			return "value.ValueEffect.Clear " + this.parent.toString();
 		}
 	}
 	
@@ -135,7 +120,7 @@ public class ValueEffect implements Value{
 			this.length = (this.next == null ? 0 : this.next.length) + 1;
 		}
 		
-		public abstract EffectNode resolve (ValueProbe probe, Value value);
+		public abstract EffectNode resolve (ValueProbe probe, Value value, Value parent, Value rParent);
 		public abstract EffectNode rebind (EffectNode root);
 	}
 	
@@ -148,8 +133,11 @@ public class ValueEffect implements Value{
 		}
 		
 		@Override
-		public EffectNode resolve(ValueProbe probe, Value value) {
-			return EffectNodeValue.create(this.next == null ? null : this.next.resolve(probe, value), this.value.resolve(probe, value));
+		public EffectNode resolve(ValueProbe probe, Value value, Value parent, Value rParent) {
+			EffectNode next = this.next == null ? null : this.next.resolve(probe, value, parent, rParent);
+			Value v = this.value == parent ? rParent : this.value.resolve(probe, value);
+			
+			return EffectNodeValue.create(next, v);
 		}
 		
 		@Override
@@ -198,8 +186,8 @@ public class ValueEffect implements Value{
 		}
 		
 		@Override
-		public EffectNode resolve(ValueProbe probe, Value value) {
-			return new EffectNodeList(this.next == null ? null : this.next.resolve(probe, value), this.effect);
+		public EffectNode resolve(ValueProbe probe, Value value, Value parent, Value rParent) {
+			return new EffectNodeList(this.next == null ? null : this.next.resolve(probe, value, parent, rParent), this.effect);
 		}
 		
 		@Override

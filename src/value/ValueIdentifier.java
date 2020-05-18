@@ -3,7 +3,17 @@ package value;
 import value.node.NodeIdentifier;
 
 public class ValueIdentifier implements Value{
-	public final static Value NULL = p -> ValueEffect.wrap(p, ValueIdentifier.NULL);
+	public final static Value NULL = new Value() {
+		@Override
+		public Value call(Value v) {
+			return ValueEffect.wrap(v, ValueIdentifier.NULL);
+		}
+		
+		@Override
+		public String toString() {
+			return "ValueIdentifier.NULL";
+		}
+	};
 	
 	private final int id;
 	

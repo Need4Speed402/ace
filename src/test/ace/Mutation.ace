@@ -27,6 +27,36 @@ test {
 }
 
 test {
+	name 'create mutable one and print static inverted'
+	case {
+		[Mutable] hello ([root Function] set {[root Function] get {
+			[console] world
+			([console] (get void))
+		}})
+	}
+	expect "
+		world
+		hello
+		
+	`"
+}
+
+test {
+	name 'create mutable one and print static'
+	case {
+		[Mutable] hello ([root Function] set {[root Function] get {
+			[console] (get void)
+			([console] world)
+		}})
+	}
+	expect "
+		hello
+		world
+		
+	`"
+}
+
+test {
 	name 'create mutable reset and then use'
 	case {
 		[Mutable] hello ([root Function] set {[root Function] get {
@@ -50,6 +80,21 @@ test {
 	expect "
 		world
 		!!
+		
+	`"
+}
+
+test {
+	name 'create two mutable and use simultaneously'
+	case {
+		[Mutable] [console] ([root Function] set {[root Function] get {
+			[Mutable] hello ([root Function] set1 {[root Function] get1 {
+				(get void) (get1 void)
+			}})
+		}})
+	}
+	expect "
+		hello
 		
 	`"
 }
