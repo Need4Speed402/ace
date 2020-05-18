@@ -3,9 +3,21 @@ package value.node;
 import parser.Stream;
 import parser.token.syntax.TokenString;
 import value.Value;
-import value.ValueIdentifier;
+import value.ValueEffect;
 
-public class NodeIdentifier implements Node{
+public class NodeIdentifier implements Node, Value {
+	public final static Value NULL = new Value() {
+		@Override
+		public Value call(Value v) {
+			return ValueEffect.wrap(v, NodeIdentifier.NULL);
+		}
+		
+		@Override
+		public String toString() {
+			return "ValueIdentifier.NULL";
+		}
+	};
+	
 	private static int counter = 0;
 	public final int id;
 
@@ -15,7 +27,17 @@ public class NodeIdentifier implements Node{
 	
 	@Override
 	public Value run(Value environment) {
-		return environment.call(new ValueIdentifier(this.id));
+		return environment.call(this);
+	}
+	
+	@Override
+	public Value call(Value v) {
+		return NULL.call(v);
+	}
+	
+	@Override
+	public Value getID(Getter getter) {
+		return getter.resolved(id);
 	}
 	
 	@Override
