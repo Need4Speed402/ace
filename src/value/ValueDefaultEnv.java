@@ -59,7 +59,7 @@ public class ValueDefaultEnv implements Value {
 	}
 	
 	public static void run (value.effect.Runtime runtime, Node root) {
-		ValueProbe probe = new ValueProbe();
+		/*ValueProbe probe = new ValueProbe();
 		//System.out.println(probe);
 		Value gen = root.run(probe);
 		//System.out.println("generated");
@@ -67,8 +67,8 @@ public class ValueDefaultEnv implements Value {
 		Value res = gen.resolve(probe, instance);
 		//System.out.println("root resolved");
 		//System.out.println(res);
-		runtime.run(res);
+		runtime.run(res);*/
 		
-		//runtime.run(root.run(instance));
+		runtime.run(root.run(instance));
 	}
 }
