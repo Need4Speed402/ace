@@ -1,4 +1,27 @@
 test {
+	name 'effects in mutable init'
+	case {
+		[Mutable] ([console] hello)
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'effects in mutable init, init function'
+	case {
+		[Mutable] ([console] 1) ([console] 2)
+	}
+	expect "
+		1
+		2
+		
+	`"
+}
+
+test {
 	name 'create mutable and use value'
 	case {
 		[Mutable] hello ([root Function] set {[root Function] get {

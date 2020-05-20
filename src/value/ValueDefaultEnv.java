@@ -1,8 +1,5 @@
 package value;
 
-import static value.ValueEffect.clear;
-import static value.ValueEffect.wrap;
-
 import java.util.HashMap;
 
 import parser.token.resolver.Unsafe;
@@ -14,40 +11,35 @@ import value.node.NodeIdentifier;
 public class ValueDefaultEnv implements Value {
 	private static ValueDefaultEnv instance = new ValueDefaultEnv();
 	
-	public static final Value TRUE = p1 -> wrap(p1, p2 -> wrap(p2, clear(p1)));
-	public static final Value FALSE = p1 -> wrap(p1, p2 -> p2);
+	public static final Value TRUE = ValueDefer.accept(p1 -> ValueDefer.accept(p2 -> p1));
+	public static final Value FALSE = ValueDefer.accept(p1 -> ValueDefer.accept(p2 -> p2));
 	
 	private ValueDefaultEnv () {
-		this.put(Unsafe.COMPARE, v1 -> wrap(v1, v2 -> {
-			return wrap(v2, clear(v1).getID(v1id -> clear(v2).getID(v2id -> {
-				return v1id == v2id ? TRUE : FALSE;
-			})));
-		}));
+		this.put(Unsafe.COMPARE, ValueDefer.accept(v1 -> ValueDefer.accept(v2 ->
+			v1.getID(v1id -> v2.getID(v2id -> v1id == v2id ? TRUE : FALSE))
+		)));
 		
-		this.put(Unsafe.FUNCTION, ident -> ident.getID(identid -> body -> {
-			return wrap(body, new ValueFunction(probe -> clear(body).call(penv -> penv.getID(envid -> identid == envid ? probe : penv))));
-		}));
+		this.put(Unsafe.FUNCTION, ident -> ident.getID(identid -> 
+			ValueDefer.accept(body -> new ValueFunction(probe -> body.call(penv -> penv.getID(envid -> identid == envid ? probe : penv))))
+		));
 		
-		this.put(Unsafe.ASSIGN, name -> wrap(name, value -> wrap(value, new ValueAssign(clear(name), clear(value)))));
+		this.put(Unsafe.ASSIGN, ValueDefer.accept(name -> ValueDefer.accept(value -> new ValueAssign(name, value))));
 		
-		this.put(Unsafe.MUTABLE, init -> {
+		this.put(Unsafe.MUTABLE, ValueDefer.accept(init -> {
 			ValueProbe probe = new ValueProbe();
 			
-			return new ValueEffect(
-				v -> v
-					.call(p -> new ValueEffect(p, p, new EffectSet(probe, clear(p))))
-					.call(p -> new ValueEffect(probe, p)),
-				init,
-				new EffectSet(probe, clear(init))
-			);
-		});
+			Value setup = v -> v
+				.call(p -> new ValueEffect(p, p, new EffectSet(probe, p)))
+				.call(p -> new ValueEffect(probe, probe, p));
+			
+			return new ValueEffect(setup, setup, init, new EffectSet(probe, init));
+		}));
 		
-		this.put(Unsafe.CONSOLE, p -> {
-			return p.getID(id -> {
-				//System.out.println("resolving: " + p);
+		this.put(Unsafe.CONSOLE, ValueDefer.accept(p -> 
+			p.getID(id -> {
 				return new ValueEffect(p, new EffectPrint(NodeIdentifier.asString(id)));
-			});
-		});
+			}))
+		);
 	}
 	
 	private final HashMap<Integer, Value> env = new HashMap<>();
@@ -67,14 +59,16 @@ public class ValueDefaultEnv implements Value {
 	}
 	
 	public static void run (value.effect.Runtime runtime, Node root) {
-		/*Value probe = new ValueProbe();
-		System.out.println(probe);
+		ValueProbe probe = new ValueProbe();
+		//System.out.println(probe);
 		Value gen = root.run(probe);
-		System.out.println("generated");
-		System.out.println(gen);*/
+		//System.out.println("generated");
+		//System.out.println(gen);
+		Value res = gen.resolve(probe, instance);
+		//System.out.println("root resolved");
+		//System.out.println(res);
+		runtime.run(res);
 		
-		//System.out.println(root.run(instance));
-		
-		runtime.run(root.run(instance));
+		//runtime.run(root.run(instance));
 	}
 }

@@ -9,7 +9,7 @@ public class NodeIdentifier implements Node, Value {
 	public final static Value NULL = new Value() {
 		@Override
 		public Value call(Value v) {
-			return ValueEffect.wrap(v, NodeIdentifier.NULL);
+			return new ValueEffect(NodeIdentifier.NULL, v, NodeIdentifier.NULL);
 		}
 		
 		@Override
@@ -42,7 +42,7 @@ public class NodeIdentifier implements Node, Value {
 	
 	@Override
 	public String toString() {
-		return asString(this.id);
+		return "NodeIdentifier(" + asString(this.id) + ")";
 	}
 	
 	@Override

@@ -5,8 +5,8 @@ import java.io.PrintStream;
 import value.Value;
 import value.ValueEffect;
 import value.ValueEffect.EffectNode;
-import value.ValueEffect.EffectNodeList;
-import value.ValueEffect.EffectNodeValue;
+import value.ValueEffect.EffectKnown;
+import value.ValueEffect.EffectProbe;
 import value.ValueProbe;
 
 public class Runtime {
@@ -36,14 +36,18 @@ public class Runtime {
 	}
 	
 	public void run (Value root) {
-		EffectNode current = new EffectNodeValue(null, root);
+		EffectNode current = null;
 			
+		if (root instanceof ValueEffect) {
+			current = ((ValueEffect) root).getEffects();
+		}
+		
 		while (current != null) {
-			if (current instanceof EffectNodeList) {
-				((EffectNodeList) current).getEffect().run(this, root);;
+			if (current instanceof EffectKnown) {
+				((EffectKnown) current).getEffect().run(this, root);;
 				current = current.next;
-			}else if (current instanceof EffectNodeValue){
-				Value v = ((EffectNodeValue) current).getValue();
+			}else if (current instanceof EffectProbe){
+				Value v = ((EffectProbe) current).getValue();
 				current = current.next;
 				
 				for (int i = 0; i < this.memory.length; i++) {

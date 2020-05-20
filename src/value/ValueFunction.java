@@ -28,7 +28,7 @@ public class ValueFunction implements Value{
 	}
 	
 	public Value call (Value v) {
-		return ValueEffect.wrap(v, this.getRoot().resolve(this.probe, ValueEffect.clear(v)));
+		return ValueDefer.create(v, d -> this.getRoot().resolve(this.probe, d));
 	}
 	
 	@Override

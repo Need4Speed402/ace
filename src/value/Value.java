@@ -11,10 +11,6 @@ public interface Value {
 		return this;
 	}
 	
-	public default boolean canCreateEffects () {
-		return false;
-	}
-	
 	public interface Getter {
 		public Value resolved (int value);
 	}

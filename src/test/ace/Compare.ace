@@ -78,13 +78,11 @@ test {
 }
 
 test {
-	name 'compare unknown values success'
+	name 'compare first unknown success'
 	case {
 		[console] (([root Function] a {
-			([root Function] b {
-				[compare] a b true false
-			})
-		}) hello hello)
+			[compare] a hello true false
+		}) hello)
 	}
 	expect "
 		true
@@ -93,13 +91,37 @@ test {
 }
 
 test {
-	name 'compare unknown values failure'
+	name 'compare first unknown failure'
 	case {
 		[console] (([root Function] a {
-			([root Function] b {
-				[compare] a b true false
-			})
-		}) hello world)
+			[compare] a world true false
+		}) hello)
+	}
+	expect "
+		false
+		
+	`"
+}
+
+test {
+	name 'compare second unknown success'
+	case {
+		[console] (([root Function] b {
+			[compare] hello b true false
+		}) hello)
+	}
+	expect "
+		true
+		
+	`"
+}
+
+test {
+	name 'compare second unknown failure'
+	case {
+		[console] (([root Function] b {
+			[compare] hello b true false
+		}) world)
 	}
 	expect "
 		false

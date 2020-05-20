@@ -2,7 +2,7 @@ package value.node;
 
 import parser.Color;
 import value.Value;
-import value.ValueEffect;
+import value.ValueDefer;
 import value.ValueFunction;
 
 public class NodeEnvironment implements Node{
@@ -13,7 +13,7 @@ public class NodeEnvironment implements Node{
 	}
 	
 	public Value run(Value environment) {
-		return new ValueFunction(probe -> this.contents.run(var -> ValueEffect.wrap(var, probe.call(environment.call(ValueEffect.clear(var))))));
+		return new ValueFunction(probe -> this.contents.run(ValueDefer.accept(var -> probe.call(environment.call(var)))));
 	}
 	
 	@Override
