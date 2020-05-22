@@ -12,7 +12,7 @@ public class EffectSet implements Effect{
 		this.value = value;
 	}
 	
-	public void run(Runtime runtime, Value root) {
+	public void run(Runtime runtime) {
 		runtime.setResolve(this.probe, this.value);
 	}
 	

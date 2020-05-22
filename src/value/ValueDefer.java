@@ -21,8 +21,8 @@ public class ValueDefer extends ValueProbe{
 			return new ValueDefer(this.probe, body, val);
 		}else if (val instanceof ValueEffect) {
 			body = body.resolve(this.probe, ((ValueEffect) val).getParent());
-			System.out.println(body + " " + val);
-			return new ValueEffect(body, val, body);
+			
+			return new ValueEffect(body, ((ValueEffect) val).getEffects());
 		}else{
 			return body.resolve(this.probe, val);
 		}
@@ -67,7 +67,7 @@ public class ValueDefer extends ValueProbe{
 			}else if (v instanceof ValueEffect){
 				Value body = this.get().resolve(this.probe, ((ValueEffect) v).getParent());
 				
-				return new ValueEffect(body, v, body);
+				return new ValueEffect(body, ((ValueEffect) v).getEffects());
 			}else{
 				return this.get().resolve(this.probe, v);
 			}

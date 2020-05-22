@@ -3,26 +3,10 @@ package value.node;
 import parser.Stream;
 import parser.token.syntax.TokenString;
 import value.Value;
-import value.ValueEffect;
-import value.ValueProbe;
+import value.ValueDefer;
 
 public class NodeIdentifier implements Node, Value {
-	public final static Value NULL = new Value() {
-		@Override
-		public Value call(Value v) {
-			return new ValueEffect(NodeIdentifier.NULL, v, NodeIdentifier.NULL);
-		}
-		
-		@Override
-		public Value resolve(ValueProbe probe, Value value) {
-			return this;
-		}
-		
-		@Override
-		public String toString() {
-			return "ValueIdentifier.NULL";
-		}
-	};
+	public final static Value NULL = ValueDefer.accept(v -> NodeIdentifier.NULL);
 	
 	private static int counter = 0;
 	public final int id;

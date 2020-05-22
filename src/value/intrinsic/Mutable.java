@@ -12,7 +12,7 @@ public class Mutable {
 		
 		return new ValueEffect(v -> v
 			.call(ValueDefer.accept(s -> new ValueEffect(s, new EffectSet(probe, s))))
-			.call(u -> new ValueEffect(probe, u))
+			.call(ValueDefer.accept(s -> probe))
 		, new EffectSet(probe, init));
 	});
 }

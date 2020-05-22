@@ -4,9 +4,6 @@ import java.io.PrintStream;
 
 import value.Value;
 import value.ValueEffect;
-import value.ValueEffect.EffectNode;
-import value.ValueEffect.EffectKnown;
-import value.ValueEffect.EffectProbe;
 import value.ValueProbe;
 
 public class Runtime {
@@ -36,7 +33,15 @@ public class Runtime {
 	}
 	
 	public void run (Value root) {
-		EffectNode current = null;
+		if (root instanceof ValueEffect) {
+			Effect[] effects = ((ValueEffect) root).getEffects();
+			
+			for (int i = 0; i < effects.length; i++) {
+				effects[i].run(this);
+			}
+		}
+		
+		/*EffectNode current = null;
 			
 		if (root instanceof ValueEffect) {
 			current = ((ValueEffect) root).getEffects();
@@ -62,7 +67,7 @@ public class Runtime {
 					}
 				}
 			}
-		}
+		}*/
 	}
 	
 	public static class Resolve {

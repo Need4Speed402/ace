@@ -1,7 +1,5 @@
 package value.effect;
 
-import value.Value;
-
 public class EffectPrint implements Effect {
 	private final String message;
 	
@@ -10,7 +8,7 @@ public class EffectPrint implements Effect {
 	}
 	
 	@Override
-	public void run(Runtime runtime, Value root) {
+	public void run(Runtime runtime) {
 		runtime.out.println(this.message);
 	}
 	

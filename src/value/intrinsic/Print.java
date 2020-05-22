@@ -19,7 +19,6 @@ public class Print implements Getter{
 
 	@Override
 	public Value resolved(int value) {
-		System.out.println(this.message);
 		return new ValueEffect(this.message, new EffectPrint(NodeIdentifier.asString(value)));
 	}
 
