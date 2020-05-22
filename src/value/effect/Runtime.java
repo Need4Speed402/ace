@@ -55,7 +55,6 @@ public class Runtime {
 				}
 				
 				if (v instanceof ValueEffect) {
-					//System.out.println(v);
 					EffectNode effects = ((ValueEffect) v).getEffects();
 					
 					if (effects != null) {

@@ -36,6 +36,9 @@ public class ValueEffect implements Value{
 		
 		if (parent instanceof ValueEffect) {
 			parent = ((ValueEffect) parent).parent;
+		}else if (parent instanceof ValueProbe) {
+			throw new RuntimeException("Cannot use yet to be known value as parent for effect");
+			//if (current != null) current = current.removeDups((ValueProbe) parent, false);
 		}
 		
 		this.effects = current;
@@ -45,6 +48,9 @@ public class ValueEffect implements Value{
 	private ValueEffect (Value parent, EffectNode effects) {
 		if (parent instanceof ValueEffect) {
 			parent = ((ValueEffect) parent).parent;
+		}else if (parent instanceof ValueProbe) {
+			throw new RuntimeException("Cannot use yet to be known value as parent for effect");
+			//if (effects != null) effects = effects.removeDups((ValueProbe) parent, false);
 		}
 		
 		this.parent = parent;
@@ -53,32 +59,14 @@ public class ValueEffect implements Value{
 	
 	@Override
 	public Value call(Value v) {
-		if (this.parent instanceof ValueProbe) {
-			ValueProbe parent = (ValueProbe) this.parent;
-			Value called = parent.call(v);
-			
-			EffectNode rep = this.effects == null ? null : this.effects.replace(parent, called);
-			
-			return new ValueEffect(called, rep);
-		}else {
-			Value c = this.parent.call(v);
-			return new ValueEffect(c, this, c);
-		}
+		Value c = this.parent.call(v);
+		return new ValueEffect(c, this, c);
 	}
 	
 	@Override
 	public Value getID(Getter getter) {
-		if (this.parent instanceof ValueProbe) {
-			ValueProbe parent = (ValueProbe) this.parent;
-			Value called = parent.getID(getter);
-			
-			EffectNode rep = this.effects == null ? null : this.effects.replace(parent, called);
-			
-			return new ValueEffect(called, rep);
-		}else {
-			Value c = this.parent.getID(getter);
-			return new ValueEffect(c, this, c);
-		}
+		Value c = this.parent.getID(getter);
+		return new ValueEffect(c, this, c);
 	}
 	
 	@Override
@@ -126,7 +114,7 @@ public class ValueEffect implements Value{
 			this.length = (this.next == null ? 0 : this.next.length) + 1;
 		}
 		
-		public abstract EffectNode replace (ValueProbe probe, Value value);
+		public abstract EffectNode removeDups (ValueProbe value, boolean found);
 		
 		public abstract EffectNode resolve (ValueProbe probe, Value value, Value parent, Value rParent);
 		public abstract EffectNode rebind (EffectNode root);
@@ -141,21 +129,13 @@ public class ValueEffect implements Value{
 		}
 		
 		@Override
-		public EffectNode replace(ValueProbe probe, Value value) {
-			EffectNode next = this.next == null ? null : this.next.replace(probe, value);
-			
-			if (this.value == probe) {
-				if (value instanceof ValueProbe) {
-					return new EffectProbe(next, (ValueProbe) value);
-				}else if (value instanceof ValueEffect){
-					return ((ValueEffect) value).getEffects().rebind(next);
-				}else {
-					return next;
-				}
-			}else if (next == this.next){
-				return this;
+		public EffectNode removeDups(ValueProbe probe, boolean found) {
+			if (probe != this.value) {
+				return new EffectProbe(this.next == null ? null : this.next.removeDups(probe, found), this.value);
+			}else if (found) {
+				return this.next == null ? null : this.next.removeDups(probe, found);
 			}else {
-				return new EffectProbe(next, this.value);
+				return new EffectProbe(this.next == null ? null : this.next.removeDups(probe, true), this.value);
 			}
 		}
 		
@@ -213,19 +193,13 @@ public class ValueEffect implements Value{
 		}
 		
 		@Override
-		public EffectNode replace(ValueProbe probe, Value value) {
-			EffectNode next = this.next == null ? null : this.next.replace(probe, value);
-			
-			if (next == this.next) {
-				return this;
-			}else {
-				return new EffectKnown(next, this.effect);
-			}
+		public EffectNode removeDups(ValueProbe probe, boolean found) {
+			return new EffectKnown(this.next == null ? null : this.next.removeDups(probe, found), this.effect);
 		}
 		
 		@Override
 		public EffectNode resolve(ValueProbe probe, Value value, Value parent, Value rParent) {
-			return new EffectKnown(this.next == null ? null : this.next.resolve(probe, value, parent, rParent), this.effect);
+			return new EffectKnown(this.next == null ? null : this.next.resolve(probe, value, parent, rParent), this.effect.resolve(probe, value));
 		}
 		
 		@Override

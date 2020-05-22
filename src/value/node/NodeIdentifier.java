@@ -4,12 +4,18 @@ import parser.Stream;
 import parser.token.syntax.TokenString;
 import value.Value;
 import value.ValueEffect;
+import value.ValueProbe;
 
 public class NodeIdentifier implements Node, Value {
 	public final static Value NULL = new Value() {
 		@Override
 		public Value call(Value v) {
 			return new ValueEffect(NodeIdentifier.NULL, v, NodeIdentifier.NULL);
+		}
+		
+		@Override
+		public Value resolve(ValueProbe probe, Value value) {
+			return this;
 		}
 		
 		@Override

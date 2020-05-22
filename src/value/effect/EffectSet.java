@@ -17,6 +17,11 @@ public class EffectSet implements Effect{
 	}
 	
 	@Override
+	public Effect resolve(ValueProbe probe, Value value) {
+		return new EffectSet(this.probe, this.value.resolve(probe, value));
+	}
+	
+	@Override
 	public String toString() {
 		return "Set " + this.probe + " = " + this.value;
 	}

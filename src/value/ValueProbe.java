@@ -68,7 +68,7 @@ public class ValueProbe implements Value {
 		
 		@Override
 		public Value resolve(ValueProbe probe, Value value) {
-			return this.parent.resolve(probe, value).getID(id -> this.getter.resolved(id).resolve(probe, value));
+			return this.parent.resolve(probe, value).getID(this.getter.resolve(probe, value));
 		}
 	}
 }

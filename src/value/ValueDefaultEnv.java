@@ -3,43 +3,23 @@ package value;
 import java.util.HashMap;
 
 import parser.token.resolver.Unsafe;
-import value.effect.EffectPrint;
-import value.effect.EffectSet;
+import value.intrinsic.Assign;
+import value.intrinsic.Compare;
+import value.intrinsic.Function;
+import value.intrinsic.Mutable;
+import value.intrinsic.Print;
 import value.node.Node;
 import value.node.NodeIdentifier;
 
 public class ValueDefaultEnv implements Value {
 	private static ValueDefaultEnv instance = new ValueDefaultEnv();
 	
-	public static final Value TRUE = ValueDefer.accept(p1 -> ValueDefer.accept(p2 -> p1));
-	public static final Value FALSE = ValueDefer.accept(p1 -> ValueDefer.accept(p2 -> p2));
-	
 	private ValueDefaultEnv () {
-		this.put(Unsafe.COMPARE, ValueDefer.accept(v1 -> ValueDefer.accept(v2 ->
-			v1.getID(v1id -> v2.getID(v2id -> v1id == v2id ? TRUE : FALSE))
-		)));
-		
-		this.put(Unsafe.FUNCTION, ident -> ident.getID(identid -> 
-			ValueDefer.accept(body -> new ValueFunction(probe -> body.call(penv -> penv.getID(envid -> identid == envid ? probe : penv))))
-		));
-		
-		this.put(Unsafe.ASSIGN, ValueDefer.accept(name -> ValueDefer.accept(value -> new ValueAssign(name, value))));
-		
-		this.put(Unsafe.MUTABLE, ValueDefer.accept(init -> {
-			ValueProbe probe = new ValueProbe();
-			
-			Value setup = v -> v
-				.call(p -> new ValueEffect(p, p, new EffectSet(probe, p)))
-				.call(p -> new ValueEffect(probe, probe, p));
-			
-			return new ValueEffect(setup, setup, init, new EffectSet(probe, init));
-		}));
-		
-		this.put(Unsafe.CONSOLE, ValueDefer.accept(p -> 
-			p.getID(id -> {
-				return new ValueEffect(p, new EffectPrint(NodeIdentifier.asString(id)));
-			}))
-		);
+		this.put(Unsafe.COMPARE, Compare.instance);
+		this.put(Unsafe.FUNCTION, Function.instance);
+		this.put(Unsafe.ASSIGN, Assign.instance);
+		this.put(Unsafe.MUTABLE, Mutable.instance);
+		this.put(Unsafe.CONSOLE, Print.instance);
 	}
 	
 	private final HashMap<Integer, Value> env = new HashMap<>();
@@ -59,16 +39,16 @@ public class ValueDefaultEnv implements Value {
 	}
 	
 	public static void run (value.effect.Runtime runtime, Node root) {
-		/*ValueProbe probe = new ValueProbe();
+		ValueProbe probe = new ValueProbe();
 		//System.out.println(probe);
 		Value gen = root.run(probe);
 		//System.out.println("generated");
-		//System.out.println(gen);
+		System.out.println(gen);
 		Value res = gen.resolve(probe, instance);
 		//System.out.println("root resolved");
-		//System.out.println(res);
-		runtime.run(res);*/
+		System.out.println(res);
+		runtime.run(res);
 		
-		runtime.run(root.run(instance));
+		//runtime.run(root.run(instance));
 	}
 }

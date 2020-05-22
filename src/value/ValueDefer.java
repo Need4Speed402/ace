@@ -19,27 +19,12 @@ public class ValueDefer extends ValueProbe{
 		
 		if (val instanceof ValueProbe) {
 			return new ValueDefer(this.probe, body, val);
-		}else if (val instanceof ValueEffect){
-			Value res = body.resolve(this.probe, ((ValueEffect) val).getParent());
-			
-			return new ValueEffect(res, val, res);
-		}else {
-			return body.resolve(this.probe, val);
-		}
-	}
-	
-	public static Value create (Value v, Node n) {
-		if (v instanceof ValueProbe) {
-			ValueProbe probe = new ValueProbe();
-			Value body = n.run(probe);
-			
-			return new ValueDefer(probe, body, v);
-		}else if (v instanceof ValueEffect){
-			Value body = n.run(((ValueEffect) v).getParent());
-			
-			return new ValueEffect(body, v, body);
+		}else if (val instanceof ValueEffect) {
+			body = body.resolve(this.probe, ((ValueEffect) val).getParent());
+			System.out.println(body + " " + val);
+			return new ValueEffect(body, val, body);
 		}else{
-			return n.run(v);
+			return body.resolve(this.probe, val);
 		}
 	}
 	
@@ -49,19 +34,52 @@ public class ValueDefer extends ValueProbe{
 	
 	private static class DeferResolve implements Value {
 		private final Node node;
+		private final ValueProbe probe;
+		
+		private Value cache;
 		
 		public DeferResolve (Node node) {
+			this(node, new ValueProbe());
+		}
+		
+		public DeferResolve(Node node, ValueProbe probe) {
 			this.node = node;
+			this.probe = probe;
+		}
+		
+		private Value get () {
+			if (this.cache == null) {
+				this.cache = this.node.run(this.probe);
+			}
+			
+			return this.cache;
 		}
 		
 		@Override
 		public Value resolve(ValueProbe probe, Value value) {
-			return new DeferResolve(v -> this.node.run(v).resolve(probe, value));
+			return new DeferResolve(v -> this.get().resolve(probe, value), this.probe);
 		}
 		
 		@Override
 		public Value call(Value v) {
-			return create(v, this.node);
+			if (v instanceof ValueProbe) {
+				return new ValueDefer(this.probe, this.get(), v);
+			}else if (v instanceof ValueEffect){
+				Value body = this.get().resolve(this.probe, ((ValueEffect) v).getParent());
+				
+				return new ValueEffect(body, v, body);
+			}else{
+				return this.get().resolve(this.probe, v);
+			}
+		}
+		
+		@Override
+		public String toString() {
+			StringBuilder b = new StringBuilder();
+			b.append(super.toString() + " -> " + this.probe + "\n");
+			b.append(Color.indent(this.get().toString(), "|-", "  "));
+			
+			return b.toString();
 		}
 	}
 	

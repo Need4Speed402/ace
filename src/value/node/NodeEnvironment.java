@@ -3,7 +3,6 @@ package value.node;
 import parser.Color;
 import value.Value;
 import value.ValueDefer;
-import value.ValueFunction;
 
 public class NodeEnvironment implements Node{
 	private final Node contents;
@@ -13,7 +12,7 @@ public class NodeEnvironment implements Node{
 	}
 	
 	public Value run(Value environment) {
-		return new ValueFunction(probe -> this.contents.run(ValueDefer.accept(var -> probe.call(environment.call(var)))));
+		return ValueDefer.accept(arg -> this.contents.run(ValueDefer.accept(var -> arg.call(environment.call(var)))));
 	}
 	
 	@Override
