@@ -29,26 +29,39 @@ public class ValueDefaultEnv implements Value {
 	}
 
 	@Override
-	public Value call(Value denv) {
-		Value out = denv.getID(id -> {
-			//System.out.println(id);
-			return this.env.getOrDefault(id, denv);
-		});
-		
-		return out;
+	public Value call(Value env) {
+		return env.getID(new IdentifierLookup(env));
 	}
 	
 	public static void run (value.effect.Runtime runtime, Node root) {
-		ValueProbe probe = new ValueProbe();
+		/*ValueProbe probe = new ValueProbe();
 		//System.out.println(probe);
 		Value gen = root.run(probe);
 		//System.out.println("generated");
-		System.out.println(gen);
+		//System.out.println(gen);
 		Value res = gen.resolve(probe, instance);
 		//System.out.println("root resolved");
-		System.out.println(res);
-		runtime.run(res);
+		//System.out.println(res);
+		runtime.run(res);*/
 		
-		//runtime.run(root.run(instance));
+		runtime.run(root.run(instance));
+	}
+	
+	private class IdentifierLookup implements Getter {
+		private final Value env;
+		
+		public IdentifierLookup(Value env) {
+			this.env = env;
+		}
+		
+		@Override
+		public Value resolved(int value) {
+			return ValueDefaultEnv.this.env.getOrDefault(value, this.env);
+		}
+		
+		@Override
+		public Getter resolve(ValueProbe probe, Value value) {
+			return new IdentifierLookup(this.env.resolve(probe, value));
+		}
 	}
 }

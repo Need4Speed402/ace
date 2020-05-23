@@ -34,9 +34,8 @@ public class ValueProbe implements Value {
 		@Override
 		public String toString() {
 			StringBuilder b = new StringBuilder();
-			b.append(super.toString() + "\n");
-			b.append(Color.indent(this.parent.toString(), "|-", "| "));
-			b.append("\n");
+			b.append(super.toString()).append('\n');
+			b.append(Color.indent(this.parent.toString(), "|-", "| ")).append('\n');
 			b.append(Color.indent(this.argument.toString(), "|-", "  "));
 			
 			return b.toString();
@@ -60,8 +59,9 @@ public class ValueProbe implements Value {
 		@Override
 		public String toString() {
 			StringBuilder b = new StringBuilder();
-			b.append(super.toString() + "\n");
-			b.append(Color.indent(this.parent.toString(), "|-", "  "));
+			b.append(super.toString()).append('\n');
+			b.append(Color.indent(this.parent.toString(), "|-", "| ")).append('\n');
+			b.append(Color.indent(this.getter.toString(), "|-", "  "));
 			
 			return b.toString();
 		}

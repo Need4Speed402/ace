@@ -36,34 +36,6 @@ public class Runtime {
 		if (root instanceof ValueEffect) {
 			((ValueEffect) root).getEffect().run(this);
 		}
-		
-		/*EffectNode current = null;
-			
-		if (root instanceof ValueEffect) {
-			current = ((ValueEffect) root).getEffects();
-		}
-		
-		while (current != null) {
-			if (current instanceof EffectKnown) {
-				((EffectKnown) current).getEffect().run(this, root);;
-				current = current.next;
-			}else if (current instanceof EffectProbe){
-				Value v = ((EffectProbe) current).getValue();
-				current = current.next;
-				
-				for (int i = 0; i < this.memory.length; i++) {
-					v = v.resolve(this.memory[i].probe, this.memory[i].value);
-				}
-				
-				if (v instanceof ValueEffect) {
-					EffectNode effects = ((ValueEffect) v).getEffects();
-					
-					if (effects != null) {
-						current = effects.rebind(current);
-					}
-				}
-			}
-		}*/
 	}
 	
 	public static class Resolve {

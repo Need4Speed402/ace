@@ -48,7 +48,8 @@ public class ValueEffect implements Value{
 	@Override
 	public String toString() {
 		StringBuilder b = new StringBuilder();
-		b.append(super.toString() + "\n");
+		b.append(super.toString()).append('\n');
+		b.append(Color.indent(this.parent.toString(), "|-", "| ")).append('\n');
 		b.append(Color.indent(this.effect.toString(), "|-", "  "));
 		return b.toString();
 	}

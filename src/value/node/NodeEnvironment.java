@@ -12,7 +12,11 @@ public class NodeEnvironment implements Node{
 	}
 	
 	public Value run(Value environment) {
-		return ValueDefer.accept(arg -> this.contents.run(ValueDefer.accept(var -> arg.call(environment.call(var)))));
+		return ValueDefer.accept(arg ->
+			this.contents.run(ValueDefer.accept(var ->
+				arg.call(environment.call(var))
+			))
+		);
 	}
 	
 	@Override

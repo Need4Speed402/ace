@@ -29,27 +29,27 @@ public class ValueDefer extends ValueProbe{
 	}
 	
 	public static Value accept (Node n) {
-		return new DeferResolve(n);
+		return new DeferResolve(n, new ValueProbe());
 	}
 	
 	private static class DeferResolve implements Value {
-		private final Node node;
+		private final Generator gen;
 		private final ValueProbe probe;
 		
 		private Value cache;
 		
-		public DeferResolve (Node node) {
-			this(node, new ValueProbe());
+		public DeferResolve (Node node, ValueProbe probe) {
+			this(() -> node.run(probe), probe);
 		}
 		
-		public DeferResolve(Node node, ValueProbe probe) {
-			this.node = node;
+		public DeferResolve(Generator gen, ValueProbe probe) {
+			this.gen = gen;
 			this.probe = probe;
 		}
 		
 		private Value get () {
 			if (this.cache == null) {
-				this.cache = this.node.run(this.probe);
+				this.cache = this.gen.generate();
 			}
 			
 			return this.cache;
@@ -57,7 +57,7 @@ public class ValueDefer extends ValueProbe{
 		
 		@Override
 		public Value resolve(ValueProbe probe, Value value) {
-			return new DeferResolve(v -> this.get().resolve(probe, value), this.probe);
+			return new DeferResolve(() -> this.get().resolve(probe, value), this.probe);
 		}
 		
 		@Override
@@ -80,6 +80,10 @@ public class ValueDefer extends ValueProbe{
 			b.append(Color.indent(this.get().toString(), "|-", "  "));
 			
 			return b.toString();
+		}
+		
+		private static interface Generator {
+			public Value generate ();
 		}
 	}
 	
