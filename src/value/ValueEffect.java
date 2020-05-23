@@ -2,53 +2,43 @@ package value;
 
 import parser.Color;
 import value.effect.Effect;
+import value.effect.EffectQueue;
 
 public class ValueEffect implements Value{
 	private final Value parent;
-	private final Effect[] effects;
+	private final Effect effect;
 	
-	public ValueEffect(Value parent, Effect ... effects) {
+	public ValueEffect(Value parent, Effect effect) {
 		if (parent instanceof ValueEffect) {
-			Effect[] ie = ((ValueEffect) parent).effects;
-			Effect[] ne = new Effect[effects.length + ie.length];
-			System.arraycopy(effects, 0, ne, 0, effects.length);
-			System.arraycopy(ie, 0, ne, effects.length, ie.length);
-			
-			effects = ne;
-			parent = ((ValueEffect) parent).parent;
+			effect = new EffectQueue(effect, ((ValueEffect) parent).getEffect());
+			parent = ((ValueEffect) parent).getParent();
 		}
 		
 		this.parent = parent;
-		this.effects = effects;
+		this.effect = effect;
 	}
 	
 	@Override
 	public Value call(Value v) {
 		Value c = this.parent.call(v);
 		
-		return new ValueEffect(c, this.effects);
+		return new ValueEffect(c, this.effect);
 	}
 	
 	@Override
 	public Value getID(Getter getter) {
 		Value c = this.parent.getID(getter);
 		
-		return new ValueEffect(c, this.effects);
+		return new ValueEffect(c, this.effect);
 	}
 	
 	@Override
 	public Value resolve(ValueProbe probe, Value value) {
-		Effect[] ne = new Effect[this.effects.length];
-		
-		for (int i = 0; i < this.effects.length; i++) {
-			ne[i] = this.effects[i].resolve(probe, value);
-		}
-		
-		return new ValueEffect(this.parent.resolve(probe, value), ne);
+		return new ValueEffect(this.parent.resolve(probe, value), this.effect.resolve(probe, value));
 	}
 	
-	public Effect[] getEffects () {
-		return this.effects;
+	public Effect getEffect () {
+		return this.effect;
 	}
 	
 	public Value getParent() {
@@ -59,15 +49,7 @@ public class ValueEffect implements Value{
 	public String toString() {
 		StringBuilder b = new StringBuilder();
 		b.append(super.toString() + "\n");
-		b.append(Color.indent(this.parent.toString(), "|-", this.effects == null ? "  " : "| "));
-		
-		for (int i = 0; i < this.effects.length; i++) {
-			Effect current = this.effects[i];
-			
-			b.append("\n");
-			b.append(Color.indent(current.toString(), "|-", i + 1 >= this.effects.length ? "  " : "| "));
-		}
-		
+		b.append(Color.indent(this.effect.toString(), "|-", "  "));
 		return b.toString();
 	}
 }

@@ -34,11 +34,7 @@ public class Runtime {
 	
 	public void run (Value root) {
 		if (root instanceof ValueEffect) {
-			Effect[] effects = ((ValueEffect) root).getEffects();
-			
-			for (int i = 0; i < effects.length; i++) {
-				effects[i].run(this);
-			}
+			((ValueEffect) root).getEffect().run(this);
 		}
 		
 		/*EffectNode current = null;
