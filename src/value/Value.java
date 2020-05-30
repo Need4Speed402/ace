@@ -1,5 +1,7 @@
 package value;
 
+import value.effect.Effect;
+
 public interface Value {
 	public Value call (Value v);
 	
@@ -9,6 +11,10 @@ public interface Value {
 	
 	public default Value getID (Getter getter) {
 		return getter.resolved(0);
+	}
+	
+	public default Effect getEffect () {
+		return Effect.NO_EFFECT;
 	}
 	
 	public interface Getter {

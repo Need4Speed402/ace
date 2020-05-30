@@ -10,7 +10,14 @@ public class ValueEffect implements Value{
 	
 	public ValueEffect(Value parent, Effect effect) {
 		if (parent instanceof ValueEffect) {
-			effect = new EffectQueue(effect, ((ValueEffect) parent).getEffect());
+			Effect peffect = ((ValueEffect) parent).getRawEffect();
+			
+			if (peffect instanceof EffectQueue) {
+				effect = new EffectQueue(effect).concat((EffectQueue) peffect);
+			}else {
+				effect = new EffectQueue(effect, peffect);
+			}
+			
 			parent = ((ValueEffect) parent).getParent();
 		}
 		
@@ -37,8 +44,19 @@ public class ValueEffect implements Value{
 		return new ValueEffect(this.parent.resolve(probe, value), this.effect.resolve(probe, value));
 	}
 	
-	public Effect getEffect () {
+	public Effect getRawEffect () {
 		return this.effect;
+	}
+	
+	@Override
+	public Effect getEffect() {
+		Effect pe = this.parent.getEffect();
+		
+		if (pe == Effect.NO_EFFECT) {
+			return this.effect;
+		}else {
+			return new EffectQueue(this.effect, pe);
+		}
 	}
 	
 	public Value getParent() {

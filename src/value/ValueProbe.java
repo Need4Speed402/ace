@@ -1,6 +1,10 @@
 package value;
 
 import parser.Color;
+import value.effect.Effect;
+import value.effect.EffectPreCompute;
+import value.effect.EffectProbe;
+import value.effect.Runtime.Resolve;
 
 public class ValueProbe implements Value {
 	@Override
@@ -22,6 +26,11 @@ public class ValueProbe implements Value {
 		return new Identifier(this, getter);
 	}
 	
+	@Override
+	public Effect getEffect () {
+		return new EffectProbe(this);
+	}
+	
 	public static class Call extends ValueProbe {
 		public final Value parent;
 		public final Value argument;
@@ -39,6 +48,17 @@ public class ValueProbe implements Value {
 			b.append(Color.indent(this.argument.toString(), "|-", "  "));
 			
 			return b.toString();
+		}
+		
+		@Override
+		public Effect getEffect() {
+			ValueProbe a = new ValueProbe(), b = new ValueProbe();
+			
+			return new EffectPreCompute(
+				new EffectProbe(a.call(b)),
+				new Resolve(a, this.parent),
+				new Resolve(b, this.argument)
+			);
 		}
 		
 		@Override

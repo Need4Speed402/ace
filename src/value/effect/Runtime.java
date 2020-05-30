@@ -8,7 +8,7 @@ import value.ValueProbe;
 
 public class Runtime {
 	public final PrintStream out;
-	public Resolve[] memory = new Resolve[0];
+	public Resolve memory = null;
 	
 	public Runtime(PrintStream stream) {
 		this.out = stream;
@@ -18,24 +18,59 @@ public class Runtime {
 		this.out = System.out;
 	}
 	
+	public Runtime(Runtime run) {
+		this.out = run.out;
+		this.memory = run.memory;
+	}
+	
 	public void setResolve (ValueProbe probe, Value value) {
-		for (int i = 0; i < this.memory.length; i++) {
-			if (this.memory[i].probe == probe) {
-				this.memory[i] = this.memory[i].useValue(value);
-				return;
+		this.setResolve(new Resolve(probe, value));
+	}
+	
+	public void setResolve (Resolve r) {
+		while (r != null) {
+			Resolve rep = this.memory == null ? null : this.memory.replace(r.probe, r.value);
+			
+			if (rep == this.memory) {
+				this.memory = new Resolve(rep, r.probe, r.value);
+			}else {
+				this.memory = rep;
 			}
+			
+			r = r.next;
+		}
+	}
+	
+	public Value apply (Value v) {
+		Resolve current = this.memory;
+		
+		while (current != null) {
+			v = v.resolve(current.probe, current.value);
+			
+			current = current.next;
 		}
 		
-		Resolve[] n = new Resolve[this.memory.length + 1];
-		System.arraycopy(this.memory, 0, n, 0, this.memory.length);
-		n[n.length - 1] = new Resolve(probe, value);
-		this.memory = n;
+		return v;
 	}
 	
 	public void run (Value root) {
-		if (root instanceof ValueEffect) {
-			((ValueEffect) root).getEffect().run(this);
+		root.getEffect().run(this);
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder b = new StringBuilder();
+		b.append(super.toString()).append('\n');
+		
+		Resolve current = this.memory;
+		
+		while (current != null) {
+			b.append(current).append('\n');
+			
+			current = current.next;
 		}
+		
+		return b.toString();
 	}
 	
 	public static class Resolve {
@@ -54,20 +89,39 @@ public class Runtime {
 			this.value = value;
 		}
 		
-		public Resolve useValue (Value value) {
-			return new Resolve(this.probe, value);
-		}
-		
-		public Resolve useProbe (ValueProbe probe) {
-			return new Resolve (probe, this.value);
-		}
-		
-		public Value resolve (Value v) {
-			if (this.next != null) {
-				v = this.next.resolve(v);
-			}
+		public Resolve runEffects (Runtime run) {
+			this.value.getEffect().run(run);
 			
-			return v.resolve(this.probe, this.value);
+			Value val = run.apply(this.value);
+			
+			Resolve next = this.next == null ? null : this.next.runEffects(run);
+			
+			if (val instanceof ValueEffect) {
+				return new Resolve(next, this.probe, ((ValueEffect) val).getParent());
+			}else {
+				return new Resolve(next, this.probe, this.value);
+			}
+		}
+		
+		public Resolve replace (ValueProbe probe, Value value) {
+			if (this.probe == probe) {
+				return new Resolve(this.next, probe, value);
+			}else if (this.next != null) {
+				Resolve rep = this.next.replace(probe, value);
+				
+				if (rep == this.next) {
+					return this;
+				}else {
+					return new Resolve(rep, this.probe, this.value);
+				}
+			}else {
+				return this;
+			}
+		}
+		
+		@Override
+		public String toString() {
+			return this.probe.toString() + "=" + this.value.toString();
 		}
 	}
 }

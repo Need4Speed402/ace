@@ -108,11 +108,44 @@ test {
 }
 
 test {
+	name 'create mutable use reset use twice'
+	case {
+		[Mutable] hello ([root Function] set {[root Function] get {
+			[root ``] (
+				[root ``] (set world) ([console] (get void))
+				([root ``] (set !!) ([console] (get void)))
+			) ([console] (get void))
+		}})
+	}
+	expect "
+		world
+		!!
+		!!
+		
+	`"
+}
+
+test {
 	name 'create two mutable and use simultaneously'
 	case {
 		[Mutable] [console] ([root Function] set {[root Function] get {
 			[Mutable] hello ([root Function] set1 {[root Function] get1 {
 				(get void) (get1 void)
+			}})
+		}})
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'create two linearly dependant mutable instances'
+	case {
+		[Mutable] hello ([root Function] set {[root Function] get {
+			[Mutable] (get void) ([root Function] set1 {[root Function] get1 {
+				[console] (get1 void)
 			}})
 		}})
 	}

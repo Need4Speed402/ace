@@ -1,6 +1,7 @@
 package value.effect;
 
 import value.Value;
+import value.ValueEffect;
 import value.ValueProbe;
 
 public class EffectSet implements Effect{
@@ -13,7 +14,15 @@ public class EffectSet implements Effect{
 	}
 	
 	public void run(Runtime runtime) {
-		runtime.setResolve(this.probe, this.value);
+		Value v = runtime.apply(this.value);
+		
+		if (v instanceof ValueEffect) {
+			v.getEffect().run(runtime);
+			
+			v = ((ValueEffect) v).getParent();
+		}
+		
+		runtime.setResolve(this.probe, v);
 	}
 	
 	@Override

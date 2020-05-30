@@ -7,12 +7,12 @@ import value.ValueProbe;
 import value.effect.EffectSet;
 
 public class Mutable {
-	public static final Value instance = ValueDefer.accept(init -> {
+	public static final Value instance = init -> {
 		ValueProbe probe = new ValueProbe();
 		
 		return new ValueEffect(v -> v
 			.call(ValueDefer.accept(s -> new ValueEffect(s, new EffectSet(probe, s))))
 			.call(ValueDefer.accept(s -> probe))
 		, new EffectSet(probe, init));
-	});
+	};
 }

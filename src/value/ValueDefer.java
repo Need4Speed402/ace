@@ -1,6 +1,9 @@
 package value;
 
 import parser.Color;
+import value.effect.Effect;
+import value.effect.EffectPreCompute;
+import value.effect.Runtime.Resolve;
 import value.node.Node;
 
 public class ValueDefer extends ValueProbe{
@@ -13,23 +16,46 @@ public class ValueDefer extends ValueProbe{
 		this.value = value;
 	}
 	
+	@Override
+	public Effect getEffect() {
+		return new EffectPreCompute(this.body.getEffect(), new Resolve(this.probe, this.value));
+	}
+	
 	public Value resolve (ValueProbe probe, Value value) {
-		Value val = this.value.resolve(probe, value);
-		Value body = this.body.resolve(probe, value);
-		
+		return eval(this.probe, this.body.resolve(probe, value), this.value.resolve(probe, value));
+	}
+	
+	private static Value eval (ValueProbe probe, Value body, Value val) {
 		if (val instanceof ValueProbe) {
-			return new ValueDefer(this.probe, body, val);
+			return new ValueDefer(probe, body, val);
 		}else if (val instanceof ValueEffect) {
-			body = body.resolve(this.probe, ((ValueEffect) val).getParent());
+			Value p = ((ValueEffect) val).getParent();
 			
-			return new ValueEffect(body, ((ValueEffect) val).getEffect());
+			if (p instanceof ValueProbe) {
+				body = new ValueDefer(probe, body, p);
+			}else {
+				body = body.resolve(probe, p);
+			}
+			
+			return new ValueEffect(body, ((ValueEffect) val).getRawEffect());
 		}else{
-			return body.resolve(this.probe, val);
+			return body.resolve(probe, val);
 		}
 	}
 	
 	public static Value accept (Node n) {
 		return new DeferResolve(n, new ValueProbe());
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder b = new StringBuilder();
+		b.append(super.toString() + " -> " + this.probe + "\n");
+		b.append(Color.indent(this.body.toString(), "|-", "| "));
+		b.append("\n");
+		b.append(Color.indent(this.value.toString(), "|-", "  "));
+		
+		return b.toString();
 	}
 	
 	private static class DeferResolve implements Value {
@@ -62,21 +88,13 @@ public class ValueDefer extends ValueProbe{
 		
 		@Override
 		public Value call(Value v) {
-			if (v instanceof ValueProbe) {
-				return new ValueDefer(this.probe, this.get(), v);
-			}else if (v instanceof ValueEffect){
-				Value body = this.get().resolve(this.probe, ((ValueEffect) v).getParent());
-				
-				return new ValueEffect(body, ((ValueEffect) v).getEffect());
-			}else{
-				return this.get().resolve(this.probe, v);
-			}
+			return eval(this.probe, this.get(), v);
 		}
 		
 		@Override
 		public String toString() {
 			StringBuilder b = new StringBuilder();
-			b.append(super.toString() + " -> " + this.probe + "\n");
+			b.append(super.toString()).append(" -> ").append(this.probe).append('\n');
 			b.append(Color.indent(this.get().toString(), "|-", "  "));
 			
 			return b.toString();
@@ -85,16 +103,5 @@ public class ValueDefer extends ValueProbe{
 		private static interface Generator {
 			public Value generate ();
 		}
-	}
-	
-	@Override
-	public String toString() {
-		StringBuilder b = new StringBuilder();
-		b.append(super.toString() + " -> " + this.probe + "\n");
-		b.append(Color.indent(this.body.toString(), "|-", "| "));
-		b.append("\n");
-		b.append(Color.indent(this.value.toString(), "|-", "  "));
-		
-		return b.toString();
 	}
 }

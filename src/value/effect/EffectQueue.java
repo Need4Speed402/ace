@@ -29,10 +29,20 @@ public class EffectQueue implements Effect {
 		}
 	}
 	
+	public EffectQueue concat (EffectQueue queue) {
+		Effect[] effects = queue.effects;
+		
+		Effect[] ne = new Effect[this.effects.length + effects.length];
+		System.arraycopy(this.effects, 0, ne, 0, this.effects.length);
+		System.arraycopy(effects, 0, ne, this.effects.length, effects.length);
+		
+		return new EffectQueue(ne);
+	}
+	
 	@Override
 	public String toString() {
 		StringBuilder b = new StringBuilder();
-		b.append(super.toString() + "\n");
+		b.append(super.toString());
 		
 		for (int i = 0; i < this.effects.length; i++) {
 			Effect current = this.effects[i];
