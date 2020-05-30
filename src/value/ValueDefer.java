@@ -44,7 +44,14 @@ public class ValueDefer extends ValueProbe{
 	}
 	
 	public static Value accept (Node n) {
-		return new DeferResolve(n, new ValueProbe());
+		return accept(n, null);
+	}
+	
+	//this function exists just to fix a case with NodeIdentifier.NULL which will
+	//cause the print rountine to enter an infinite loop and eventally stack
+	//overflow. This methods lets you override the print routine.
+	public static Value accept (Node n, String print) {
+		return new DeferResolve(print, n, new ValueProbe());
 	}
 	
 	@Override
@@ -61,14 +68,16 @@ public class ValueDefer extends ValueProbe{
 	private static class DeferResolve implements Value {
 		private final Generator gen;
 		private final ValueProbe probe;
+		private final String print;
 		
 		private Value cache;
 		
-		public DeferResolve (Node node, ValueProbe probe) {
-			this(() -> node.run(probe), probe);
+		public DeferResolve (String print, Node node, ValueProbe probe) {
+			this(print, () -> node.run(probe), probe);
 		}
 		
-		public DeferResolve(Generator gen, ValueProbe probe) {
+		public DeferResolve(String print, Generator gen, ValueProbe probe) {
+			this.print = print;
 			this.gen = gen;
 			this.probe = probe;
 		}
@@ -83,7 +92,7 @@ public class ValueDefer extends ValueProbe{
 		
 		@Override
 		public Value resolve(ValueProbe probe, Value value) {
-			return new DeferResolve(() -> this.get().resolve(probe, value), this.probe);
+			return new DeferResolve(this.print, () -> this.get().resolve(probe, value), this.probe);
 		}
 		
 		@Override
@@ -95,7 +104,12 @@ public class ValueDefer extends ValueProbe{
 		public String toString() {
 			StringBuilder b = new StringBuilder();
 			b.append(super.toString()).append(" -> ").append(this.probe).append('\n');
-			b.append(Color.indent(this.get().toString(), "|-", "  "));
+			
+			if (this.print != null) {
+				b.append(Color.indent(this.print, "|-", "  ")); 
+			}else {
+				b.append(Color.indent(this.get().toString(), "|-", "  "));
+			}
 			
 			return b.toString();
 		}

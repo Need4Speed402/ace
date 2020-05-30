@@ -6,7 +6,7 @@ import value.Value;
 import value.ValueDefer;
 
 public class NodeIdentifier implements Node, Value {
-	public final static Value NULL = ValueDefer.accept(v -> NodeIdentifier.NULL);
+	public final static Value NULL = ValueDefer.accept(v -> NodeIdentifier.NULL, "NodeIdentifier.NULL");
 	
 	private static int counter = 0;
 	public final int id;
