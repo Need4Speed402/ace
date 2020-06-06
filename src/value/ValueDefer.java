@@ -1,9 +1,7 @@
 package value;
 
 import parser.Color;
-import value.effect.Effect;
-import value.effect.EffectPreCompute;
-import value.effect.Runtime.Resolve;
+import value.effect.Runtime;
 import value.node.Node;
 
 public class ValueDefer extends ValueProbe{
@@ -17,8 +15,10 @@ public class ValueDefer extends ValueProbe{
 	}
 	
 	@Override
-	public Effect getEffect() {
-		return new EffectPreCompute(this.body.getEffect(), new Resolve(this.probe, this.value));
+	public Value run(Runtime r) {
+		Value arg = this.value.run(r);
+		
+		return this.body.resolve(this.probe, arg).run(r);
 	}
 	
 	public Value resolve (ValueProbe probe, Value value) {

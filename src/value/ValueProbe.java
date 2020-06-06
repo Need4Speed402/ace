@@ -1,9 +1,7 @@
 package value;
 
 import parser.Color;
-import value.effect.Effect;
-import value.effect.EffectPreCompute;
-import value.effect.EffectProbe;
+import value.effect.Runtime;
 import value.effect.Runtime.Resolve;
 
 public class ValueProbe implements Value {
@@ -17,6 +15,21 @@ public class ValueProbe implements Value {
 	}
 	
 	@Override
+	public Value run(Runtime r) {
+		Resolve res = r.memory;
+		
+		while (res != null) {
+			if (res.probe == this) {
+				return res.value;
+			}
+			
+			res = res.next;
+		}
+		
+		throw new Error("neither compile time or runtime info is able to satisfy this probe. This indicates a bug with the interpreter");
+	}
+	
+	@Override
 	public Value call (Value arg) {
 		return new Call(this, arg);
 	}
@@ -24,11 +37,6 @@ public class ValueProbe implements Value {
 	@Override
 	public Value getID (Getter getter) {
 		return new Identifier(this, getter);
-	}
-	
-	@Override
-	public Effect getEffect () {
-		return new EffectProbe(this);
 	}
 	
 	public static class Call extends ValueProbe {
@@ -51,14 +59,11 @@ public class ValueProbe implements Value {
 		}
 		
 		@Override
-		public Effect getEffect() {
-			ValueProbe a = new ValueProbe(), b = new ValueProbe();
+		public Value run(Runtime r) {
+			Value a = this.parent.run(r);
+			Value b = this.argument.run(r);
 			
-			return new EffectPreCompute(
-				new EffectProbe(a.call(b)),
-				new Resolve(a, this.parent),
-				new Resolve(b, this.argument)
-			);
+			return a.call(b).run(r);
 		}
 		
 		@Override
@@ -84,6 +89,13 @@ public class ValueProbe implements Value {
 			b.append(Color.indent(this.getter.toString(), "|-", "  "));
 			
 			return b.toString();
+		}
+		
+		@Override
+		public Value run(Runtime r) {
+			Value p = this.parent.run(r);
+			
+			return p.getID(this.getter).run(r);
 		}
 		
 		@Override

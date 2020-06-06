@@ -3,7 +3,6 @@ package value.effect;
 import java.io.PrintStream;
 
 import value.Value;
-import value.ValueEffect;
 import value.ValueProbe;
 
 public class Runtime {
@@ -41,20 +40,10 @@ public class Runtime {
 		}
 	}
 	
-	public Value apply (Value v) {
-		Resolve current = this.memory;
-		
-		while (current != null) {
-			v = v.resolve(current.probe, current.value);
-			
-			current = current.next;
-		}
-		
-		return v;
-	}
-	
 	public void run (Value root) {
-		root.getEffect().run(this);
+		System.out.println(root);
+		
+		root.run(this);
 	}
 	
 	@Override
@@ -87,20 +76,6 @@ public class Runtime {
 			this.next = next;
 			this.probe = probe;
 			this.value = value;
-		}
-		
-		public Resolve runEffects (Runtime run) {
-			this.value.getEffect().run(run);
-			
-			Value val = run.apply(this.value);
-			
-			Resolve next = this.next == null ? null : this.next.runEffects(run);
-			
-			if (val instanceof ValueEffect) {
-				return new Resolve(next, this.probe, ((ValueEffect) val).getParent());
-			}else {
-				return new Resolve(next, this.probe, this.value);
-			}
 		}
 		
 		public Resolve replace (ValueProbe probe, Value value) {

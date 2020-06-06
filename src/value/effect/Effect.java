@@ -2,6 +2,7 @@ package value.effect;
 
 import value.Value;
 import value.ValueProbe;
+import value.effect.Runtime;
 
 public interface Effect {
 	public void run (Runtime runtime);

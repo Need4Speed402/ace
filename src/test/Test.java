@@ -64,12 +64,13 @@ public class Test {
 				ValueDefaultEnv.run(r, this.body);
 				
 				this.duration = System.nanoTime() - start;
-				this.result = Charset.forName("UTF8").decode(ByteBuffer.wrap(bytes.toByteArray())).toString();
 			}catch (Throwable e) {
 				this.duration = System.nanoTime() - start;
 				this.result = "";
 				
 				e.printStackTrace();
+			}finally {
+				this.result = Charset.forName("UTF8").decode(ByteBuffer.wrap(bytes.toByteArray())).toString();
 			}
 		}
 		

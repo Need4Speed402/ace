@@ -12,6 +12,8 @@ import test.Test;
 import value.ValueDefaultEnv;
 import value.node.Node;
 
+import value.effect.Runtime;
+
 public class Packages {
 	public static final boolean RUNTIME_STATS = true;
 	
@@ -42,6 +44,8 @@ public class Packages {
 			args = new String[] {"run", args[0]};
 		}
 		
+		//args = new String[] {"run", "/home/alex/Documents/ace/main.ace"};
+		
 		String directive = args[0];
 		
 		if (directive.equals("run")) {
@@ -57,11 +61,11 @@ public class Packages {
 			
 			Token r = new Virtual ("root",
 				new Unsafe (),
-				new Directory("std", new File("D:\\documents\\eclipse\\SimpleAceInterpreter\\src\\ace")).insert(new Source("root", Node.call(Node.id("unsafe"), Node.id("root")))),
-				new Directory("import", start.getParentFile()).insert(new Source("root", Node.call(Node.id("std"), Node.id("root"))))
+				//new Directory("std", new File("/media/wdhhd/documents/eclipse/SimpleAceInterpreter/src/ace")).insert(new Source("root", Node.call(Node.id("unsafe"), Node.id("root")))),
+				new Directory("import", start.getParentFile()).insert(new Source("root", Node.call(Node.id("unsafe"), Node.id("root"))))
 			);
 			
-			ValueDefaultEnv.run(new value.effect.Runtime(), Node.call(r.createNode(), Node.id("import"), Node.id(name), Node.id("`")));
+			ValueDefaultEnv.run(new Runtime(), Node.call(r.createNode(), Node.id("import"), Node.id(name), Node.id("`")));
 			
 			/*Packages.file(args[0]);
 			

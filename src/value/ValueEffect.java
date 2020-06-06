@@ -3,6 +3,7 @@ package value;
 import parser.Color;
 import value.effect.Effect;
 import value.effect.EffectQueue;
+import value.effect.Runtime;
 
 public class ValueEffect implements Value{
 	private final Value parent;
@@ -49,14 +50,9 @@ public class ValueEffect implements Value{
 	}
 	
 	@Override
-	public Effect getEffect() {
-		Effect pe = this.parent.getEffect();
-		
-		if (pe == Effect.NO_EFFECT) {
-			return this.effect;
-		}else {
-			return new EffectQueue(this.effect, pe);
-		}
+	public Value run (Runtime r) {
+		this.effect.run(r);
+		return this.parent.run(r);
 	}
 	
 	public Value getParent() {
