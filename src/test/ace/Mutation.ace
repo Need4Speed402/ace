@@ -221,3 +221,187 @@ test {
 		
 	`"
 }
+
+test {
+	name 'mutation common initializer'
+	case {
+		[root Function] createMutable {
+			[console] (createMutable void get)
+		} ([root Function] void {
+			[Mutable] hello ([root Function] mSet {[root Function] mGet {
+				[root Function] env {
+					[root Scope] ([compare] env get {mGet void} {
+						[root Scope] ([compare] env set {
+							mSet
+						} {mGet void env})
+					})
+				}
+			}})
+		})
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'mutation common initializer use twice'
+	case {
+		[root Function] createMutable {
+			[root Function] a {
+				[root Function] b {
+					[root ``] ([console] (a get)) ([console] (b get))
+				} (createMutable void)
+			} (createMutable void)		} ([root Function] void {
+			[Mutable] hello ([root Function] mSet {[root Function] mGet {
+				[root Function] env {
+					[root Scope] ([compare] env get {mGet void} {
+						[root Scope] ([compare] env set {
+							mSet
+						} {mGet void env})
+					})
+				}
+			}})
+		})
+	}
+	expect "
+		hello
+		hello
+		
+	`"
+}
+
+test {
+	name 'mutation common initializer use twice set once'
+	case {
+		[root Function] createMutable {
+			[root Function] a {
+				[root Function] b {
+					[root ``] (a set world) ([root ``] ([console] (a get)) ([console] (b get)))
+				} (createMutable void)
+			} (createMutable void)
+		} ([root Function] void {
+			[Mutable] hello ([root Function] mSet {[root Function] mGet {
+				[root Function] env {
+					[root Scope] ([compare] env get {mGet void} {
+						[root Scope] ([compare] env set {
+							mSet
+						} {mGet void env})
+					})
+				}
+			}})
+		})
+	}
+	expect "
+		world
+		hello
+		
+	`"
+}
+
+test {
+	name 'mutation common initializer use twice set once reversed'
+	case {
+		[root Function] createMutable {
+			[root Function] a {
+				[root Function] b {
+					[root ``] (b set world) ([root ``] ([console] (a get)) ([console] (b get)))
+				} (createMutable void)
+			} (createMutable void)
+		} ([root Function] void {
+			[Mutable] hello ([root Function] mSet {[root Function] mGet {
+				[root Function] env {
+					[root Scope] ([compare] env get {mGet void} {
+						[root Scope] ([compare] env set {
+							mSet
+						} {mGet void env})
+					})
+				}
+			}})
+		})
+	}
+	expect "
+		hello
+		world
+		
+	`"
+}
+
+test {
+	name 'mutation behind abstraction'
+	case {
+		[root Function] createMutable {
+			[root Function] mut {
+				[console] (mut get)
+			} (createMutable hello)
+		} ([root Function] init {
+			[Mutable] init ([root Function] mSet {[root Function] mGet {
+				[root Function] env {
+					[root Scope] ([compare] env get {mGet void} {
+						[root Scope] ([compare] env set {
+							mSet
+						} {mGet void env})
+					})
+				}
+			}})
+		})
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'mutation behind abstraction with set'
+	case {
+		[root Function] createMutable {
+			[root Function] mut {
+				[root ``] (mut set world) ([console] (mut get))
+				
+			} (createMutable hello)
+		} ([root Function] init {
+			[Mutable] init ([root Function] mSet {[root Function] mGet {
+				[root Function] env {
+					[root Scope] ([compare] env get {mGet void} {
+						[root Scope] ([compare] env set {
+							mSet
+						} {mGet void env})
+					})
+				}
+			}})
+		})
+	}
+	expect "
+		world
+		
+	`"
+}
+
+test {
+	name 'mutation behind abstraction with set use two times'
+	case {
+		[root Function] createMutable {
+			[root Function] mut {
+				[root ``] ([console] (mut get)) ([root ``] (mut set world) ([console] (mut get)))
+				
+			} (createMutable hello)
+		} ([root Function] init {
+			[Mutable] init ([root Function] mSet {[root Function] mGet {
+				[root Function] env {
+					[root Scope] ([compare] env get {mGet void} {
+						[root Scope] ([compare] env set {
+							mSet
+						} {mGet void env})
+					})
+				}
+			}})
+		})
+	}
+	expect "
+		hello
+		world
+		
+	`"
+}
