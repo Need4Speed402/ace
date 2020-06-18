@@ -1,8 +1,7 @@
 package value.effect;
 
 import parser.Color;
-import value.Value;
-import value.ValueProbe;
+import value.Value.Resolver;
 
 public class EffectQueue implements Effect {
 	private final Effect[] effects;
@@ -12,11 +11,11 @@ public class EffectQueue implements Effect {
 	}
 	
 	@Override
-	public Effect resolve(ValueProbe probe, Value value) {
+	public Effect resolve(Resolver res) {
 		Effect[] ne = new Effect[this.effects.length];
 		
 		for (int i = 0; i < this.effects.length; i++) {
-			ne[i] = this.effects[i].resolve(probe, value);
+			ne[i] = this.effects[i].resolve(res);
 		}
 		
 		return new EffectQueue(ne);

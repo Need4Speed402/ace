@@ -1,11 +1,12 @@
 package value;
 
+import value.ValuePartial.Probe;
 import value.effect.Runtime;
 
 public interface Value {
 	public Value call (Value v);
 	
-	public default Value resolve (ValueProbe probe, Value value) {
+	public default Value resolve (Resolver res) {
 		return this;
 	}
 	
@@ -23,10 +24,22 @@ public interface Value {
 		return this;
 	}
 	
+	public interface Resolver {};
+	
+	public class ProbeResolver implements Resolver {
+		public final Probe probe;
+		public final Value value;
+		
+		public ProbeResolver (Probe probe, Value value) {
+			this.probe = probe;
+			this.value = value;
+		}
+	}
+	
 	public interface Getter {
 		public Value resolved (int value);
 		
-		public default Getter resolve (ValueProbe probe, Value value) {
+		public default Getter resolve (Resolver r) {
 			return this;
 		}
 	}

@@ -60,8 +60,8 @@ public class ValueDefaultEnv implements Value {
 		}
 		
 		@Override
-		public Getter resolve(ValueProbe probe, Value value) {
-			return new IdentifierLookup(this.env.resolve(probe, value));
+		public Getter resolve(Resolver res) {
+			return new IdentifierLookup(this.env.resolve(res));
 		}
 	}
 }

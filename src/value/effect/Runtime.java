@@ -3,7 +3,7 @@ package value.effect;
 import java.io.PrintStream;
 
 import value.Value;
-import value.ValueProbe;
+import value.ValuePartial.Probe;
 
 public class Runtime {
 	public final PrintStream out;
@@ -22,7 +22,7 @@ public class Runtime {
 		this.memory = run.memory;
 	}
 	
-	public void setResolve (ValueProbe probe, Value value) {
+	public void setResolve (Probe probe, Value value) {
 		this.setResolve(new Resolve(probe, value));
 	}
 	
@@ -64,21 +64,21 @@ public class Runtime {
 	
 	public static class Resolve {
 		public final Value value;
-		public final ValueProbe probe;
+		public final Probe probe;
 		
 		public final Resolve next;
 		
-		public Resolve(ValueProbe probe, Value value) {
+		public Resolve(Probe probe, Value value) {
 			this(null, probe, value);
 		}
 		
-		public Resolve (Resolve next, ValueProbe probe, Value value){
+		public Resolve (Resolve next, Probe probe, Value value){
 			this.next = next;
 			this.probe = probe;
 			this.value = value;
 		}
 		
-		public Resolve replace (ValueProbe probe, Value value) {
+		public Resolve replace (Probe probe, Value value) {
 			if (this.probe == probe) {
 				return new Resolve(this.next, probe, value);
 			}else if (this.next != null) {

@@ -2,7 +2,7 @@ package value.node;
 
 import parser.Color;
 import value.Value;
-import value.ValueDefer;
+import value.ValueFunction;
 
 public class NodeEnvironment implements Node{
 	private final Node contents;
@@ -12,8 +12,8 @@ public class NodeEnvironment implements Node{
 	}
 	
 	public Value run(Value environment) {
-		return ValueDefer.accept(arg ->
-			this.contents.run(ValueDefer.accept(var ->
+		return new ValueFunction(arg ->
+			this.contents.run(new ValueFunction(var ->
 				arg.call(environment.call(var))
 			))
 		);

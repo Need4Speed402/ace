@@ -2,14 +2,14 @@ package value.intrinsic;
 
 import value.Value;
 import value.Value.Getter;
-import value.ValueDefer;
+import value.Value.Resolver;
 import value.ValueEffect;
-import value.ValueProbe;
+import value.ValueFunction;
 import value.effect.EffectPrint;
 import value.node.NodeIdentifier;
 
 public class Print implements Getter{
-	public static final Value instance = ValueDefer.accept(message -> message.getID(new Print(message)));
+	public static final Value instance = new ValueFunction(message -> message.getID(new Print(message)));
 	
 	private final Value message;
 	
@@ -23,7 +23,7 @@ public class Print implements Getter{
 	}
 
 	@Override
-	public Getter resolve(ValueProbe probe, Value value) {
-		return new Print(this.message.resolve(probe, value));
+	public Getter resolve(Resolver res) {
+		return new Print(this.message.resolve(res));
 	}
 }

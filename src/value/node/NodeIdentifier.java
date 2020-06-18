@@ -3,10 +3,10 @@ package value.node;
 import parser.Stream;
 import parser.token.syntax.TokenString;
 import value.Value;
-import value.ValueDefer;
+import value.ValueFunction;
 
 public class NodeIdentifier implements Node, Value {
-	public final static Value NULL = ValueDefer.accept(v -> NodeIdentifier.NULL, "NodeIdentifier.NULL");
+	public final static Value NULL = new Null();
 	
 	private static int counter = 0;
 	public final int id;
@@ -72,6 +72,22 @@ public class NodeIdentifier implements Node, Value {
 			return new TokenString (name).toString();
 		}else {
 			return name;
+		}
+	}
+	
+	private static class Null extends ValueFunction {
+		public Null () {
+			super (v -> NodeIdentifier.NULL);
+		}
+		
+		@Override
+		public Value resolve(Resolver res) {
+			return this;
+		}
+		
+		@Override
+		public String toString() {
+			return "NodeIdentifier.Null";
 		}
 	}
 }

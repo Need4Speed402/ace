@@ -1,13 +1,11 @@
 package value.effect;
 
-import value.Value;
-import value.ValueProbe;
-import value.effect.Runtime;
+import value.Value.Resolver;
 
 public interface Effect {
 	public void run (Runtime runtime);
 	
-	public default Effect resolve (ValueProbe probe, Value value) {
+	public default Effect resolve (Resolver res) {
 		return this;
 	}
 	

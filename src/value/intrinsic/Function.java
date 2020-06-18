@@ -2,12 +2,12 @@ package value.intrinsic;
 
 import value.Value;
 import value.Value.Getter;
-import value.ValueDefer;
-import value.ValueProbe;
+import value.Value.Resolver;
+import value.ValueFunction;
 
 public class Function{
 	public static final Value instance = identv -> identv.getID(ident ->
-		ValueDefer.accept(body -> ValueDefer.accept(arg ->
+		new ValueFunction(body -> new ValueFunction(arg ->
 			body.call(new Env(arg, ident))
 		))
 	);
@@ -27,8 +27,8 @@ public class Function{
 		}
 		
 		@Override
-		public Value resolve(ValueProbe probe, Value value) {
-			return new Env(this.arg.resolve(probe, value), this.value);
+		public Value resolve(Resolver res) {
+			return new Env(this.arg.resolve(res), this.value);
 		}
 	}
 	
@@ -52,8 +52,8 @@ public class Function{
 		}
 		
 		@Override
-		public Getter resolve(ValueProbe probe, Value value) {
-			return new Arg(this.arg.resolve(probe, value), this.env.resolve(probe, value), this.value);
+		public Getter resolve(Resolver res) {
+			return new Arg(this.arg.resolve(res), this.env.resolve(res), this.value);
 		}
 	}
 }

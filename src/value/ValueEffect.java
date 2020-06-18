@@ -41,8 +41,8 @@ public class ValueEffect implements Value{
 	}
 	
 	@Override
-	public Value resolve(ValueProbe probe, Value value) {
-		return new ValueEffect(this.parent.resolve(probe, value), this.effect.resolve(probe, value));
+	public Value resolve(Resolver res) {
+		return new ValueEffect(this.parent.resolve(res), this.effect.resolve(res));
 	}
 	
 	public Effect getRawEffect () {
@@ -56,7 +56,7 @@ public class ValueEffect implements Value{
 	}
 	
 	public Value getParent() {
-		return parent;
+		return this.parent;
 	}
 	
 	@Override

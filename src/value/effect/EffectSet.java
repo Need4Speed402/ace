@@ -1,13 +1,14 @@
 package value.effect;
 
 import value.Value;
-import value.ValueProbe;
+import value.Value.Resolver;
+import value.ValuePartial.Probe;
 
 public class EffectSet implements Effect{
 	private final Value value;
-	private final ValueProbe probe;
+	private final Probe probe;
 	
-	public EffectSet (ValueProbe probe, Value value) {
+	public EffectSet (Probe probe, Value value) {
 		this.probe = probe;
 		this.value = value;
 	}
@@ -17,8 +18,8 @@ public class EffectSet implements Effect{
 	}
 	
 	@Override
-	public Effect resolve(ValueProbe probe, Value value) {
-		return new EffectSet(this.probe, this.value.resolve(probe, value));
+	public Effect resolve(Resolver res) {
+		return new EffectSet(this.probe, this.value.resolve(res));
 	}
 	
 	@Override
