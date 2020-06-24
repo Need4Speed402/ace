@@ -41,8 +41,6 @@ public class Runtime {
 	}
 	
 	public void run (Value root) {
-		System.out.println(root);
-		
 		root.run(this);
 	}
 	

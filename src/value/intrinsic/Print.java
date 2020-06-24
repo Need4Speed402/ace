@@ -5,7 +5,8 @@ import value.Value.Getter;
 import value.Value.Resolver;
 import value.ValueEffect;
 import value.ValueFunction;
-import value.effect.EffectPrint;
+import value.effect.Effect;
+import value.effect.Runtime;
 import value.node.NodeIdentifier;
 
 public class Print implements Getter{
@@ -26,4 +27,23 @@ public class Print implements Getter{
 	public Getter resolve(Resolver res) {
 		return new Print(this.message.resolve(res));
 	}
+	
+	public static class EffectPrint implements Effect {
+		private final String message;
+		
+		public EffectPrint (String message) {
+			this.message = message;
+		}
+		
+		@Override
+		public void run(Runtime runtime) {
+			runtime.out.println(this.message);
+		}
+		
+		@Override
+		public String toString() {
+			return "Print(" + this.message + ")";
+		}
+	}
+
 }

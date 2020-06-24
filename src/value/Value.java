@@ -28,11 +28,15 @@ public interface Value {
 	
 	public class ProbeResolver implements Resolver {
 		public final Probe probe;
-		public final Value value;
+		private final Value value;
 		
 		public ProbeResolver (Probe probe, Value value) {
 			this.probe = probe;
 			this.value = value;
+		}
+		
+		public Value use () {
+			return this.value;
 		}
 	}
 	

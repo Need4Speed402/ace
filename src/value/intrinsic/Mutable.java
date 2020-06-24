@@ -4,20 +4,20 @@ import java.util.HashMap;
 
 import value.Value;
 import value.ValueEffect;
-import value.ValueFunction;
 import value.ValuePartial.Probe;
-import value.effect.EffectSet;
+import value.effect.Effect;
+import value.effect.EffectQueue;
 import value.effect.Runtime;
 import value.effect.Runtime.Resolve;
 
 public class Mutable implements Value {
 	public static final Probe DUP_PROBE = new Probe();
 	
-	public static final Value instance = new ValueFunction(init -> {
+	public static final Value instance = init -> {
 		Probe probe = new Probe();
 		
 		return new ValueEffect(new Mutable(probe), new EffectSet(probe, init));
-	});
+	};
 	
 	private final Probe probe;
 	
@@ -114,6 +114,36 @@ public class Mutable implements Value {
 		}
 	}
 	
+	public static class EffectSet implements Effect{
+		private final Value value;
+		private final Probe probe;
+		
+		public EffectSet (Probe probe, Value value) {
+			this.probe = probe;
+			this.value = value;
+		}
+		
+		public void run(Runtime runtime) {
+			runtime.setResolve(this.probe, this.value.run(runtime));
+		}
+		
+		@Override
+		public Effect resolve(Resolver res) {
+			Effect t = new EffectSet(this.probe, this.value.resolve(res));
+			
+			if (res instanceof Mutable.Context) {
+				return new EffectQueue(t, new EffectSet(((Mutable.Context) res).createMapping(this.probe), this.probe));
+			}else {
+				return t;
+			}
+		}
+		
+		@Override
+		public String toString() {
+			return "Set " + this.probe + " = " + this.value;
+		}
+	}
+	
 	public static class Context implements Resolver {
 		private HashMap<Probe, MutableProbe> map = new HashMap<>();
 		
@@ -123,8 +153,6 @@ public class Mutable implements Value {
 			if (mapping == null) {
 				mapping = new MutableProbe(initial);
 				this.map.put(initial, mapping);
-			}else {
-				System.out.println("reusing mapping");
 			}
 			
 			return mapping;

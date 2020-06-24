@@ -19,41 +19,15 @@ public abstract class ValuePartial implements Value {
 	}
 	
 	public static class Probe extends ValuePartial {
-		private final Resolver[] resolvers;
-		private final Probe root;
-		
-		public Probe () {
-			this.resolvers = new Resolver[0];
-			this.root = this;
-		}
-		
-		private Probe (Probe root, Resolver ... resolvers) {
-			this.resolvers = resolvers;
-			this.root = root;
-		}
-		
 		@Override
 		public Value resolve(Resolver r) {
 			if (r instanceof ProbeResolver) {
 				ProbeResolver pr = (ProbeResolver) r;
 				
-				if (pr.probe == this.root) {
-					Value v = pr.value;
-					
-					for (int i = 0; i < this.resolvers.length; i++) {
-						v = v.resolve(this.resolvers[i]);
-					}
-					
-					return v;
+				if (pr.probe == this) {
+					return pr.use();
 				}
-			}/*else {
-				Resolver[] n = new Resolver[this.resolvers.length + 1];
-				
-				for (int i = 0; i < this.resolvers.length; i++) n[i] = this.resolvers[i];
-				n[this.resolvers.length] = r;
-				
-				return new Probe(this.root, n);
-			}*/
+			}
 			
 			return this;
 		}

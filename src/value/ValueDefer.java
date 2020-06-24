@@ -29,14 +29,14 @@ public class ValueDefer extends ValuePartial{
 		if (val instanceof ValuePartial) {
 			return new ValueDefer(probe, body, val);
 		}else if (val instanceof ValueEffect) {
+			val = val.resolve(new Mutable.Context());
+			
 			return new ValueEffect(
 				create(probe, body, ((ValueEffect) val).getParent()),
 				((ValueEffect) val).getRawEffect()
 			);
 		}else{
-			//val = val.resolve(new Mutable.Context());
-			//System.out.println(val);
-			return body.resolve(new ProbeResolver(probe, val)).resolve(new Mutable.Context());
+			return body.resolve(new ProbeResolver(probe, val));
 		}
 	}
 	
