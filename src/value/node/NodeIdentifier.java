@@ -4,6 +4,7 @@ import parser.Stream;
 import parser.token.syntax.TokenString;
 import value.Value;
 import value.ValueFunction;
+import value.ValuePartial.Probe;
 
 public class NodeIdentifier implements Node, Value {
 	public final static Value NULL = new Null();
@@ -81,7 +82,7 @@ public class NodeIdentifier implements Node, Value {
 		}
 		
 		@Override
-		public Value resolve(Resolver res) {
+		public Value resolve(Probe probe, Value value) {
 			return this;
 		}
 		

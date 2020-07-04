@@ -2,7 +2,6 @@ package value;
 
 import parser.Color;
 import value.effect.Runtime;
-import value.effect.Runtime.Resolve;
 
 public abstract class ValuePartial implements Value {
 	@Override
@@ -20,31 +19,13 @@ public abstract class ValuePartial implements Value {
 	
 	public static class Probe extends ValuePartial {
 		@Override
-		public Value resolve(Resolver r) {
-			if (r instanceof ProbeResolver) {
-				ProbeResolver pr = (ProbeResolver) r;
-				
-				if (pr.probe == this) {
-					return pr.use();
-				}
-			}
-			
-			return this;
+		public Value resolve(Probe probe, Value value) {
+			return probe == this ? value : this;
 		}
-		
+
 		@Override
 		public Value run(Runtime r) {
-			Resolve res = r.memory;
-			
-			while (res != null) {
-				if (res.probe == this) {
-					return res.value;
-				}
-				
-				res = res.next;
-			}
-			
-			throw new Error("neither compile time or runtime info is able to satisfy this probe. This indicates a bug with the interpreter. Unknown: " + this);
+			return r.get(this).run(r);
 		}
 	}
 	
@@ -76,8 +57,8 @@ public abstract class ValuePartial implements Value {
 		}
 		
 		@Override
-		public Value resolve(Resolver res) {
-			return this.parent.resolve(res).call(this.argument.resolve(res));
+		public Value resolve(Probe probe, Value value) {
+			return this.parent.resolve(probe, value).call(this.argument.resolve(probe, value));
 		}
 	}
 	
@@ -108,8 +89,8 @@ public abstract class ValuePartial implements Value {
 		}
 		
 		@Override
-		public Value resolve(Resolver res) {
-			return this.parent.resolve(res).getID(this.getter.resolve(res));
+		public Value resolve(Probe probe, Value value) {
+			return this.parent.resolve(probe, value).getID(this.getter.resolve(probe, value));
 		}
 	}
 }

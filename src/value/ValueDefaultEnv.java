@@ -3,6 +3,7 @@ package value;
 import java.util.HashMap;
 
 import parser.token.resolver.Unsafe;
+import value.ValuePartial.Probe;
 import value.intrinsic.Assign;
 import value.intrinsic.Compare;
 import value.intrinsic.Function;
@@ -60,8 +61,8 @@ public class ValueDefaultEnv implements Value {
 		}
 		
 		@Override
-		public Getter resolve(Resolver res) {
-			return new IdentifierLookup(this.env.resolve(res));
+		public Getter resolve(Probe probe, Value value) {
+			return new IdentifierLookup(this.env.resolve(probe, value));
 		}
 	}
 }

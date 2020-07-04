@@ -2,8 +2,8 @@ package value.intrinsic;
 
 import value.Value;
 import value.Value.Getter;
-import value.Value.Resolver;
 import value.ValueFunction;
+import value.ValuePartial.Probe;
 
 public class Function{
 	public static final Value instance = identv -> identv.getID(ident ->
@@ -27,8 +27,8 @@ public class Function{
 		}
 		
 		@Override
-		public Value resolve(Resolver res) {
-			return new Env(this.arg.resolve(res), this.value);
+		public Value resolve(Probe probe, Value value) {
+			return new Env(this.arg.resolve(probe, value), this.value);
 		}
 	}
 	
@@ -52,8 +52,8 @@ public class Function{
 		}
 		
 		@Override
-		public Getter resolve(Resolver res) {
-			return new Arg(this.arg.resolve(res), this.env.resolve(res), this.value);
+		public Getter resolve(Probe probe, Value value) {
+			return new Arg(this.arg.resolve(probe, value), this.env.resolve(probe, value), this.value);
 		}
 	}
 }

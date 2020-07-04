@@ -108,6 +108,24 @@ test {
 }
 
 test {
+	name "wierd thing that didn't work once`"
+	case {
+		[Mutable] hello ([root Function] set {[root Function] get {
+			[root ``] (
+				[root ``] (lol lol) ([console] world)
+				([root ``] (set !!) ([console] !!))
+			) ([console] !!)
+		}})
+	}
+	expect "
+		world
+		!!
+		!!
+		
+	`"
+}
+
+test {
 	name 'create mutable use reset use twice'
 	case {
 		[Mutable] hello ([root Function] set {[root Function] get {
@@ -354,6 +372,152 @@ test {
 }
 
 test {
+	name 'mutable behind function'
+	case {
+		[root Function] create {
+			create ([root Function] set {
+				[root Function] get {
+					[console] (get void)
+				}
+			})
+		} ([Mutable] hello)
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'multiple behind function call'
+	case {
+		[root Function] create {
+			create void ([root Function] set {
+				[root Function] get {
+					[console] (get void)
+				}
+			})
+		} ([root Function] void {[Mutable] hello})
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'multiple mutable behind function'
+	case {
+		[root Function] create {
+			create void ([root Function] set {
+				[root Function] get {
+					create void ([root Function] set2 {
+						[root Function] get2 {
+							[root ``] ([console] (get void)) ([console] (get2 void))
+						}
+					})
+				}
+			})
+		} ([root Function] void {[Mutable] hello})
+	}
+	expect "
+		hello
+		hello
+		
+	`"
+}
+
+test {
+	name 'duplicated instance set one'
+	case {
+		[root Function] create {
+			create ([root Function] set {
+				[root Function] get {
+					create ([root Function] set2 {
+						[root Function] get2 {
+							[root ``] (set2 world) ([root ``] ([console] (get void)) ([console] (get2 void)))
+						}
+					})
+				}
+			})
+		} ([Mutable] hello)
+	}
+	expect "
+		world
+		world
+		
+	`"
+}
+
+test {
+	name 'mutible mutable behind function set one behind function'
+	case {
+		[root Function] create {
+			create void ([root Function] set {
+				[root Function] get {
+					create void ([root Function] set2 {
+						[root Function] get2 {
+							[root ``] (set2 world) ([root ``] ([console] (get void)) ([console] (get2 void)))
+						}
+					})
+				}
+			})
+		} ([root Function] void {[Mutable] hello})
+	}
+	expect "
+		hello
+		world
+		
+	`"
+}
+
+test {
+	name 'multiple mutable behind function set one reversed'
+	case {
+		[root Function] create {
+			create void ([root Function] set {
+				[root Function] get {
+					create void ([root Function] set2 {
+						[root Function] get2 {
+							[root ``] (set world) ([root ``] ([console] (get void)) ([console] (get2 void)))
+						}
+					})
+				}
+			})
+		} ([root Function] void {[Mutable] hello})
+	}
+	expect "
+		world
+		hello
+		
+	`"
+}
+
+test {
+	name 'multiple mutable behind function set one both'
+	case {
+		[root Function] create {
+			create void ([root Function] set {
+				[root Function] get {
+					create void ([root Function] set2 {
+						[root Function] get2 {
+							[root ``] (set world)
+								([root ``] (set2 yeah) (
+									([root ``] ([console] (get void)) ([console] (get2 void)))))
+						}
+					})
+				}
+			})
+		} ([root Function] void {[Mutable] hello})
+	}
+	expect "
+		world
+		yeah
+		
+	`"
+}
+
+test {
 	name 'mutation behind abstraction with set'
 	case {
 		[root Function] createMutable {
@@ -402,6 +566,38 @@ test {
 	expect "
 		hello
 		world
+		
+	`"
+}
+
+test {
+	name 'mutable instance behind mutable'
+	case {
+		[Mutable] [Mutable] ([root Function] set {[root Function] get {
+			get void hello ([root Function] set1 {[root Function] get1 {
+				[console] (get1 void)
+			}})
+		}})
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'mutable instance behind mutable tripple'
+	case {
+		[Mutable] [Mutable] ([root Function] set {[root Function] get {
+			get void [Mutable] ([root Function] set1 {[root Function] get1 {
+				get1 void hello ([root Function] set2 {[root Function] get2 {
+					[console] (get2 void)
+				}})
+			}})
+		}})
+	}
+	expect "
+		hello
 		
 	`"
 }

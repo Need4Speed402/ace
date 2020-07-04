@@ -32,8 +32,8 @@ public class ValueFunction implements Value {
 		}
 		
 		@Override
-		public Value resolve(Resolver res) {
-			return new ValueFunction(() -> this.get().resolve(res), this.probe);
+		public Value resolve(Probe probe, Value value) {
+			return new ValueFunction(() -> this.get().resolve(probe, value), this.probe);
 		}
 		
 		@Override

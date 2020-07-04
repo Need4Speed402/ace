@@ -1,6 +1,7 @@
 package value;
 
 import parser.Color;
+import value.effect.Effect;
 import value.effect.Runtime;
 import value.intrinsic.Mutable;
 
@@ -18,25 +19,45 @@ public class ValueDefer extends ValuePartial{
 	public Value run(Runtime r) {
 		Value arg = this.value.run(r);
 		
-		return this.body.resolve(new ProbeResolver(this.probe, arg)).run(r);
+		r.push();
+		//r.declare(this.probe, arg);
+		Value resolved = this.body.resolve(this.probe, arg).run(r);
+		
+		return r.pop(resolved);
 	}
 	
-	public Value resolve (Resolver res) {
-		return create(this.probe, this.body.resolve(res), this.value.resolve(res));
+	public Value resolve (Probe probe, Value value) {
+		return create(this.probe, this.body.resolve(probe, value), this.value.resolve(probe, value));
+	}
+	
+	public static ValueEffect remapDeclares (ValueEffect ret) {
+		for (Effect effect : ret.getEffects()) {
+			if (effect instanceof Mutable.EffectDeclare) {
+				ret = ret.resolve(((Mutable.EffectDeclare) effect).probe, new Probe());
+			}
+		}
+		
+		return ret;
 	}
 	
 	public static Value create (Probe probe, Value body, Value val) {
+		//return new ValueDefer(probe, body, val);
+		
 		if (val instanceof ValuePartial) {
 			return new ValueDefer(probe, body, val);
 		}else if (val instanceof ValueEffect) {
-			val = val.resolve(new Mutable.Context());
-			
-			return new ValueEffect(
+			return remapDeclares(new ValueEffect(
 				create(probe, body, ((ValueEffect) val).getParent()),
-				((ValueEffect) val).getRawEffect()
-			);
+				((ValueEffect) val).getEffects()
+			));
 		}else{
-			return body.resolve(new ProbeResolver(probe, val));
+			Value v = body.resolve(probe, val);
+			
+			if (v instanceof ValueEffect) {
+				v = remapDeclares((ValueEffect) v);
+			}
+			
+			return v;
 		}
 	}
 	

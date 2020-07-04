@@ -6,7 +6,7 @@ import value.effect.Runtime;
 public interface Value {
 	public Value call (Value v);
 	
-	public default Value resolve (Resolver res) {
+	public default Value resolve (Probe probe, Value value) {
 		return this;
 	}
 	
@@ -24,26 +24,10 @@ public interface Value {
 		return this;
 	}
 	
-	public interface Resolver {};
-	
-	public class ProbeResolver implements Resolver {
-		public final Probe probe;
-		private final Value value;
-		
-		public ProbeResolver (Probe probe, Value value) {
-			this.probe = probe;
-			this.value = value;
-		}
-		
-		public Value use () {
-			return this.value;
-		}
-	}
-	
 	public interface Getter {
 		public Value resolved (int value);
 		
-		public default Getter resolve (Resolver r) {
+		public default Getter resolve (Probe probe, Value value) {
 			return this;
 		}
 	}

@@ -30,6 +30,35 @@ test {
 }
 
 test {
+	name 'effects in print message indirect'
+	case {
+		[root Function] print {
+			[console] ([console] print)
+		} hello
+	}
+	expect "
+		hello
+		hello
+		
+	`"
+}
+
+test {
+	name 'effects in print message with indirection having effects'
+	case {
+		[root Function] print {
+			[console] ([console] print)
+		} ([root ``] ([console] dude) hello)
+	}
+	expect "
+		dude
+		hello
+		hello
+		
+	`"
+}
+
+test {
 	name 'print twice'
 	case {
 		[root Function] message {

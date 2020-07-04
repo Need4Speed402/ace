@@ -1,10 +1,12 @@
 package value.intrinsic;
 
+import java.io.IOException;
+
 import value.Value;
 import value.Value.Getter;
-import value.Value.Resolver;
 import value.ValueEffect;
 import value.ValueFunction;
+import value.ValuePartial.Probe;
 import value.effect.Effect;
 import value.effect.Runtime;
 import value.node.NodeIdentifier;
@@ -24,25 +26,32 @@ public class Print implements Getter{
 	}
 
 	@Override
-	public Getter resolve(Resolver res) {
-		return new Print(this.message.resolve(res));
+	public Getter resolve(Probe probe, Value value) {
+		return new Print(this.message.resolve(probe, value));
+	}
+	
+	@Override
+	public String toString() {
+		return super.toString() + " <- " + this.message;
 	}
 	
 	public static class EffectPrint implements Effect {
-		private final String message;
+		private final byte[] message;
 		
 		public EffectPrint (String message) {
-			this.message = message;
+			this.message = (message + "\n").getBytes();
 		}
 		
 		@Override
 		public void run(Runtime runtime) {
-			runtime.out.println(this.message);
+			try {
+				runtime.out.write(this.message);
+			} catch (IOException e) {}
 		}
 		
 		@Override
 		public String toString() {
-			return "Print(" + this.message + ")";
+			return "Print(" + new String(this.message, 0, this.message.length - 1) + ")";
 		}
 	}
 

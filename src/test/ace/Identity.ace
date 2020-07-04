@@ -81,3 +81,95 @@ test {
 		
 	`"
 }
+
+test {
+	name 'indirect environment single'
+	case {
+		([root Function] wrap {
+			{
+				[console] hello
+			} ([root Function] env {
+				wrap {env} void
+			})
+		}) ([root Function] env {[root Function] void {env ([root Function] ident {ident})}})
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'indirect environment twice nested'
+	case {
+		([root Function] wrap {
+			{
+				{
+					[console] hello
+				} ([root Function] env {
+					wrap {env} void
+				})
+			} ([root Function] env {
+				wrap {env} void
+			})
+		}) ([root Function] env {[root Function] void {env ([root Function] ident {ident})}})
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'indirect environment thrice nested'
+	case {
+		([root Function] wrap {
+			{
+				{
+					{
+						[console] hello
+					} ([root Function] env {
+						wrap {env} void
+					})
+				} ([root Function] env {
+					wrap {env} void
+				})
+			} ([root Function] env {
+				wrap {env} void
+			})
+		}) ([root Function] env {[root Function] void {env ([root Function] ident {ident})}})
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'indirect environment quad nested'
+	case {
+		([root Function] wrap {
+			{
+				{
+					{
+						{
+							[console] hello
+						} ([root Function] env {
+							wrap {env} void
+						})
+					} ([root Function] env {
+						wrap {env} void
+					})
+				} ([root Function] env {
+					wrap {env} void
+				})
+			} ([root Function] env {
+				wrap {env} void
+			})
+		}) ([root Function] env {[root Function] void {env ([root Function] ident {ident})}})
+	}
+	expect "
+		hello
+		
+	`"
+}

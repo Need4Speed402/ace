@@ -1,46 +1,71 @@
 package value.effect;
 
-import java.io.PrintStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
 import value.Value;
 import value.ValuePartial.Probe;
 
 public class Runtime {
-	public final PrintStream out;
-	public Resolve memory = null;
+	public final OutputStream out;
+	public final InputStream in;
 	
-	public Runtime(PrintStream stream) {
-		this.out = stream;
+	private Memory memory = new Memory(null);
+	
+	public Runtime(OutputStream out, InputStream in) {
+		this.out = out;
+		this.in = in;
 	}
 	
 	public Runtime () {
 		this.out = System.out;
+		this.in = System.in;
 	}
 	
-	public Runtime(Runtime run) {
-		this.out = run.out;
-		this.memory = run.memory;
+	
+	public void push () {
+		this.memory = new Memory(this.memory);
 	}
 	
-	public void setResolve (Probe probe, Value value) {
-		this.setResolve(new Resolve(probe, value));
-	}
-	
-	public void setResolve (Resolve r) {
-		while (r != null) {
-			Resolve rep = this.memory == null ? null : this.memory.replace(r.probe, r.value);
-			
-			if (rep == this.memory) {
-				this.memory = new Resolve(rep, r.probe, r.value);
-			}else {
-				this.memory = rep;
+	public Value pop (Value v) {
+		HashMap<Probe, Reference> c = this.memory.memory;
+		this.memory = this.memory.previous;
+		
+		for (Entry<Probe, Reference> entry: c.entrySet()) {
+			if (entry.getValue() != this.memory.memory.get(entry.getKey())) {
+				Probe p = new Probe();
+				
+				v = v.resolve(entry.getKey(), p);
+				
+				this.memory.memory.put(p, entry.getValue());
 			}
-			
-			r = r.next;
 		}
+		
+		return v;
+	}
+	
+	public void set (Probe p, Value value) {
+		Reference r = this.memory.memory.get(p);
+		if (r == null) throw new Error("Cannot set: " + p + ". This indicates a bug with the interpreter");
+		
+		r.value = value;
+	}
+	
+	public void declare (Probe p, Value value) {
+		this.memory.memory.put(p, new Reference(value));
+	}
+	
+	public Value get (Probe p) {
+		Reference r = this.memory.memory.get(p);
+		if (r == null) throw new Error("Cannot resolve: " + p + ". This indicates a bug with the interpreter");
+		
+		return r.value;
 	}
 	
 	public void run (Value root) {
+		//System.out.println(root);
 		root.run(this);
 	}
 	
@@ -49,52 +74,31 @@ public class Runtime {
 		StringBuilder b = new StringBuilder();
 		b.append(super.toString()).append('\n');
 		
-		Resolve current = this.memory;
-		
-		while (current != null) {
-			b.append(current).append('\n');
-			
-			current = current.next;
+		for (Entry<Probe, Reference> entry : this.memory.memory.entrySet()){
+			b.append(entry.getKey() + " = " + entry.getValue().value + '\n');
 		}
 		
 		return b.toString();
 	}
 	
-	public static class Resolve {
-		public final Value value;
-		public final Probe probe;
+	private static class Reference {
+		public Value value;
 		
-		public final Resolve next;
-		
-		public Resolve(Probe probe, Value value) {
-			this(null, probe, value);
-		}
-		
-		public Resolve (Resolve next, Probe probe, Value value){
-			this.next = next;
-			this.probe = probe;
+		public Reference (Value value) {
 			this.value = value;
 		}
+	}
+	
+	private static class Memory {
+		public final HashMap<Probe, Reference> memory = new HashMap<>();
+		public final Memory previous;
 		
-		public Resolve replace (Probe probe, Value value) {
-			if (this.probe == probe) {
-				return new Resolve(this.next, probe, value);
-			}else if (this.next != null) {
-				Resolve rep = this.next.replace(probe, value);
-				
-				if (rep == this.next) {
-					return this;
-				}else {
-					return new Resolve(rep, this.probe, this.value);
-				}
-			}else {
-				return this;
+		public Memory (Memory previous) {
+			this.previous = previous;
+			
+			if (previous != null) for (Entry<Probe, Reference> entry : previous.memory.entrySet()){
+				this.memory.put(entry.getKey(), entry.getValue());
 			}
-		}
-		
-		@Override
-		public String toString() {
-			return this.probe.toString() + "=" + this.value.toString();
 		}
 	}
 }
