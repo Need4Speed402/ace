@@ -4,6 +4,7 @@ import value.Value;
 import value.Value.Getter;
 import value.ValueFunction;
 import value.ValuePartial.Probe;
+import value.effect.Runtime;
 
 public class Function{
 	public static final Value instance = identv -> identv.getID(ident ->
@@ -22,6 +23,11 @@ public class Function{
 		}
 		
 		@Override
+		public Value run(Runtime r) {
+			return new Env(this.arg.run(r), value);
+		}
+		
+		@Override
 		public Value call(Value v) {
 			return v.getID(new Arg(this.arg, v, this.value));
 		}
@@ -29,6 +35,11 @@ public class Function{
 		@Override
 		public Value resolve(Probe probe, Value value) {
 			return new Env(this.arg.resolve(probe, value), this.value);
+		}
+		
+		@Override
+		public String toString() {
+			return super.toString() + " ? " + this.value + " -> " + this.arg;
 		}
 	}
 	

@@ -12,56 +12,79 @@ public class Runtime {
 	public final OutputStream out;
 	public final InputStream in;
 	
-	private Memory memory = new Memory(null);
+	private final HashMap<Probe, Value> memory = new HashMap<>();
+	private final Runtime parent;
+	public final Runtime root;
 	
 	public Runtime(OutputStream out, InputStream in) {
 		this.out = out;
 		this.in = in;
+		
+		this.parent = null;
+		this.root = this;
 	}
 	
 	public Runtime () {
-		this.out = System.out;
-		this.in = System.in;
+		this(System.out, System.in);
 	}
 	
-	
-	public void push () {
-		this.memory = new Memory(this.memory);
-	}
-	
-	public Value pop (Value v) {
-		HashMap<Probe, Reference> c = this.memory.memory;
-		this.memory = this.memory.previous;
+	private Runtime (Runtime r) {
+		this.out = r.out;
+		this.in = r.in;
 		
-		for (Entry<Probe, Reference> entry: c.entrySet()) {
-			if (entry.getValue() != this.memory.memory.get(entry.getKey())) {
-				Probe p = new Probe();
-				
-				v = v.resolve(entry.getKey(), p);
-				
-				this.memory.memory.put(p, entry.getValue());
-			}
+		this.parent = r;
+		this.root = r.root;
+	}
+	
+	
+	public Runtime push () {
+		return new Runtime(this);
+	}
+	
+	public Value extend (Runtime r, Value v) {
+		for (Entry<Probe, Value> entry : r.memory.entrySet()) {
+			Probe p = new Probe();
+			v = v.resolve(entry.getKey(), p);
+			
+			this.memory.put(p, entry.getValue());
 		}
 		
 		return v;
 	}
 	
 	public void set (Probe p, Value value) {
-		Reference r = this.memory.memory.get(p);
-		if (r == null) throw new Error("Cannot set: " + p + ". This indicates a bug with the interpreter");
+		Runtime current = this;
 		
-		r.value = value;
+		while (current != null) {
+			Value v = current.memory.get(p);
+			
+			if (v != null) {
+				current.memory.put(p, value);
+				return;
+			}
+			
+			current = current.parent;
+		}
+		
+		throw new Error("Cannot set: " + p + ". This indicates a bug with the interpreter");
 	}
 	
 	public void declare (Probe p, Value value) {
-		this.memory.memory.put(p, new Reference(value));
+		this.memory.put(p, value);
 	}
 	
 	public Value get (Probe p) {
-		Reference r = this.memory.memory.get(p);
-		if (r == null) throw new Error("Cannot resolve: " + p + ". This indicates a bug with the interpreter");
+		Runtime current = this;
 		
-		return r.value;
+		while (current != null) {
+			Value v = current.memory.get(p);
+			
+			if (v != null) return v;
+			
+			current = current.parent;
+		}
+		
+		throw new Error("Cannot resolve: " + p + ". This indicates a bug with the interpreter");
 	}
 	
 	public void run (Value root) {
@@ -74,31 +97,10 @@ public class Runtime {
 		StringBuilder b = new StringBuilder();
 		b.append(super.toString()).append('\n');
 		
-		for (Entry<Probe, Reference> entry : this.memory.memory.entrySet()){
-			b.append(entry.getKey() + " = " + entry.getValue().value + '\n');
+		for (Entry<Probe, Value> entry : this.memory.entrySet()){
+			b.append(entry.getKey() + " = " + entry.getValue() + '\n');
 		}
 		
 		return b.toString();
-	}
-	
-	private static class Reference {
-		public Value value;
-		
-		public Reference (Value value) {
-			this.value = value;
-		}
-	}
-	
-	private static class Memory {
-		public final HashMap<Probe, Reference> memory = new HashMap<>();
-		public final Memory previous;
-		
-		public Memory (Memory previous) {
-			this.previous = previous;
-			
-			if (previous != null) for (Entry<Probe, Reference> entry : previous.memory.entrySet()){
-				this.memory.put(entry.getKey(), entry.getValue());
-			}
-		}
 	}
 }

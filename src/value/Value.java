@@ -4,6 +4,8 @@ import value.ValuePartial.Probe;
 import value.effect.Runtime;
 
 public interface Value {
+	public static final int DEFAULT_ID = 0;
+	
 	public Value call (Value v);
 	
 	public default Value resolve (Probe probe, Value value) {
@@ -11,7 +13,7 @@ public interface Value {
 	}
 	
 	public default Value getID (Getter getter) {
-		return getter.resolved(0);
+		return getter.resolved(DEFAULT_ID);
 	}
 	
 	/*

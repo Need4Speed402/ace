@@ -2,6 +2,9 @@ package value;
 
 import parser.Color;
 import value.ValuePartial.Probe;
+import value.effect.Effect;
+import value.effect.Runtime;
+import value.intrinsic.Mutable;
 import value.node.Node;
 
 public class ValueFunction implements Value {
@@ -32,13 +35,52 @@ public class ValueFunction implements Value {
 		}
 		
 		@Override
-		public Value resolve(Probe probe, Value value) {
+		public ValueFunction resolve(Probe probe, Value value) {
 			return new ValueFunction(() -> this.get().resolve(probe, value), this.probe);
+		}
+		
+		public static ValueEffect remapDeclares (ValueEffect ret) {
+			for (Effect effect : ret.getEffects()) {
+				if (effect instanceof Mutable.EffectDeclare) {
+					ret = ret.resolve(((Mutable.EffectDeclare) effect).probe, new Probe());
+				}
+			}
+			
+			return ret;
 		}
 		
 		@Override
 		public Value call(Value v) {
-			return ValueDefer.create(this.probe, this.get(), v);
+			//to effectively disable the optimizer, this code can be uncommented
+			//which will basically make all functions be evaluated at runtime
+			//when most can be evalutated at compile time.
+			//return new ValuePartial.Call(this, v);
+			
+			if (v instanceof ValuePartial) {
+				return new ValuePartial.Call(this, v);
+			}else if (v instanceof ValueEffect) {
+				if (((ValueEffect) v).getParent() instanceof ValuePartial) {
+					return new ValuePartial.Call(this, v);
+				}
+				
+				return remapDeclares(new ValueEffect(
+					this.get().resolve(probe, ((ValueEffect) v).getParent()),
+					((ValueEffect) v).getEffects()
+				));
+			}else{
+				Value ret = this.get().resolve(probe, v);
+				
+				if (ret instanceof ValueEffect) {
+					ret = remapDeclares((ValueEffect) ret);
+				}
+				
+				return ret;
+			}
+		}
+		
+		@Override
+		public Value run(Runtime r) {
+			return new RuntimeFunction(r, this);
 		}
 		
 		@Override
@@ -52,5 +94,31 @@ public class ValueFunction implements Value {
 		
 		private static interface Generator {
 			public Value generate ();
+		}
+		
+		private static class RuntimeFunction implements Value{
+			private final Runtime runtime;
+			private final ValueFunction func;
+			
+			public RuntimeFunction (Runtime runtime, ValueFunction func) {
+				this.runtime = runtime;
+				this.func = func;
+			}
+			
+			@Override
+			public RuntimeFunction resolve(Probe probe, Value value) {
+				return new RuntimeFunction(this.runtime, this.func.resolve(probe, value));
+			}
+			
+			@Override
+			public Value call(Value v) {
+				if (v instanceof ValuePartial) throw new Error("what");
+				
+				Runtime child = this.runtime.push();
+				child.declare(this.func.probe, v);
+				Value ret = this.func.get().run(child);
+				
+				return this.runtime.root.extend(child, ret);
+			}
 		}
 	}

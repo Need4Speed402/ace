@@ -523,7 +523,6 @@ test {
 		[root Function] createMutable {
 			[root Function] mut {
 				[root ``] (mut set world) ([console] (mut get))
-				
 			} (createMutable hello)
 		} ([root Function] init {
 			[Mutable] init ([root Function] mSet {[root Function] mGet {
@@ -549,7 +548,6 @@ test {
 		[root Function] createMutable {
 			[root Function] mut {
 				[root ``] ([console] (mut get)) ([root ``] (mut set world) ([console] (mut get)))
-				
 			} (createMutable hello)
 		} ([root Function] init {
 			[Mutable] init ([root Function] mSet {[root Function] mGet {
@@ -598,6 +596,36 @@ test {
 	}
 	expect "
 		hello
+		
+	`"
+}
+
+test {
+	name 'mutation common initializer use twice set once reversed with mutable behind other mutable'
+	case {
+		[Mutable] [Mutable] ([root Function] setMutable {[root Function] getMutable {
+			[root Function] createMutable {
+				[root Function] a {
+					[root Function] b {
+						[root ``] (b set world) ([root ``] ([console] (a get)) ([console] (b get)))
+					} (createMutable void)
+				} (createMutable void)
+			} ([root Function] void {
+				getMutable void hello ([root Function] mSet {[root Function] mGet {
+					[root Function] env {
+						[root Scope] ([compare] env get {mGet void} {
+							[root Scope] ([compare] env set {
+								mSet
+							} {mGet void env})
+						})
+					}
+				}})
+			})
+		}})
+	}
+	expect "
+		hello
+		world
 		
 	`"
 }

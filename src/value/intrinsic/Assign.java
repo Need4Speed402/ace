@@ -3,6 +3,7 @@ package value.intrinsic;
 import value.Value;
 import value.ValueFunction;
 import value.ValuePartial.Probe;
+import value.effect.Runtime;
 
 public class Assign implements Value{
 	public static final Value instance = new ValueFunction(name ->
@@ -19,6 +20,11 @@ public class Assign implements Value{
 	@Override
 	public Value resolve(Probe probe, Value value) {
 		return new Assign(this.name.resolve(probe, value), this.value.resolve(probe, value));
+	}
+	
+	@Override
+	public Value run(Runtime r) {
+		return new Assign(this.name.run(r), this.value.run(r));
 	}
 	
 	@Override

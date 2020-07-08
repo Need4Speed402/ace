@@ -82,7 +82,7 @@ public class NodeIdentifier implements Node, Value {
 		}
 		
 		@Override
-		public Value resolve(Probe probe, Value value) {
+		public ValueFunction resolve(Probe probe, Value value) {
 			return this;
 		}
 		
