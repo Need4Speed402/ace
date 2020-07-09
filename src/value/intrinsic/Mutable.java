@@ -24,8 +24,8 @@ public class Mutable implements Value {
 	
 	@Override
 	public Value call(Value v) {
-		return v.call(new Setter(this.probe))
-		        .call(new Getter(this.probe));
+		return v.call(new ValueFunction(p -> new ValueEffect(p, new EffectSet(this.probe, p))))
+		        .call(new ValueFunction(p -> this.probe));
 	}
 	
 	@Override
@@ -35,50 +35,6 @@ public class Mutable implements Value {
 		}
 		
 		return this;
-	}
-	
-	private static class Setter implements Value{
-		private final Probe probe;
-		
-		public Setter (Probe probe){
-			this.probe = probe;
-		}
-		
-		@Override
-		public Value call(Value v) {
-			return new ValueEffect(v, new EffectSet(this.probe, v));
-		}
-		
-		@Override
-		public Value resolve(Probe probe, Value value) {
-			if (this.probe == probe) {
-				return new Setter((Probe) value);
-			}
-			
-			return this;
-		}
-	}
-	
-	private static class Getter implements Value {
-		private final Probe probe;
-		
-		public Getter (Probe probe) {
-			this.probe = probe;
-		}
-		
-		@Override
-		public Value call(Value v) {
-			return this.probe;
-		}
-		
-		@Override
-		public Value resolve(Probe probe, Value value) {
-			if (this.probe == probe) {
-				return new Mutable.Getter((Probe) value);
-			}
-			
-			return this;
-		}
 	}
 	
 	public static class EffectSet implements Effect{
@@ -101,11 +57,10 @@ public class Mutable implements Value {
 		
 		@Override
 		public Effect resolve(Probe probe, Value value) {
-			if (this.probe == probe) {
-				return new EffectSet((Probe) value, this.value);
-			}else {
-				return new EffectSet(this.probe, this.value.resolve(probe, value));
-			}
+			return new EffectSet(
+				this.probe == probe ? (Probe) value : this.probe,
+				this.value.resolve(probe, value)
+			);
 		}
 	}
 	
@@ -129,11 +84,10 @@ public class Mutable implements Value {
 		
 		@Override
 		public Effect resolve(Probe probe, Value value) {
-			if (this.probe == probe) {
-				return new EffectDeclare((Probe) value, this.value);
-			}else {
-				return new EffectDeclare(this.probe, this.value.resolve(probe, value));
-			}
+			return new EffectDeclare(
+				this.probe == probe ? (Probe) value : this.probe,
+				this.value.resolve(probe, value)
+			);
 		}
 	}
 }

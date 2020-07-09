@@ -32,7 +32,7 @@ public class TokenBuiltin implements Token{
 		}
 		
 		String[] path = b.toString().trim().split(" ");
-		Resolver current = new Unsafe();
+		Resolver current = Unsafe.instance;
 		
 		for (int i = 0; i < path.length && current != null; i++) {
 			if (current instanceof Virtual) {

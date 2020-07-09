@@ -19,7 +19,9 @@ public class Unsafe extends Virtual {
 	public static final Node SCOPE = Node.call(FUNCTION, TEMP2, Node.env(Node.call(TEMP2, IDENTITY)));
 	public static final Node DO = Node.call(FUNCTION, TEMP2, Node.env(IDENTITY));
 	
-	public Unsafe() {
+	public static Unsafe instance = new Unsafe();
+	
+	private Unsafe() {
 		super("unsafe",
 			new Source("compare", COMPARE),
 			new Source("assign", ASSIGN),

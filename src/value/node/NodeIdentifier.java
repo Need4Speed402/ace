@@ -1,6 +1,13 @@
 package value.node;
 
+import java.util.HashMap;
+
+import parser.Color;
 import parser.Stream;
+import parser.token.Resolver;
+import parser.token.resolver.Source;
+import parser.token.resolver.Unsafe;
+import parser.token.resolver.Virtual;
 import parser.token.syntax.TokenString;
 import value.Value;
 import value.ValueFunction;
@@ -11,7 +18,34 @@ public class NodeIdentifier implements Node, Value {
 	
 	private static int counter = 0;
 	public final int id;
-
+	
+	private static HashMap<Integer, String> builtinSearch;
+	
+	private static void searchUnsafe (Resolver current, String dir) {
+		if (current instanceof Virtual) {
+			Resolver[] resolvers = ((Virtual) current).getResolvers();
+			
+			for (Resolver r : resolvers) {
+				searchUnsafe(r, dir == null ? r.getName() : dir + " " + r.getName());
+			}
+		}else if (current instanceof Source) {
+			Node source = ((Source) current).getSource();
+			
+			if (source instanceof NodeIdentifier) {
+				builtinSearch.put(((NodeIdentifier) source).id, dir);
+			}
+		}
+	}
+	
+	private static HashMap<Integer, String> getBuiltinSearch () {
+		if (builtinSearch == null) {
+			builtinSearch = new HashMap<>();
+			searchUnsafe(Unsafe.instance, null);
+		}
+		
+		return builtinSearch;
+	}
+	
 	protected NodeIdentifier() {
 		this.id = ++counter;
 	}
@@ -33,7 +67,7 @@ public class NodeIdentifier implements Node, Value {
 	
 	@Override
 	public String toString() {
-		return "NodeIdentifier(" + asString(this.id) + ")";
+		return asString(this.id);
 	}
 	
 	@Override
@@ -51,6 +85,14 @@ public class NodeIdentifier implements Node, Value {
 	}
 	
 	public static String asString (int id) {
+		{
+			String rev = getBuiltinSearch().get(id);
+			
+			if (rev != null) {
+				return "[" + Color.purple(rev) + "]";
+			}
+		}
+		
 		String name = Node.ids_rev.get(id);
 		if (name == null) name = Integer.toString(id);
 		

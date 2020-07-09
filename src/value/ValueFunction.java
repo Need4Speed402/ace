@@ -39,7 +39,7 @@ public class ValueFunction implements Value {
 			return new ValueFunction(() -> this.get().resolve(probe, value), this.probe);
 		}
 		
-		public static ValueEffect remapDeclares (ValueEffect ret) {
+		private static ValueEffect remapDeclares (ValueEffect ret) {
 			for (Effect effect : ret.getEffects()) {
 				if (effect instanceof Mutable.EffectDeclare) {
 					ret = ret.resolve(((Mutable.EffectDeclare) effect).probe, new Probe());
@@ -54,7 +54,8 @@ public class ValueFunction implements Value {
 			//to effectively disable the optimizer, this code can be uncommented
 			//which will basically make all functions be evaluated at runtime
 			//when most can be evalutated at compile time.
-			//return new ValuePartial.Call(this, v);
+			
+			//if (true) return new ValuePartial.Call(this, v);
 			
 			if (v instanceof ValuePartial) {
 				return new ValuePartial.Call(this, v);

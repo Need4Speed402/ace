@@ -85,11 +85,11 @@ public class Virtual extends Resolver {
 			Node block = Node.call(parent, rel);
 			
 			for (IdentifierResolver p : pairs) {
-				block = Node.call(Unsafe.SCOPE, Node.call(Unsafe.COMPARE, rel, p.identifier, Node.env(
+				block = Node.call(Unsafe.COMPARE, rel, p.identifier, Node.env(
 					p.uniqueIdentifier
 				), Node.env(
 					block
-				)));
+				), Unsafe.IDENTITY);
 			}
 			
 			block = Node.call(Unsafe.FUNCTION, rel, Node.env(block));
@@ -109,11 +109,11 @@ public class Virtual extends Resolver {
 				block = Node.call(Unsafe.FUNCTION, p.uniqueIdentifier, Node.env(block), Node.call(
 					p.createNode(),
 					Node.call(Unsafe.FUNCTION, param, Node.env(
-						Node.call(Unsafe.SCOPE, Node.call(Unsafe.COMPARE, Unsafe.PARENT, param, Node.env(
+						Node.call(Unsafe.COMPARE, Unsafe.PARENT, param, Node.env(
 							tparent
 						), Node.env(
 							root
-						)))
+						), Unsafe.IDENTITY)
 					))
 				));
 			}

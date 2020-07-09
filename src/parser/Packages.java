@@ -60,13 +60,15 @@ public class Packages {
 			}
 			
 			Token r = new Virtual ("root",
-				new Unsafe (),
-				//new Directory("std", new File("/media/wdhhd/documents/eclipse/SimpleAceInterpreter/src/ace")).insert(new Source("root", Node.call(Node.id("unsafe"), Node.id("root")))),
-				new Directory("import", start.getParentFile()).insert(new Source("root", Node.call(Node.id("unsafe"), Node.id("root"))))
+				Unsafe.instance,
+				new Directory("std", new File("/media/wdhhd/documents/eclipse/SimpleAceInterpreter/src/ace")).insert(new Source("root", Node.call(Node.id("unsafe"), Node.id("root")))),
+				new Directory("import", start.getParentFile()).insert(new Source("root", Node.call(Node.id("std"), Node.id("root"))))
 			);
 			
-			ValueDefaultEnv.run(new Runtime(), Node.call(r.createNode(), Node.id("import"), Node.id(name), Node.id("`")));
+			System.out.println(r);
 			
+			ValueDefaultEnv.run(new Runtime(), Node.call(r.createNode(), Unsafe.IDENTITY, Node.id("import"), Node.id(name), Node.id("`")));
+
 			/*Packages.file(args[0]);
 			
 			RUN_TIME += System.nanoTime() - start;

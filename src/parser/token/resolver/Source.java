@@ -15,9 +15,7 @@ public class Source extends Resolver{
 	private final Node source;
 	
 	public Source (String name, File f) {
-		super(name);
-		
-		this.source = Node.delegate(() -> {
+		this(name, Node.delegate(() -> {
 			System.out.println("Loading: " + f);
 			Stream s;
 			long p1 = System.nanoTime();
@@ -42,16 +40,18 @@ public class Source extends Resolver{
 				
 				throw e;
 			}
-		});
+		}));
 	}
 	
 	public Source(String name, Node node) {
 		super(name);
+		if (node == null) throw new NullPointerException();
+		
 		this.source = node;
 	}
 	
 	public Node getSource() {
-		return source;
+		return this.source;
 	}
 	
 	@Override
@@ -60,7 +60,6 @@ public class Source extends Resolver{
 		Node get = Node.id();
 		Node param = Node.id();
 		Node root = Node.id();
-		Node rootparam = Node.id();
 		
 		return Node.call(Unsafe.FUNCTION, root, Node.env(
 			Node.call(Unsafe.MUTABLE, Node.id(), Node.call(Unsafe.FUNCTION, set, Node.env(
@@ -69,16 +68,7 @@ public class Source extends Resolver{
 						Node.call(Unsafe.DO,
 							Node.call(Unsafe.DO,
 								Node.call(set, Node.call(root, Unsafe.PARENT, Node.id(this.getName()))),
-								Node.call(set, Node.call(
-									Node.env(this.source),
-									Node.call(Unsafe.FUNCTION, rootparam, Node.env(
-										Node.call(Unsafe.SCOPE, Node.call(Unsafe.COMPARE, Node.id("root"), rootparam, Node.env(
-											rootparam
-										), Node.env(
-											Node.call(root, rootparam)
-										)))
-									))
-								))
+								Node.call(set, Node.call(Node.env(this.source), root))
 							),
 							Node.call(get, Node.id(), param)
 						)

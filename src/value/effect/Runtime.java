@@ -88,6 +88,7 @@ public class Runtime {
 	}
 	
 	public void run (Value root) {
+		System.out.println("generated stuff");
 		//System.out.println(root);
 		root.run(this);
 	}
