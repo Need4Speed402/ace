@@ -629,3 +629,44 @@ test {
 		
 	`"
 }
+
+test {
+	name 'mutable of function with effects'
+	case {
+		[Mutable] ([root Function] void {[console] hello}) ([root Function] set {[root Function] get {
+			get void void
+		}})
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'mutable of function with effects with dummy set'
+	case {
+		[Mutable] void ([root Function] set {[root Function] get {
+			[root ``] (set ([root Function] void {[console] hello}))
+			(get void void)
+		}})
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'effects in mutable set'
+	case {
+		[Mutable] void ([root Function] set {[root Function] get {
+			[root ``] (set ([console] hello))
+			(get void)
+		}})
+	}
+	expect "
+		hello
+		
+	`"
+}
