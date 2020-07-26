@@ -11,7 +11,7 @@ import parser.token.resolver.Virtual;
 import test.Test;
 import value.ValueDefaultEnv;
 import value.node.Node;
-
+import value.effect.ProbeList;
 import value.effect.Runtime;
 
 public class Packages {
@@ -49,9 +49,9 @@ public class Packages {
 		String directive = args[0];
 		
 		if (directive.equals("run")) {
-			File start = new File(args[1]);
+			File entry = new File(args[1]);
 			
-			String name = start.getName();
+			String name = entry.getName();
 			
 			if (name.endsWith(".ace")) {
 				name = name.substring(0, name.lastIndexOf('.'));
@@ -62,7 +62,7 @@ public class Packages {
 			Token r = new Virtual ("root",
 				Unsafe.instance,
 				new Directory("std", new File("/media/wdhhd/documents/eclipse/SimpleAceInterpreter/src/ace")).insert(new Source("root", Node.call(Node.id("unsafe"), Node.id("root")))),
-				new Directory("import", start.getParentFile()).insert(new Source("root", Node.call(Node.id("std"), Node.id("root"))))
+				new Directory("import", entry.getParentFile()).insert(new Source("root", Node.call(Node.id("unsafe"), Node.id("root"))))
 			);
 			
 			System.out.println(r);
