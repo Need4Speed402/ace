@@ -14,9 +14,11 @@ test {
 test {
 	name 'test [root Scope]'
 	case {
-		[root Scope] {
-			[console] hello
-		}
+		([root Function] message {
+			[root Scope] {
+				[console] message
+			}
+		}) hello
 	}
 	expect "
 		hello

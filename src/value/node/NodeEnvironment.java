@@ -15,8 +15,8 @@ public class NodeEnvironment implements Node{
 		return new ValueFunction(arg ->
 			this.contents.run(new ValueFunction(var ->
 				arg.call(environment.call(var))
-			))
-		);
+			, arg, environment))
+		, environment);
 	}
 	
 	@Override

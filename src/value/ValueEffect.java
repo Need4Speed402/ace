@@ -1,6 +1,7 @@
 package value;
 
 import parser.Color;
+import parser.ProbeSet;
 import value.ValuePartial.Probe;
 import value.effect.Effect;
 import value.effect.Runtime;
@@ -38,12 +39,34 @@ public class ValueEffect implements Value{
 	@Override
 	public ValueEffect resolve(Probe probe, Value value) {
 		Effect[] ne = new Effect[this.effects.length];
+		boolean equal = true;
 		
 		for (int i = 0; i < ne.length; i++) {
 			ne[i] = this.effects[i].resolve(probe, value);
+			
+			if (ne[i] != this.effects[i]) {
+				equal = false;
+			}
 		}
 		
-		return new ValueEffect(this.parent.resolve(probe, value), ne);
+		Value pr = this.parent.resolve(probe, value);
+		
+		if (pr == this.parent && equal) {
+			return this;
+		}else if (equal) {
+			return new ValueEffect(pr, this.effects);
+		}else {
+			return new ValueEffect(pr, ne);
+		}
+	}
+	
+	@Override
+	public void getResolves(ProbeSet set) {
+		this.parent.getResolves(set);
+		
+		for (int i = 0; i < this.effects.length; i++) {
+			this.effects[i].getResolves(set);
+		}
 	}
 	
 	public Effect[] getEffects () {

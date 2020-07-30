@@ -1,21 +1,18 @@
-package value;
+package value.intrinsic;
 
 import java.util.HashMap;
 
+import parser.ProbeSet;
 import parser.token.resolver.Unsafe;
+import value.Value;
 import value.ValuePartial.Probe;
-import value.intrinsic.Assign;
-import value.intrinsic.Compare;
-import value.intrinsic.Function;
-import value.intrinsic.Mutable;
-import value.intrinsic.Print;
 import value.node.Node;
 import value.node.NodeIdentifier;
 
-public class ValueDefaultEnv implements Value {
-	private static ValueDefaultEnv instance = new ValueDefaultEnv();
+public class Environment implements Value {
+	private static Environment instance = new Environment();
 	
-	private ValueDefaultEnv () {
+	private Environment () {
 		this.put(Unsafe.COMPARE, Compare.instance);
 		this.put(Unsafe.FUNCTION, Function.instance);
 		this.put(Unsafe.ASSIGN, Assign.instance);
@@ -34,18 +31,8 @@ public class ValueDefaultEnv implements Value {
 		return env.getID(new IdentifierLookup(env));
 	}
 	
-	public static void run (value.effect.Runtime runtime, Node root) {
-		/*ValueProbe probe = new ValueProbe();
-		//System.out.println(probe);
-		Value gen = root.run(probe);
-		//System.out.println("generated");
-		//System.out.println(gen);
-		Value res = gen.resolve(probe, instance);
-		//System.out.println("root resolved");
-		//System.out.println(res);
-		runtime.run(res);*/
-		
-		runtime.run(root.run(instance));
+	public static Value exec (Node root) {
+		return root.run(instance);
 	}
 	
 	private class IdentifierLookup implements Getter {
@@ -57,12 +44,28 @@ public class ValueDefaultEnv implements Value {
 		
 		@Override
 		public Value resolved(int value) {
-			return ValueDefaultEnv.this.env.getOrDefault(value, this.env);
+			return Environment.this.env.getOrDefault(value, this.env);
 		}
 		
 		@Override
 		public Getter resolve(Probe probe, Value value) {
-			return new IdentifierLookup(this.env.resolve(probe, value));
+			Value r = this.env.resolve(probe, value);
+			
+			if (r == this.env) {
+				return this;
+			}else {
+				return new IdentifierLookup(r);
+			}
+		}
+		
+		@Override
+		public void getResolves(ProbeSet set) {
+			this.env.getResolves(set);
+		}
+		
+		@Override
+		public String toString() {
+			return super.toString() + " -> " + this.env;
 		}
 	}
 }

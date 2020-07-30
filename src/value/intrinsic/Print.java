@@ -2,6 +2,7 @@ package value.intrinsic;
 
 import java.io.IOException;
 
+import parser.ProbeSet;
 import value.Value;
 import value.Value.Getter;
 import value.ValueEffect;
@@ -27,7 +28,18 @@ public class Print implements Getter{
 
 	@Override
 	public Getter resolve(Probe probe, Value value) {
-		return new Print(this.message.resolve(probe, value));
+		Value m = this.message.resolve(probe, value);
+		
+		if (m == this.message) {
+			return this;
+		}else {
+			return new Print(m);
+		}
+	}
+	
+	@Override
+	public void getResolves(ProbeSet set) {
+		this.message.getResolves(set);
 	}
 	
 	@Override

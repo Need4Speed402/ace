@@ -9,10 +9,10 @@ import parser.token.resolver.Source;
 import parser.token.resolver.Unsafe;
 import parser.token.resolver.Virtual;
 import test.Test;
-import value.ValueDefaultEnv;
-import value.node.Node;
-import value.effect.ProbeList;
+import value.Value;
 import value.effect.Runtime;
+import value.intrinsic.Environment;
+import value.node.Node;
 
 public class Packages {
 	public static final boolean RUNTIME_STATS = true;
@@ -23,6 +23,7 @@ public class Packages {
 	public static long AST_TIME = 0;
 	public static long NODE_TIME = 0;
 	public static long RUN_TIME = 0;
+	public static long RESOLVE_TIME = 0;
 	
 	public static String formatTime (long time) {
 		String error = Double.toString((time % 1000000L) / 1000000.0);
@@ -62,14 +63,18 @@ public class Packages {
 			Token r = new Virtual ("root",
 				Unsafe.instance,
 				new Directory("std", new File("/media/wdhhd/documents/eclipse/SimpleAceInterpreter/src/ace")).insert(new Source("root", Node.call(Node.id("unsafe"), Node.id("root")))),
-				new Directory("import", entry.getParentFile()).insert(new Source("root", Node.call(Node.id("unsafe"), Node.id("root"))))
+				new Directory("import", entry.getParentFile()).insert(new Source("root", Node.call(Node.id("std"), Node.id("root"))))
 			);
 			
-			System.out.println(r);
+			long start = System.nanoTime();
+			Node program = Node.call(r.createNode(), Unsafe.IDENTITY, Node.id("import"), Node.id(name), Node.id("`"));
+			NODE_TIME += System.nanoTime() - start;
 			
-			ValueDefaultEnv.run(new Runtime(), Node.call(r.createNode(), Unsafe.IDENTITY, Node.id("import"), Node.id(name), Node.id("`")));
-
-			/*Packages.file(args[0]);
+			Value v = Environment.exec(program);
+			
+			RESOLVE_TIME += System.nanoTime() - start;
+			
+			new Runtime().run(v);
 			
 			RUN_TIME += System.nanoTime() - start;
 			
@@ -77,9 +82,10 @@ public class Packages {
 				System.out.println(Color.white(Color.bgBlack(" - Runtime Statistics - ")));
 				System.out.println("AST / Parsing: " + formatTime(AST_TIME));
 				System.out.println("NODE / Tree Generation: " + formatTime(NODE_TIME));
-				System.out.println("Execution: " + formatTime(RUN_TIME - AST_TIME - NODE_TIME));
+				System.out.println("Resolving: " + formatTime(RESOLVE_TIME));
+				System.out.println("Execution: " + formatTime(RUN_TIME - AST_TIME - NODE_TIME - RESOLVE_TIME));
 				System.out.println("Total time: " + formatTime(RUN_TIME));
-			}*/
+			}
 		}else if (directive.equals("test")) {
 			Test.test(new File(args[1]));
 		}

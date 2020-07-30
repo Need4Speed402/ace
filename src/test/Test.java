@@ -16,8 +16,8 @@ import parser.token.node.TokenBlock;
 import parser.token.node.TokenIdentifier;
 import parser.token.node.TokenScope;
 import parser.token.syntax.TokenString;
-import value.ValueDefaultEnv;
 import value.effect.Runtime;
+import value.intrinsic.Environment;
 import value.node.Node;
 
 public class Test {
@@ -72,7 +72,7 @@ public class Test {
 			long start = System.nanoTime();
 			
 			try {
-				ValueDefaultEnv.run(r, this.body);
+				r.run(Environment.exec(this.body));
 				
 				this.duration = System.nanoTime() - start;
 			}catch (Throwable e) {

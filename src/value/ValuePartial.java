@@ -1,6 +1,7 @@
 package value;
 
 import parser.Color;
+import parser.ProbeSet;
 import value.effect.Runtime;
 
 public abstract class ValuePartial implements Value {
@@ -18,6 +19,9 @@ public abstract class ValuePartial implements Value {
 	}
 	
 	public static class Probe extends ValuePartial {
+		private static int ids = 0;
+		public final int id = ++ids;
+		
 		@Override
 		public Value resolve(Probe probe, Value value) {
 			return probe == this ? value : this;
@@ -25,7 +29,12 @@ public abstract class ValuePartial implements Value {
 
 		@Override
 		public Value run(Runtime r) {
-			return r.get(this).run(r);
+			return r.get(this);
+		}
+		
+		@Override
+		public void getResolves(ProbeSet set) {
+			set.set(this);
 		}
 	}
 	
@@ -58,7 +67,20 @@ public abstract class ValuePartial implements Value {
 		
 		@Override
 		public Value resolve(Probe probe, Value value) {
-			return this.parent.resolve(probe, value).call(this.argument.resolve(probe, value));
+			Value a = this.parent.resolve(probe, value);
+			Value b = this.argument.resolve(probe, value);
+			
+			if (a == this.parent & b == this.argument) {
+				return this;
+			}else {
+				return a.call(b);
+			}
+		}
+		
+		@Override
+		public void getResolves(ProbeSet set) {
+			this.parent.getResolves(set);
+			this.argument.getResolves(set);
 		}
 	}
 	
@@ -90,7 +112,20 @@ public abstract class ValuePartial implements Value {
 		
 		@Override
 		public Value resolve(Probe probe, Value value) {
-			return this.parent.resolve(probe, value).getID(this.getter.resolve(probe, value));
+			Value a = this.parent.resolve(probe, value);
+			Getter b = this.getter.resolve(probe, value);
+			
+			if (a == this.parent & b == this.getter) {
+				return this;
+			}else {
+				return a.getID(b);
+			}
+		}
+		
+		@Override
+		public void getResolves(ProbeSet set) {
+			this.parent.getResolves(set);
+			this.getter.getResolves(set);
 		}
 	}
 }

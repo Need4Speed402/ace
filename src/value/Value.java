@@ -1,9 +1,10 @@
 package value;
 
+import parser.ProbeSet;
 import value.ValuePartial.Probe;
 import value.effect.Runtime;
 
-public interface Value {
+public interface Value extends ProbeSet.Resolver {
 	public static final int DEFAULT_ID = 0;
 	
 	public Value call (Value v);
@@ -26,7 +27,7 @@ public interface Value {
 		return this;
 	}
 	
-	public interface Getter {
+	public interface Getter extends ProbeSet.Resolver {
 		public Value resolved (int value);
 		
 		public default Getter resolve (Probe probe, Value value) {

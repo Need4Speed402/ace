@@ -1,5 +1,6 @@
 package value.intrinsic;
 
+import parser.ProbeSet;
 import value.Value;
 import value.ValueEffect;
 import value.ValueFunction;
@@ -24,8 +25,8 @@ public class Mutable implements Value {
 	
 	@Override
 	public Value call(Value v) {
-		return v.call(new ValueFunction(p -> new ValueEffect(p, new EffectSet(this.probe, p))))
-		        .call(new ValueFunction(p -> this.probe));
+		return v.call(new ValueFunction(p -> new ValueEffect(p, new EffectSet(this.probe, p)), this.probe))
+		        .call(new ValueFunction(p -> this.probe, this.probe));
 	}
 	
 	@Override
@@ -35,6 +36,11 @@ public class Mutable implements Value {
 		}
 		
 		return this;
+	}
+	
+	@Override
+	public void getResolves(ProbeSet set) {
+		set.set(this.probe);
 	}
 	
 	public static class EffectSet implements Effect{
@@ -57,10 +63,19 @@ public class Mutable implements Value {
 		
 		@Override
 		public Effect resolve(Probe probe, Value value) {
-			return new EffectSet(
-				this.probe == probe ? (Probe) value : this.probe,
-				this.value.resolve(probe, value)
-			);
+			Value v = this.value.resolve(probe, value);
+			
+			if (v == this.value & this.probe != probe) {
+				return this;
+			}else {
+				return new EffectSet(this.probe != probe ? this.probe : (Probe) value, v);
+			}
+		}
+		
+		@Override
+		public void getResolves(ProbeSet set) {
+			set.set(this.probe);
+			this.value.getResolves(set);
 		}
 	}
 	
@@ -88,6 +103,12 @@ public class Mutable implements Value {
 				this.probe == probe ? (Probe) value : this.probe,
 				this.value.resolve(probe, value)
 			);
+		}
+		
+		@Override
+		public void getResolves(ProbeSet set) {
+			set.set(this.probe);
+			this.value.getResolves(set);
 		}
 	}
 }

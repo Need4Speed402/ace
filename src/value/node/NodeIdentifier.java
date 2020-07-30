@@ -52,6 +52,7 @@ public class NodeIdentifier implements Node, Value {
 	
 	@Override
 	public Value run(Value environment) {
+		//System.out.println(environment);
 		return environment.call(this);
 	}
 	

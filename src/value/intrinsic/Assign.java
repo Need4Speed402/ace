@@ -1,5 +1,6 @@
 package value.intrinsic;
 
+import parser.ProbeSet;
 import value.Value;
 import value.ValueFunction;
 import value.ValuePartial.Probe;
@@ -7,7 +8,7 @@ import value.effect.Runtime;
 
 public class Assign implements Value{
 	public static final Value instance = new ValueFunction(name ->
-		new ValueFunction(value -> new Assign(name, value))
+		new ValueFunction(value -> new Assign(name, value), name)
 	);
 	
 	private final Value name, value;
@@ -18,8 +19,21 @@ public class Assign implements Value{
 	}
 	
 	@Override
+	public void getResolves(ProbeSet set) {
+		this.name.getResolves(set);
+		this.value.getResolves(set);
+	}
+	
+	@Override
 	public Value resolve(Probe probe, Value value) {
-		return new Assign(this.name.resolve(probe, value), this.value.resolve(probe, value));
+		Value n = this.name.resolve(probe, value);
+		Value v = this.value.resolve(probe, value);
+		
+		if (n == this.name & v == this.value) {
+			return this;
+		}else {
+			return new Assign(n, v);
+		}
 	}
 	
 	@Override

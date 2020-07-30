@@ -1,5 +1,6 @@
 package value.intrinsic;
 
+import parser.ProbeSet;
 import value.Value;
 import value.Value.Getter;
 import value.ValueFunction;
@@ -7,11 +8,13 @@ import value.ValuePartial.Probe;
 import value.effect.Runtime;
 
 public class Function{
-	public static final Value instance = identv -> identv.getID(ident ->
-		new ValueFunction(body -> new ValueFunction(arg ->
-			body.call(new Env(arg, ident))
-		))
-	);
+	public static final Value instance = identv -> {
+		return identv.getID(ident ->
+			new ValueFunction(body -> new ValueFunction(arg ->
+				body.call(new Env(arg, ident))
+			, body))
+		);
+	};
 	
 	private static class Env implements Value {
 		private final Value arg;
@@ -34,7 +37,18 @@ public class Function{
 		
 		@Override
 		public Value resolve(Probe probe, Value value) {
-			return new Env(this.arg.resolve(probe, value), this.value);
+			Value v = this.arg.resolve(probe, value);
+			
+			if (v == this.arg) {
+				return this;
+			}else {
+				return new Env(v, this.value);
+			}
+		}
+		
+		@Override
+		public void getResolves(ProbeSet set) {
+			this.arg.getResolves(set);
 		}
 		
 		@Override
@@ -56,15 +70,28 @@ public class Function{
 		@Override
 		public Value resolved(int value) {
 			if (this.value == value) {
-				return arg;
+				return this.arg;
 			}else {
-				return env;
+				return this.env;
 			}
 		}
 		
 		@Override
 		public Getter resolve(Probe probe, Value value) {
-			return new Arg(this.arg.resolve(probe, value), this.env.resolve(probe, value), this.value);
+			Value a = this.arg.resolve(probe, value);
+			Value e = this.env.resolve(probe, value);
+			
+			if (a == this.arg & e == this.env) {
+				return this;
+			}else {
+				return new Arg(a, e, this.value);
+			}
+		}
+		
+		@Override
+		public void getResolves(ProbeSet set) {
+			this.arg.getResolves(set);
+			this.env.getResolves(set);
 		}
 	}
 }
