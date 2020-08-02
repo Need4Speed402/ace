@@ -1,16 +1,16 @@
 Class {(
-	.value = .
+	.value : .
 	
 	;; run cb if true
 	this ? Scope _, cb, {
 		Scope (value cb ())
-		` .` = this
+		` .` : this
 	}
 	
 	;; run cb if false
 	this !? Scope _, cb, {
 		Scope (value () cb)
-		` .` = this
+		` .` : this
 	}
 	
 	;; invert
@@ -19,7 +19,7 @@ Class {(
 	}
 	
 	;; xor
-	this ! Scope _, v2, {
+	this ~ Scope _, v2, {
 		value !v2 v2
 	}
 	

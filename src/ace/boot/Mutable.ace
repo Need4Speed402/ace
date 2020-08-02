@@ -4,7 +4,7 @@
 			(unsafe Mutable) _init (
 				Function _set {Function _get {
 					Function _context {
-						(compare _context =) {
+						(compare _context :) {
 							Function _value {
 								(std root Scope) {} (_set _value)
 							}

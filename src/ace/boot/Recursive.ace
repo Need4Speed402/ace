@@ -10,8 +10,8 @@
   " 
   " For instance this will not work:
   " 
-  " 1. .loop = {}, {}
-  " 2. .loop = message, {
+  " 1. .loop : {}, {}
+  " 2. .loop : message, {
   " 3.     console println message
   " 4.     loop message
   " 5. }
@@ -21,8 +21,8 @@
   " it will instead refer to the loop variable on line 1.
 "`"
 
-.compare = unsafe compare
-.assign = unsafe assign
+.compare : unsafe compare
+.assign : unsafe assign
 
 (Function ``) { (Function Scope) {
 	Function _body {

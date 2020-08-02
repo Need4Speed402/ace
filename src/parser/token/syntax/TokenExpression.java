@@ -12,7 +12,7 @@ import parser.token.Modifier;
 import parser.token.Token;
 
 public class TokenExpression extends TokenProcedure implements Modifier{
-	public static final String operators = "= ` ., @#\\ ?~ |&! :<> +- */% ^$";
+	public static final String operators = ": ` ., @#\\ ?! |&~ =<> +- */% ^$";
 	public static final char[] ops = operators.replaceAll(" ", "").toCharArray();
 	public static final int[] operatorValues;
 	
