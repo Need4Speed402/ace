@@ -73,7 +73,7 @@ public class ValueFunction implements Value {
 		// when most can be evaluated at compile time.
 		//if (true) return new ValuePartial.Call(this, v);
 		
-		if (v instanceof ValuePartial) {
+		if (v instanceof ValuePartial && !(v instanceof Probe)) {
 			return new ValuePartial.Call(this, v);
 		}else if (v instanceof ValueEffect) {
 			if (((ValueEffect) v).getParent() instanceof ValuePartial) {
@@ -129,8 +129,6 @@ public class ValueFunction implements Value {
 		
 		@Override
 		public Value call(Value v) {
-			if (v instanceof ValuePartial) throw new Error("what");
-			
 			Runtime child = this.runtime.push();
 			child.declare(this.func.probe, v);
 			

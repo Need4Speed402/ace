@@ -1,10 +1,13 @@
 package parser;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import parser.token.Token;
 import parser.token.resolver.Directory;
+import parser.token.resolver.EntrySource;
 import parser.token.resolver.Source;
 import parser.token.resolver.Unsafe;
 import parser.token.resolver.Virtual;
@@ -62,8 +65,11 @@ public class Packages {
 			
 			Token r = new Virtual ("root",
 				Unsafe.instance,
-				new Directory("std", new File("/media/wdhhd/documents/eclipse/SimpleAceInterpreter/src/ace")).insert(new Source("root", Node.call(Node.id("unsafe"), Node.id("root")))),
-				new Directory("import", entry.getParentFile()).insert(new Source("root", Node.call(Node.id("std"), Node.id("root"))))
+				//new Directory("std", new File("/media/wdhhd/documents/eclipse/SimpleAceInterpreter/src/ace"))
+				//	.insert(new Source("root", Node.call(Node.id("unsafe"), Node.id("root")))),
+				new Directory("import", entry.getParentFile())
+					.insert(new Source("root", Node.call(Node.id("unsafe"), Node.id("root"))))
+					.set(new EntrySource(name, entry))
 			);
 			
 			long start = System.nanoTime();

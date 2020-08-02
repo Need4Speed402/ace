@@ -14,7 +14,11 @@ import value.node.Node;
 public class Source extends Resolver{
 	private final Node source;
 	
-	public Source (String name, File f) {
+	public Source(String name, File f) {
+		this(name, f, false);
+	}
+	
+	public Source (String name, File f, boolean entry) {
 		this(name, Node.delegate(() -> {
 			System.out.println("Loading: " + f);
 			Stream s;
@@ -27,7 +31,7 @@ public class Source extends Resolver{
 			}
 			
 			try {
-				Token ast = new TokenBase(s);
+				Token ast = new TokenBase(s, entry);
 				long p2 = System.nanoTime();
 				Packages.AST_TIME += p2 - p1;
 				

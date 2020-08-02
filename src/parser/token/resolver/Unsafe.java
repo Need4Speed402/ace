@@ -33,6 +33,7 @@ public class Unsafe extends Virtual {
 				new Source("Procedure", IDENTITY),
 				new Source("Environment", IDENTITY),
 				new Source("Package", SCOPE),
+				new Source("EntryPackage", SCOPE),
 				new Source("Scope", SCOPE),
 				new Source("Function", FUNCTION)
 			)

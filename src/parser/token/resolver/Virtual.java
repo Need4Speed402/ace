@@ -160,6 +160,28 @@ public class Virtual extends Resolver {
 		return new Virtual(this.getName(), pairs);
 	}
 	
+	public Virtual set (Resolver r) {
+		Resolver[] thispairs = this.getResolvers();
+		
+		int index = -1;
+		
+		for (int i = 0; i < thispairs.length; i++) {
+			Resolver pair = thispairs[i];
+			
+			if (pair.getName().equals(r.getName())) {
+				index = i;
+				break;
+			}
+		}
+		
+		Resolver[] newpairs = new Resolver[thispairs.length + (index >= 0 ? 0 : 1)];
+		if (index == -1) index = thispairs.length;
+		
+		System.arraycopy(thispairs, 0, newpairs, 0, thispairs.length);
+		newpairs[index] = r;
+		return new Virtual(this.getName(), newpairs);
+	}
+	
 	@Override
 	public String toString() {
 		Resolver[] children = this.getResolvers();
