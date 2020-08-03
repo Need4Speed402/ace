@@ -136,7 +136,7 @@ Function Constructor, {(
 			)}
 			
 			Function ident, _, {(
-				check (cmp :: *ident) Function _, Constructor, {
+				check (cmp == *ident) Function _, Constructor, {
 					compareID id Constructor classID true false
 				}
 				

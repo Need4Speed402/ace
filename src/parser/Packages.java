@@ -1,9 +1,7 @@
 package parser;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 import parser.token.Token;
 import parser.token.resolver.Directory;
@@ -60,7 +58,7 @@ public class Packages {
 			if (name.endsWith(".ace")) {
 				name = name.substring(0, name.lastIndexOf('.'));
 			}else {
-				throw new RuntimeException("Program entry not ace source code");
+				throw new RuntimeException("Program entry must have a .ace extension");
 			}
 			
 			Token r = new Virtual ("root",

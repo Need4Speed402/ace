@@ -3,45 +3,48 @@ package parser.token.syntax;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.HashMap;
 
-import value.node.Node;
 import parser.ParserException;
 import parser.Stream;
 import parser.TokenList;
 import parser.token.Modifier;
 import parser.token.Token;
+import value.node.Node;
 
 public class TokenExpression extends TokenProcedure implements Modifier{
 	public static final String operators = ": ` ., @#\\ ?! |&~ =<> +- */% ^$";
-	public static final char[] ops = operators.replaceAll(" ", "").toCharArray();
-	public static final int[] operatorValues;
+	
+	public static final HashMap<Character, Integer> operatorIndex;
+	
+	public static final boolean VERBOSE_PRECEDENCE = false;
 	
 	public TokenExpression (Stream s) {
 		super(TokenExpression.readStatement(s));
 	}
 	
 	static {
-		operatorValues = new int[operators.length()];
+		operatorIndex = new HashMap<>(256);
 		int v = 0;
 		for (int i = 0; i < operators.length(); i++) {
-			if (operators.charAt(i) == ' ') {
+			char c = operators.charAt(i);
+			
+			if (c == ' ') {
 				v++;
 			}else {
-				operatorValues[i] = v;
+				operatorIndex.put(c, v);
 			}
 		}
 	}
 	
 	@Override
 	public String toString() {
-		boolean verbose = true;
-		
 		if (this.getTokens().length == 0) return "";
 		
-		if (verbose) {
+		if (VERBOSE_PRECEDENCE) {
 			return getCaller(this.getTokens()).toString();
 		}else {
-			return super.toString();
+			return toString(this, ' ');
 		}
 	}
 	
@@ -63,7 +66,7 @@ public class TokenExpression extends TokenProcedure implements Modifier{
 		if (!ctoken) {
 			String o = ((TokenIdentifier) r).getName();
 			
-			if (operators.indexOf(o.charAt(o.length() - 1)) >= 0) {
+			if (operatorIndex.containsKey(o.charAt(o.length() - 1))) {
 				return 1;
 			}else {
 				return 0;
@@ -73,7 +76,7 @@ public class TokenExpression extends TokenProcedure implements Modifier{
 		if (!rtoken) {
 			String o = ((TokenIdentifier) c).getName();
 			
-			if (operators.indexOf(o.charAt(o.length() - 1)) >= 0) {
+			if (operatorIndex.containsKey(o.charAt(o.length() - 1))) {
 				return -1;
 			}else {
 				return 0;
@@ -90,8 +93,8 @@ public class TokenExpression extends TokenProcedure implements Modifier{
 				return 0;
 			}
 			
-			int o1i = operators.indexOf(o1.charAt(o1.length() - 1 - i));
-			int o2i = operators.indexOf(o2.charAt(o2.length() - 1 - i));
+			int o1i = operatorIndex.getOrDefault(o1.charAt(o1.length() - 1 - i), -1);
+			int o2i = operatorIndex.getOrDefault(o2.charAt(o2.length() - 1 - i), -1);
 			
 			if (o1i == -1 && o2i == -1) {
 				return 0;
@@ -99,8 +102,8 @@ public class TokenExpression extends TokenProcedure implements Modifier{
 				return 1;
 			}else if (o2i == -1) {
 				return -1;
-			}else if (operatorValues[o1i] != operatorValues[o2i]) {
-				if (operatorValues[o1i] < operatorValues[o2i]) {
+			}else if (o1i != o2i) {
+				if (o1i < o2i) {
 					return -1;
 				}else {
 					return 1;
@@ -215,7 +218,7 @@ public class TokenExpression extends TokenProcedure implements Modifier{
 		
 		@Override
 		public String toString () {
-			return this.function.toString() + " " + this.param.toString();
+			return "(" + this.function.toString() + " " + this.param.toString() + ")";
 		}
 	}
 	
@@ -240,9 +243,9 @@ public class TokenExpression extends TokenProcedure implements Modifier{
 	public static Token readImmediate (Stream s) {
 		if (!s.hasChr() || s.isNext(Stream.whitespace) || s.isNext(")]};".toCharArray())) return null;
 		
-		if (s.isNext(ops)) {
+		if (operatorIndex.containsKey(s.peek())) {
 			StringBuilder operator = new StringBuilder();
-			while (s.isNext(ops)) operator.append(s.chr());
+			while (operatorIndex.containsKey(s.peek())) operator.append(s.chr());
 			
 			return new TokenOperator(operator.toString());
 		}
@@ -263,9 +266,9 @@ public class TokenExpression extends TokenProcedure implements Modifier{
 					ident.append(ss.chr());
 				}
 				
-				if (operators.indexOf(ident.charAt(ident.length() - 1)) >= 0) {
+				if (operatorIndex.containsKey(ident.charAt(ident.length() - 1))) {
 					int index = ident.length() - 1;
-					while (operators.indexOf(ident.charAt(index - 1)) >= 0) index--;
+					while (operatorIndex.containsKey(ident.charAt(index - 1))) index--;
 					
 					Object num;
 					
