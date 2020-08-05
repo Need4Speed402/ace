@@ -6,7 +6,7 @@ import parser.token.Modifier;
 import parser.token.Token;
 import value.node.Node;
 
-public class TokenScope extends TokenProcedure implements Modifier{
+public class TokenScope extends TokenEnvironment implements Modifier{
 	public TokenScope (Stream s) {
 		super(readBlock(s, ')'));
 	}
@@ -22,7 +22,7 @@ public class TokenScope extends TokenProcedure implements Modifier{
 		}else if (this.getTokens().length == 1) {
 			return "(" + this.getTokens()[0].toString() + ")";
 		}else {
-			return "(\n" + Color.indent(TokenProcedure.toString(this, '\n')) + "\n)";
+			return "(\n" + Color.indent(TokenEnvironment.toString(this, '\n')) + "\n)";
 		}
 	}
 	

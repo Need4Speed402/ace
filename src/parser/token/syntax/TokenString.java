@@ -13,7 +13,7 @@ import parser.token.Token;
 import parser.unicode.Unicode;
 import value.node.Node;
 
-public class TokenString extends TokenProcedure{
+public class TokenString extends TokenEnvironment{
 	public static HashMap<String, String> unicodeNames = Unicode.getLookup();
 	public static HashMap<String, String> inverseUnicodeNames = Unicode.getInverse();
 
@@ -32,7 +32,7 @@ public class TokenString extends TokenProcedure{
 			string[ii] = Node.call(Node.id("Integer"), new TokenInteger.BooleanArray(s.charAt(ii)).toNode());
 		}
 		
-		return TokenProcedure.createBlock(string);
+		return TokenEnvironment.createBlock(string);
 	}
 	
 	@Override
@@ -94,7 +94,7 @@ public class TokenString extends TokenProcedure{
 			}else if (this.getTokens().length == 1) {
 				return "(" + Color.reset(this.getTokens()[0].toString()) + ")";
 			}else {
-				return "(\n" + Color.reset(Color.indent(TokenProcedure.toString(this, '\n'))) + "\n)";
+				return "(\n" + Color.reset(Color.indent(TokenEnvironment.toString(this, '\n'))) + "\n)";
 			}
 		}
 	}

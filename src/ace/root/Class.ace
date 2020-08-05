@@ -12,7 +12,7 @@
 .Resolver : std boot Resolver
 .Function : Scope
 
-.Environment : unsafe root Environment
+.Procedure : unsafe root Procedure
 
 .check : Function bool, callback, {
 	Scope (bool callback {})

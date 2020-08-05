@@ -9,6 +9,7 @@ import parser.Stream;
 import parser.token.Resolver;
 import parser.token.Token;
 import parser.token.syntax.TokenBase;
+import parser.token.syntax.TokenBaseEntry;
 import value.node.Node;
 
 public class Source extends Resolver{
@@ -31,7 +32,14 @@ public class Source extends Resolver{
 			}
 			
 			try {
-				Token ast = new TokenBase(s, entry);
+				Token ast;
+				
+				if (entry) {
+					ast = new TokenBaseEntry(s);
+				}else {
+					ast = new TokenBase(s);
+				}
+				
 				long p2 = System.nanoTime();
 				Packages.AST_TIME += p2 - p1;
 				

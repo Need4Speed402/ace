@@ -4,8 +4,8 @@ import parser.ParserException;
 import parser.Stream;
 import parser.TokenList;
 import parser.token.Token;
+import parser.token.syntax.TokenBaseEntry;
 import parser.token.syntax.TokenExpression;
-import parser.token.syntax.TokenProcedure;
 import parser.token.syntax.TokenString;
 import value.node.Node;
 
@@ -49,7 +49,7 @@ public abstract class TokenBlock implements Token{
 		if (s.next('{')) return new TokenEnvironment(s);
 		if (s.next('[')) {
 			if (s.next('[')) {
-				Token t = new TokenProcedure(s, ']');
+				Token t = new TokenBaseEntry(s, ']');
 				if (!s.next(']')) throw new ParserException("Expected extra closing bracket ']' to match with opening syntax literal '[['");
 				return t;
 			}else{

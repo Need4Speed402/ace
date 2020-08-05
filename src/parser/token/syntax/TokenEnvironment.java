@@ -1,30 +1,120 @@
 package parser.token.syntax;
 
-import parser.Color;
-import parser.Stream;
-import parser.token.Token;
 import value.node.Node;
+import parser.ParserException;
+import parser.Stream;
+import parser.TokenList;
+import parser.token.Token;
 
-public class TokenEnvironment extends TokenProcedure {
-	public TokenEnvironment (Stream s) {
-		super(readBlock(s, '}'));
+public class TokenEnvironment implements Token{
+	private Token[] tokens;
+	
+	public TokenEnvironment (Token[] tokens) {
+		this.tokens = tokens;
 	}
 	
-	public TokenEnvironment (Token ... contents) {
-		super(contents);
+	public int getLength () {
+		return this.tokens.length;
+	}
+	
+	public Token[] getTokens() {
+		return tokens;
 	}
 	
 	@Override
-	public String toString () {
-		if (this.getLength() <= 1) {
-			return "{" + TokenProcedure.toString(this, '\n') + "}";
-		}else {
-			return "{\n" + Color.indent(TokenProcedure.toString(this, '\n')) + "\n}";
+	public String toString() {
+		return toString(this, '\n');
+	}
+	
+	protected static String toString(TokenEnvironment compound, char separator) {
+		StringBuilder b = new StringBuilder();
+		
+		for (int i = 0; i < compound.tokens.length; i++) {
+			b.append(compound.tokens[i].toString());
+			
+			if (i + 1 < compound.tokens.length) {
+				b.append(separator);
+			}
 		}
+		
+		return b.toString();
 	}
 	
 	@Override
-	public Node createNode() {
-		return Node.call(Node.id("Environment"), super.createNode());
+	public Node createNode () {
+		Node[] nodes = new Node[this.tokens.length];
+		for (int i = 0; i < nodes.length; i++) nodes[i] = this.tokens[i].createNode();
+		return createBlock(nodes);
+	}
+	
+	public static Node createBlock (Node ... nodes) {
+		Node current = Node.env(Node.id("`"));
+		
+		for (int i = nodes.length - 1; i >= 0; i--) {
+			current = Node.env(Node.call(Node.id("``"), current, nodes[i]));
+		}
+		
+		return Node.call(Node.id("Environment"), current);
+	}
+	
+	public static Token[] readBlock (Stream s, char terminator) {
+		TokenList tokens = new TokenList();
+		
+		boolean semiLegal = false, semiUsed = false;
+		
+		while (true) {
+			if (!s.hasChr()) {
+				if (terminator != '\0') throw new ParserException("Unexpected end of input");
+				break;
+			}
+			
+			//comments
+			if (!s.isNext(";;}", ";;)", ";;]", ";;;") && s.next(";;")) {
+				if (!s.hasChr()) break;
+				if (s.isNext(Stream.whitespace)) {
+					while (s.hasChr() && !s.isNext('\n')) s.chr();
+				}else{
+					new TokenExpression(s);
+				}
+				
+				continue;
+			}
+			
+			if (s.next(';')) {
+				if (!semiLegal) throw new ParserException("illegal location of semicolon");
+				semiLegal = false;
+				semiUsed = true;
+				
+				continue;
+			}
+			
+			if (s.next('\n')) {
+				if (semiUsed) throw new ParserException ("illegal location of semicolon");
+				semiUsed = false;
+				semiLegal = false;
+				
+				continue;
+			}
+			
+			if (s.next(Stream.whitespace)) continue;
+			
+			if (s.isNext(']', ')', '}')) {
+				char next = s.chr();
+				
+				if (next == terminator) {
+					break;
+				}else {
+					throw new ParserException("illegal location of closing block token: " + next);
+				}
+			}
+			
+			tokens.push(new TokenExpression(s));
+			semiLegal = true;
+			semiUsed = false;
+		}
+		
+		if (semiUsed) throw new ParserException("illegal location of semicolon");
+		
+		return tokens.toArray();
 	}
 }

@@ -12,7 +12,7 @@ import parser.token.Modifier;
 import parser.token.Token;
 import value.node.Node;
 
-public class TokenExpression extends TokenProcedure implements Modifier{
+public class TokenExpression extends TokenEnvironment implements Modifier{
 	public static final String operators = ": ` ., @#\\ ?! |&~ =<> +- */% ^$";
 	
 	public static final HashMap<Character, Integer> operatorIndex;
@@ -251,7 +251,7 @@ public class TokenExpression extends TokenProcedure implements Modifier{
 		}
 		
 		if (s.next('(')) return new TokenScope(s);
-		if (s.next('{')) return new TokenEnvironment(s);
+		if (s.next('{')) return new TokenProcedure(s);
 		if (s.next('[')) return new TokenArray(s);
 		if (s.next('"')) return TokenString.readEscapedString(s);
 		if (s.next('\'')) return TokenString.readString(s);

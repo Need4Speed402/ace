@@ -4,7 +4,7 @@ import parser.Color;
 import parser.Stream;
 import value.node.Node;
 
-public class TokenArray extends TokenProcedure{
+public class TokenArray extends TokenEnvironment{
 	public TokenArray(Stream s) {
 		super(readBlock(s, ']'));
 	}
@@ -16,7 +16,7 @@ public class TokenArray extends TokenProcedure{
 		}else if (this.getTokens().length == 1) {
 			return "[" + this.getTokens()[0].toString() + "]";
 		}else {
-			return "[\n" + Color.indent(TokenProcedure.toString(this, '\n')) + "\n]";
+			return "[\n" + Color.indent(TokenEnvironment.toString(this, '\n')) + "\n]";
 		}
 	}
 	

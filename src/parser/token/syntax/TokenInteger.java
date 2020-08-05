@@ -199,7 +199,7 @@ public class TokenInteger implements Token{
 				values[i] = Node.id(this.array[i] ? "true" : "false");
 			}
 			
-			return TokenProcedure.createBlock(values);
+			return TokenEnvironment.createBlock(values);
 		}
 		
 		public boolean get (int i) {
