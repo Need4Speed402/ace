@@ -1,0 +1,77 @@
+test {
+	name 'basic do'
+	case {
+		[console] ([root ``] hello world)
+	}
+	expect "
+		world
+		
+	`"
+}
+
+test {
+	name 'basic do with effects'
+	case {
+		[root ``] ([console] hello) ([console] world)
+	}
+	expect "
+		hello
+		world
+		
+	`"
+}
+
+test {
+	name 'basic do wiht effects and return'
+	case {
+		[console] ([root ``] ([console] hello) ([console] world))
+	}
+	expect "
+		hello
+		world
+		world
+		
+	`"
+}
+
+test {
+	name 'do with indirection'
+	case {
+		[root Function] a {
+			[root Function] b {
+				[console] ([root ``] a b)
+			} hello
+		} world
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'do with double indirection'
+	case {
+		{
+			[root Function] a {
+				[root Function] b {
+					[console] ([root ``] a b)
+				} hello
+			} world
+		} ([root Function] env {
+			[root Scope] ([compare] env hello {
+				sup
+			} {
+				[root Scope] ([compare] env world {
+					dude
+				} {
+					env
+				})
+			})
+		})
+	}
+	expect "
+		sup
+		
+	`"
+}

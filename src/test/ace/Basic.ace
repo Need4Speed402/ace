@@ -44,6 +44,58 @@ test {
 }
 
 test {
+	name 'effects in print message indirect twice'
+	case {
+		[root Function] print1 {
+			[root Function] print {
+				[console] print
+			} print1
+		} hello
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'effects in print message indirect thrice'
+	case {
+		[root Function] print1 {
+			[root Function] print2 {
+				[root Function] print {
+					[console] print
+				} print2
+			} print1
+		} hello
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+
+test {
+	name 'effects in print message indirect quad'
+	case {
+		[root Function] print1 {
+			[root Function] print2 {
+				[root Function] print3 {
+					[root Function] print {
+						[console] print
+					} print3
+				} print2
+			} print1
+		} hello
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
 	name 'effects in print message with indirection having effects'
 	case {
 		[root Function] print {

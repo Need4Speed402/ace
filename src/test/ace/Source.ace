@@ -1,0 +1,35 @@
+;;" 
+  " this file is responsible for basic testing that the ast parsing works properly
+  " and generates the right calls.
+"`"
+
+test {
+	name 'package resolves right identifiers for basic case'
+	case {
+		{
+			[[]]
+		} [console]
+	}
+	expect "
+		EntryPackage
+		Environment
+		
+	`"
+}
+
+test {
+	name 'can get into entry point'
+	case {
+		[root Function] EntryPackage { [root Function] Environment { [root Function] `` {
+			[root Function] print {
+				[[
+					print hello
+				]]
+			} [console]
+		} [root ``] } [root Environment] } [root Scope]
+	}
+	expect "
+		hello
+		
+	`"
+}
