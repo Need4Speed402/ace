@@ -131,6 +131,10 @@ public class ProbeSet{
 		return set;
 	}
 	
+	public ProbeSet remove (Probe remove) {
+		return new ProbeSet(this, remove.id);
+	}
+	
 	public static interface ProbeContainer {
 		public default void getResolves(ProbeSet set) {}
 	}

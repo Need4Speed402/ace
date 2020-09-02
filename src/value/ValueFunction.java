@@ -13,7 +13,7 @@ public class ValueFunction implements Value {
 	private final Generator body;
 	private final Probe probe;
 	
-	private ProbeSet probeCache;
+	private ProbeSet probeCache, cleanProbeCache;
 	private Value cache;
 	
 	public ValueFunction (Node node) {
@@ -78,7 +78,19 @@ public class ValueFunction implements Value {
 	
 	@Override
 	public void getResolves(ProbeSet set) {
-		set.set(this.getProbes());
+		if (this.cleanProbeCache == null) {
+			this.cleanProbeCache = this.getProbes().remove(this.probe);
+		}
+		
+		set.set(this.cleanProbeCache);
+	}
+	
+	private Value getResolved (Value v) {
+		if (this.getProbes().has(this.probe)) {
+			return this.get().resolve(new ResolverProbe(this.probe, v));
+		}else {
+			return this.get();
+		}
 	}
 	
 	@Override
@@ -89,16 +101,19 @@ public class ValueFunction implements Value {
 			Value ret;
 			
 			if (v instanceof ValueEffect) {
-				if (((ValueEffect) v).getParent() instanceof ValuePartial) {
+				ValueEffect vv = (ValueEffect) v;
+				
+				if (vv.getParent() instanceof ValuePartial) {
+					//return ValueEffect.create(new ValuePartial.Call(this, vv), vv.getEffectNode());
 					return new ValuePartial.Call(this, v);
 				}
 				
 				ret = ValueEffect.create(
-					this.get().resolve(new ResolverProbe(probe, ((ValueEffect) v).getParent())),
-					((ValueEffect) v).getEffects()
+					this.getResolved(vv.getParent()),
+					vv.getEffectNode()
 				);
 			}else {
-				ret = this.get().resolve(new ResolverProbe(probe, v));
+				ret = this.getResolved(v);
 			}
 			
 			return ret.resolve(new ResolverFunctionBody());

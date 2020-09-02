@@ -29,7 +29,7 @@ public class ValueEffect implements Value{
 		return ValueEffect.create(parent, current);
 	}
 	
-	private static Value create (Value parent, EffectNode tail) {
+	public static Value create (Value parent, EffectNode tail) {
 		if (tail != null) {
 			ResolverMutable mut = new ResolverMutable();
 			
@@ -37,28 +37,37 @@ public class ValueEffect implements Value{
 			parent = parent.resolve(mut);
 			
 			ProbeSet set = new ProbeSet(parent);
+			if (tail != null) tail.getResolves(set);
 			
-			Probe[] deps = new Probe[mut.getMap().size()];
+			EffectDeclare[] entries = new EffectDeclare[mut.getMap().size()];
+			
 			{
 				int i = 0;
 				
-				for (Probe p : mut.getMap().keySet()) {
-					deps[i++] = p;
+				for (Entry<Probe, Value> entry : mut.getMap().entrySet()) {
+					entries[i++] = new EffectDeclare(entry.getKey(), entry.getValue());
 				}
-			}
-			
-			for (Value p : mut.getMap().values()) {
-				p.getResolves(set);
 			}
 			
 			EffectNode declares = null;
 			
-			for (Entry<Probe, Value> entry : mut.getMap().entrySet()) {
-				// if the mutation has effects outside of the current scope,
-				// that means we cannot eliminate the mutation at this point
-				// and we must store the mutation declare back on the effects
-				if (set.has(entry.getKey())) {
-					declares = new EffectNode(new EffectDeclare(entry.getKey(), entry.getValue()), declares);
+			while (true) {
+				boolean resolved = false;
+				
+				for (int i = 0; i < entries.length; i++) {
+					EffectDeclare decl = entries[i];
+					if (decl == null) continue;
+					
+					if (set.has(decl.probe)) {
+						entries[i] = null;
+						declares = new EffectNode(decl, declares);
+						decl.value.getResolves(set);
+						resolved = true;
+					}
+				}
+				
+				if (!resolved) {
+					break;
 				}
 			}
 			
@@ -108,6 +117,10 @@ public class ValueEffect implements Value{
 		}
 		
 		return effects;
+	}
+	
+	public EffectNode getEffectNode () {
+		return this.tail;
 	}
 	
 	@Override
