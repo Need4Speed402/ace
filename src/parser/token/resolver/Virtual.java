@@ -124,7 +124,7 @@ public class Virtual extends Resolver {
 		Node arg = Node.id();
 		
 		return Node.call(Unsafe.FUNCTION, proot, Node.env(
-			Node.call(Unsafe.MUTABLE, Node.id(),
+			Node.call(Unsafe.MUTABLE, Unsafe.DEFAULT_MOD,
 				Node.call(Unsafe.FUNCTION, set, Node.env(
 					Node.call(Unsafe.FUNCTION, get, Node.env(
 						Node.call(Unsafe.DO,

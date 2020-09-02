@@ -1,15 +1,14 @@
 package value;
 
 import parser.ProbeSet;
-import value.ValuePartial.Probe;
-import value.effect.Runtime;
+import value.resolver.Resolver;
 
-public interface Value extends ProbeSet.Resolver {
+public interface Value extends ProbeSet.ProbeContainer {
 	public static final int DEFAULT_ID = 0;
 	
 	public Value call (Value v);
 	
-	public default Value resolve (Probe probe, Value value) {
+	public default Value resolve (Resolver resolver) {
 		return this;
 	}
 	
@@ -17,20 +16,10 @@ public interface Value extends ProbeSet.Resolver {
 		return getter.resolved(DEFAULT_ID);
 	}
 	
-	/*
-	 * this function represents a hold of until I can figure out how I want
-	 * to design the compiler. After the optimizer is done, the run function
-	 * will be invoked and will run the optimized ast as if it were
-	 * interpreted.
-	 */
-	public default Value run (Runtime r) {
-		return this;
-	}
-	
-	public interface Getter extends ProbeSet.Resolver {
+	public interface Getter extends ProbeSet.ProbeContainer {
 		public Value resolved (int value);
 		
-		public default Getter resolve (Probe probe, Value value) {
+		public default Getter resolve (Resolver resolver) {
 			return this;
 		}
 	}

@@ -4,28 +4,23 @@ import java.util.HashMap;
 
 import parser.Color;
 import parser.Stream;
-import parser.token.Resolver;
 import parser.token.resolver.Source;
 import parser.token.resolver.Unsafe;
 import parser.token.resolver.Virtual;
 import parser.token.syntax.TokenString;
 import value.Value;
-import value.ValueFunction;
-import value.ValuePartial.Probe;
 
 public class NodeIdentifier implements Node, Value {
-	public final static Value NULL = new Null();
-	
 	private static int counter = 0;
 	public final int id;
 	
 	private static HashMap<Integer, String> builtinSearch;
 	
-	private static void searchUnsafe (Resolver current, String dir) {
+	private static void searchUnsafe (parser.token.Resolver current, String dir) {
 		if (current instanceof Virtual) {
-			Resolver[] resolvers = ((Virtual) current).getResolvers();
+			parser.token.Resolver[] resolvers = ((Virtual) current).getResolvers();
 			
-			for (Resolver r : resolvers) {
+			for (parser.token.Resolver r : resolvers) {
 				searchUnsafe(r, dir == null ? r.getName() : dir + " " + r.getName());
 			}
 		}else if (current instanceof Source) {
@@ -58,7 +53,7 @@ public class NodeIdentifier implements Node, Value {
 	
 	@Override
 	public Value call(Value v) {
-		return NULL.call(v);
+		return v;
 	}
 	
 	@Override
@@ -116,22 +111,6 @@ public class NodeIdentifier implements Node, Value {
 			return new TokenString (name).toString();
 		}else {
 			return name;
-		}
-	}
-	
-	private static class Null extends ValueFunction {
-		public Null () {
-			super (v -> NodeIdentifier.NULL);
-		}
-		
-		@Override
-		public ValueFunction resolve(Probe probe, Value value) {
-			return this;
-		}
-		
-		@Override
-		public String toString() {
-			return "NodeIdentifier.Null";
 		}
 	}
 }

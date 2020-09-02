@@ -4,15 +4,12 @@ import parser.ProbeSet;
 import value.Value;
 import value.Value.Getter;
 import value.ValueFunction;
-import value.ValuePartial.Probe;
-import value.effect.Runtime;
+import value.resolver.Resolver;
 
 public class Function{
 	public static final Value instance = identv -> {
 		return identv.getID(ident ->
-			new ValueFunction(body -> new ValueFunction(arg ->
-				body.call(new Env(arg, ident))
-			, body))
+			new ValueFunction(body -> new ValueFunction(arg -> body.call(new Env(arg, ident))))
 		);
 	};
 	
@@ -26,18 +23,13 @@ public class Function{
 		}
 		
 		@Override
-		public Value run(Runtime r) {
-			return new Env(this.arg.run(r), value);
-		}
-		
-		@Override
 		public Value call(Value v) {
 			return v.getID(new Arg(this.arg, v, this.value));
 		}
 		
 		@Override
-		public Value resolve(Probe probe, Value value) {
-			Value v = this.arg.resolve(probe, value);
+		public Value resolve(Resolver res) {
+			Value v = this.arg.resolve(res);
 			
 			if (v == this.arg) {
 				return this;
@@ -77,9 +69,9 @@ public class Function{
 		}
 		
 		@Override
-		public Getter resolve(Probe probe, Value value) {
-			Value a = this.arg.resolve(probe, value);
-			Value e = this.env.resolve(probe, value);
+		public Getter resolve(Resolver res) {
+			Value a = this.arg.resolve(res);
+			Value e = this.env.resolve(res);
 			
 			if (a == this.arg & e == this.env) {
 				return this;

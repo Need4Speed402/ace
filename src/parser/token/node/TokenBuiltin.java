@@ -27,7 +27,7 @@ public class TokenBuiltin implements Token{
 		while (true) {
 			if (!s.hasChr()) throw new ParserException("Unexpected end of input");
 			
-			if (s.next("]")) break;
+			if (s.isNext("]")) break;
 			b.append(s.chr());
 		}
 		

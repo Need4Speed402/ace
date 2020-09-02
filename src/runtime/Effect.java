@@ -1,15 +1,14 @@
-package value.effect;
+package runtime;
 
 import parser.ProbeSet;
-import value.Value;
-import value.ValuePartial.Probe;
+import value.resolver.Resolver;
 
-public interface Effect extends ProbeSet.Resolver{
+public interface Effect extends ProbeSet.ProbeContainer{
 	public void run (Runtime runtime);
 	
 	public default void getResolves (ProbeSet set) {}
 	
-	public default Effect resolve (Probe probe, Value value) {
+	public default Effect resolve (Resolver resolver) {
 		return this;
 	}
 	

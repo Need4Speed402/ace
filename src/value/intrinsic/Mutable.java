@@ -1,46 +1,57 @@
 package value.intrinsic;
 
 import parser.ProbeSet;
+import runtime.Effect;
+import runtime.Runtime;
 import value.Value;
 import value.ValueEffect;
 import value.ValueFunction;
 import value.ValuePartial.Probe;
-import value.effect.Effect;
-import value.effect.Runtime;
+import value.resolver.ResolverFunctionBody;
+import value.resolver.ResolverMutable;
+import value.resolver.Resolver;
 
 public class Mutable implements Value {
 	public static final Probe DUP_PROBE = new Probe();
 	
-	public static final Value instance = new ValueFunction(init -> {
-		Probe probe = new Probe();
-		
-		return new ValueEffect(new Mutable(probe), new EffectDeclare(probe, init));
-	});
+	public static final Value instance = new ValueFunction(init -> new Mutable(init));
 	
-	private final Probe probe;
+	private final Value init;
 	
-	public Mutable (Probe probe) {
-		this.probe = probe;
+	public Mutable (Value init) {
+		this.init = init;
 	}
 	
 	@Override
 	public Value call(Value v) {
-		return v.call(new ValueFunction(p -> new ValueEffect(p, new EffectSet(this.probe, p)), this.probe))
-		        .call(new ValueFunction(p -> this.probe, this.probe));
+		Probe probe = new Probe();
+		
+		return ValueEffect.create(
+			v.call(new ValueFunction(p -> ValueEffect.create(p, new EffectSet(probe, p))))
+			 .call(new ValueFunction(p -> probe)),
+			new EffectDeclare(probe, init)
+		);
 	}
 	
 	@Override
-	public Value resolve(Probe probe, Value value) {
-		if (this.probe == probe) {
-			return new Mutable((Probe) value);
-		}
+	public Value resolve(Resolver res) {
+		Value init = this.init.resolve(res);
 		
-		return this;
+		if (init == this.init) {
+			return this;
+		}else {
+			return new Mutable(init);
+		}
+	}
+	
+	@Override
+	public String toString() {
+		return super.toString() + " <- " + this.init;
 	}
 	
 	@Override
 	public void getResolves(ProbeSet set) {
-		set.set(this.probe);
+		this.init.getResolves(set);
 	}
 	
 	public static class EffectSet implements Effect{
@@ -53,7 +64,7 @@ public class Mutable implements Value {
 		}
 		
 		public void run(Runtime runtime) {
-			runtime.set(this.probe, this.value.run(runtime));
+			runtime.set(this.probe, this.value);
 		}
 		
 		@Override
@@ -62,13 +73,34 @@ public class Mutable implements Value {
 		}
 		
 		@Override
-		public Effect resolve(Probe probe, Value value) {
-			Value v = this.value.resolve(probe, value);
-			
-			if (v == this.value & this.probe != probe) {
-				return this;
+		public Effect resolve(Resolver res) {
+			if (res instanceof ResolverFunctionBody) {
+				Probe p = ((ResolverFunctionBody) res).get(this.probe);
+				Value v = this.value.resolve(res);
+				
+				if (v == this.value & p == this.probe) {
+					return this;
+				}else {
+					return new EffectSet(p, v);
+				}
+			}else if (res instanceof ResolverMutable) {
+				Value v = ((ResolverMutable) res).set(this.probe, this.value.resolve(res));
+				
+				if (v == null) {
+					return Effect.NO_EFFECT;
+				}else if (v == this.value) {
+					return this;
+				}else {
+					return new EffectSet(this.probe, value);
+				}
 			}else {
-				return new EffectSet(this.probe != probe ? this.probe : (Probe) value, v);
+				Value v = this.value.resolve(res);
+				
+				if (v == this.value) {
+					return this;
+				}else {
+					return new EffectSet(this.probe, v);
+				}
 			}
 		}
 		
@@ -89,7 +121,7 @@ public class Mutable implements Value {
 		}
 		
 		public void run(Runtime runtime) {
-			runtime.declare(this.probe, this.value.run(runtime));
+			runtime.declare(this.probe, this.value);
 		}
 		
 		@Override
@@ -98,11 +130,29 @@ public class Mutable implements Value {
 		}
 		
 		@Override
-		public Effect resolve(Probe probe, Value value) {
-			return new EffectDeclare(
-				this.probe == probe ? (Probe) value : this.probe,
-				this.value.resolve(probe, value)
-			);
+		public Effect resolve(Resolver res) {
+			if (res instanceof ResolverFunctionBody) {
+				Probe p = ((ResolverFunctionBody) res).set(this.probe);
+				Value v = this.value.resolve(res);
+				
+				if (v == this.value & p == this.probe) {
+					return this;
+				}else {
+					return new EffectDeclare(p, v);
+				}
+			}else if (res instanceof ResolverMutable) {
+				((ResolverMutable) res).put(this.probe, this.value.resolve(res));
+				
+				return Effect.NO_EFFECT;
+			}else {
+				Value v = this.value.resolve(res);
+				
+				if (v == this.value) {
+					return this;
+				}else {
+					return new EffectDeclare(this.probe, v);
+				}
+			}
 		}
 		
 		@Override

@@ -11,6 +11,7 @@ public class Unsafe extends Virtual {
 	public static final NodeIdentifier CONSOLE = Node.id();
 	
 	public static final NodeIdentifier PARENT = Node.id();
+	public static final Node DEFAULT_MOD = Node.id();
 	
 	private static final Node TEMP1 = Node.id();
 	private static final Node TEMP2 = Node.id();

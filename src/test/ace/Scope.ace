@@ -1,5 +1,5 @@
 test {
-	name 'print inside scope'
+	name ';print inside scope'
 	case {
 		[root Scope] {
 			[console] hello

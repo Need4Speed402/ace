@@ -9,9 +9,9 @@ import parser.token.resolver.EntrySource;
 import parser.token.resolver.Source;
 import parser.token.resolver.Unsafe;
 import parser.token.resolver.Virtual;
+import runtime.Runtime;
 import test.Test;
 import value.Value;
-import value.effect.Runtime;
 import value.intrinsic.Environment;
 import value.node.Node;
 
@@ -27,6 +27,9 @@ public class Packages {
 	public static long RESOLVE_TIME = 0;
 	
 	public static String formatTime (long time) {
+		boolean neg = time < 0;
+		time = Math.abs(time);
+		
 		String error = Double.toString((time % 1000000L) / 1000000.0);
 		
 		String out = Long.toString(time / 1000000L);
@@ -35,7 +38,7 @@ public class Packages {
 			out = out.substring(0, i) + ',' + out.substring(i);
 		}
 		
-		return out + error.substring(1, Math.min(error.length(), 4)) + " ms";
+		return (neg ? "-" : "") + out + error.substring(1, Math.min(error.length(), 4)) + " ms";
 	}
 	
 	public static void main(String[] args) throws IOException{
@@ -72,22 +75,27 @@ public class Packages {
 			
 			long start = System.nanoTime();
 			Node program = Node.call(r.createNode(), Unsafe.IDENTITY, Node.id("import"), Node.id(name), Node.id("`"));
-			NODE_TIME += System.nanoTime() - start;
+			
+			long progstart = System.nanoTime();
+			NODE_TIME += progstart - start;
 			
 			Value v = Environment.exec(program);
 			
-			RESOLVE_TIME += System.nanoTime() - start;
+			RESOLVE_TIME += System.nanoTime() - progstart;
 			
-			new Runtime().run(v);
+			Runtime run = new Runtime();
+			run.run(v);
 			
 			RUN_TIME += System.nanoTime() - start;
+			
+			System.out.println(run.size());
 			
 			if (RUNTIME_STATS) {
 				System.out.println(Color.white(Color.bgBlack(" - Runtime Statistics - ")));
 				System.out.println("AST / Parsing: " + formatTime(AST_TIME));
 				System.out.println("NODE / Tree Generation: " + formatTime(NODE_TIME));
-				System.out.println("Resolving: " + formatTime(RESOLVE_TIME));
-				System.out.println("Execution: " + formatTime(RUN_TIME - AST_TIME - NODE_TIME - RESOLVE_TIME));
+				System.out.println("Resolving: " + formatTime(RESOLVE_TIME - AST_TIME));
+				System.out.println("Execution: " + formatTime(RUN_TIME - NODE_TIME - RESOLVE_TIME));
 				System.out.println("Total time: " + formatTime(RUN_TIME));
 			}
 		}else if (directive.equals("test")) {

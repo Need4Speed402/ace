@@ -9,7 +9,7 @@ public class TokenBaseEntry extends TokenEnvironment{
 	}
 	
 	public TokenBaseEntry(Stream s, char terminator) {
-		super(TokenBase.readBlock(s, terminator));
+		super(TokenBase.readBase(s, terminator));
 	}
 
 	@Override

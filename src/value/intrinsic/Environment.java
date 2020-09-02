@@ -5,9 +5,9 @@ import java.util.HashMap;
 import parser.ProbeSet;
 import parser.token.resolver.Unsafe;
 import value.Value;
-import value.ValuePartial.Probe;
 import value.node.Node;
 import value.node.NodeIdentifier;
+import value.resolver.Resolver;
 
 public class Environment implements Value {
 	private static Environment instance = new Environment();
@@ -32,7 +32,9 @@ public class Environment implements Value {
 	}
 	
 	public static Value exec (Node root) {
-		return root.run(instance);
+		Value program = root.run(instance);
+		//System.out.println(program);
+		return program;
 	}
 	
 	private class IdentifierLookup implements Getter {
@@ -48,8 +50,8 @@ public class Environment implements Value {
 		}
 		
 		@Override
-		public Getter resolve(Probe probe, Value value) {
-			Value r = this.env.resolve(probe, value);
+		public Getter resolve(Resolver res) {
+			Value r = this.env.resolve(res);
 			
 			if (r == this.env) {
 				return this;

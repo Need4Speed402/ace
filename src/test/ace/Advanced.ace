@@ -109,7 +109,7 @@ test {
 }
 
 test {
-	name 'remap in enviroment'
+	name 'remap in environment'
 	case {
 		{
 			stdout hello
@@ -139,7 +139,7 @@ test {
 }
 
 test {
-	name 'remap in enviroment multiple'
+	name 'remap in environment multiple'
 	case {
 		{
 			stdout hello
@@ -164,7 +164,7 @@ test {
 }
 
 test {
-	name 'remap in enviroment multiple with wrap'
+	name 'remap in environment multiple with wrap'
 	case {
 		([root Function] wrap {
 			{
@@ -191,7 +191,7 @@ test {
 }
 
 test {
-	name 'remap in enviroment multiple with wrap nested'
+	name 'remap in environment multiple with wrap nested'
 	case {
 		([root Function] wrap {
 			{
@@ -220,7 +220,7 @@ test {
 }
 
 test {
-	name 'remap in enviroment multiple with wrap nested thrice'
+	name 'remap in environment multiple with wrap nested thrice'
 	case {
 		([root Function] wrap {
 			{
@@ -263,7 +263,7 @@ test {
 }
 
 test {
-	name 'remap in enviroment multiple with wrap nested quad'
+	name 'remap in environment multiple with wrap nested quad'
 	case {
 		([root Function] wrap {
 			{

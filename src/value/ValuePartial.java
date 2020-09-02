@@ -2,12 +2,10 @@ package value;
 
 import parser.Color;
 import parser.ProbeSet;
-import value.effect.Runtime;
+import value.resolver.ResolverMutable;
+import value.resolver.Resolver;
 
 public abstract class ValuePartial implements Value {
-	@Override
-	public abstract Value run(Runtime r);
-	
 	@Override
 	public Value call (Value arg) {
 		return new Call(this, arg);
@@ -23,18 +21,18 @@ public abstract class ValuePartial implements Value {
 		public final int id = ++ids;
 		
 		@Override
-		public Value resolve(Probe probe, Value value) {
-			return probe == this ? value : this;
+		public Value resolve(Resolver res) {
+			return res.get(this);
 		}
 
 		@Override
-		public Value run(Runtime r) {
-			return r.get(this);
+		public void getResolves(ProbeSet set) {
+			set.set(this);
 		}
 		
 		@Override
-		public void getResolves(ProbeSet set) {
-			set.set(this);
+		public String toString() {
+			return "Probe(" + this.id + ")";
 		}
 	}
 	
@@ -58,22 +56,20 @@ public abstract class ValuePartial implements Value {
 		}
 		
 		@Override
-		public Value run(Runtime r) {
-			Value a = this.parent.run(r);
-			Value b = this.argument.run(r);
-			
-			return a.call(b).run(r);
-		}
-		
-		@Override
-		public Value resolve(Probe probe, Value value) {
-			Value a = this.parent.resolve(probe, value);
-			Value b = this.argument.resolve(probe, value);
+		public Value resolve(Resolver res) {
+			Value a = this.parent.resolve(res);
+			Value b = this.argument.resolve(res);
 			
 			if (a == this.parent & b == this.argument) {
 				return this;
 			}else {
-				return a.call(b);
+				Value ret = a.call(b);
+				
+				if (res instanceof ResolverMutable) {
+					ret = ret.resolve(res);
+				}
+				
+				return ret;
 			}
 		}
 		
@@ -104,16 +100,9 @@ public abstract class ValuePartial implements Value {
 		}
 		
 		@Override
-		public Value run(Runtime r) {
-			Value p = this.parent.run(r);
-			
-			return p.getID(this.getter).run(r);
-		}
-		
-		@Override
-		public Value resolve(Probe probe, Value value) {
-			Value a = this.parent.resolve(probe, value);
-			Getter b = this.getter.resolve(probe, value);
+		public Value resolve(Resolver res) {
+			Value a = this.parent.resolve(res);
+			Getter b = this.getter.resolve(res);
 			
 			if (a == this.parent & b == this.getter) {
 				return this;

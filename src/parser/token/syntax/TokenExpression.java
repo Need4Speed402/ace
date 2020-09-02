@@ -13,7 +13,7 @@ import parser.token.Token;
 import value.node.Node;
 
 public class TokenExpression extends TokenEnvironment implements Modifier{
-	public static final String operators = ": ` ., @#\\ ?! |&~ =<> +- */% ^$";
+	public static final String operators = ": ` @#\\ ?! |&~ =<> +- ., */% ^$";
 	
 	public static final HashMap<Character, Integer> operatorIndex;
 	

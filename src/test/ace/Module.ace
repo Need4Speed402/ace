@@ -1,32 +1,36 @@
 test {
-	name 'basic module'
-	case {
-		(([root Function] 13) {
-		  (([Mutable] 14) (([root Function] 10) {
-		    (([root Function] 11) {
-		      (((([root Function] 8) {
-		        (([root Function] 7) {
-		          7
-		        })
-		      }) (10 (([root Function] 12) {
-		        (((([root Function] 8) {
-		          (([root Function] 7) {
-		            7
-		          })
-		        }) (((([root Function] 8) {
-		          (([root Function] 7) {
-		            7
-		          })
-		        }) (10 ((13 6) entry))) (10 ({
-		          ([console] hello)
-		        } 13)))) ((11 16) 12))
-		      }))) (([root Function] 12) {
-		        ((11 17) 12)
-		      }))
-		    })
-		  }))
-		}) [root Procedure] entry `
+	name 'basic package'
+	package {
+		name root
+		case main {
+			[console] hello
+		}
 	}
+	entry main
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'basic root package'
+	package {
+		name root
+		unsafe
+		package {
+			name import
+			case main {
+				[[
+					unsafe console hello
+				]]
+			}
+			case root {
+				unsafe root
+			}
+		}
+	}
+	entry (import main)
 	expect "
 		hello
 		

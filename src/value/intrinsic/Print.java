@@ -3,14 +3,14 @@ package value.intrinsic;
 import java.io.IOException;
 
 import parser.ProbeSet;
+import runtime.Effect;
+import runtime.Runtime;
 import value.Value;
 import value.Value.Getter;
 import value.ValueEffect;
 import value.ValueFunction;
-import value.ValuePartial.Probe;
-import value.effect.Effect;
-import value.effect.Runtime;
 import value.node.NodeIdentifier;
+import value.resolver.Resolver;
 
 public class Print implements Getter{
 	public static final Value instance = new ValueFunction(message -> message.getID(new Print(message)));
@@ -23,12 +23,12 @@ public class Print implements Getter{
 
 	@Override
 	public Value resolved(int value) {
-		return new ValueEffect(this.message, new EffectPrint(NodeIdentifier.asString(value)));
+		return ValueEffect.create(this.message, new EffectPrint(NodeIdentifier.asString(value)));
 	}
 
 	@Override
-	public Getter resolve(Probe probe, Value value) {
-		Value m = this.message.resolve(probe, value);
+	public Getter resolve(Resolver res) {
+		Value m = this.message.resolve(res);
 		
 		if (m == this.message) {
 			return this;

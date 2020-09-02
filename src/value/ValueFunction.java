@@ -1,103 +1,108 @@
 package value;
 
 import parser.Color;
-import parser.Packages;
 import parser.ProbeSet;
 import value.ValuePartial.Probe;
-import value.effect.Effect;
-import value.effect.Runtime;
-import value.intrinsic.Mutable;
 import value.node.Node;
+import value.resolver.Resolver;
+import value.resolver.ResolverFunctionBody;
+import value.resolver.ResolverMutable;
+import value.resolver.ResolverProbe;
 
 public class ValueFunction implements Value {
-	private final Generator gen;
+	private final Generator body;
 	private final Probe probe;
-	private final ProbeSet probes;
 	
+	private ProbeSet probeCache;
 	private Value cache;
 	
-	public ValueFunction (Node n, ProbeSet.Resolver ... probes) {
-		this(n, new Probe(), probes);
+	public ValueFunction (Node node) {
+		this.probe = new Probe();
+		this.body = () -> node.run(this.probe);
 	}
 	
-	private ValueFunction (Node node, Probe probe, ProbeSet.Resolver ... probes) {
-		this(() -> node.run(probe), new ProbeSet(probes), probe);
+	public ValueFunction (Node node, ProbeSet.ProbeContainer ... resolvers) {
+		this.probe = new Probe();
+		this.body = () -> node.run(this.probe);
+		this.probeCache = new ProbeSet(resolvers);
 	}
 	
-	private ValueFunction(Generator gen, ProbeSet probes, Probe probe) {
-		this.gen = gen;
-		this.probes = probes;
+	private ValueFunction(Generator body, ProbeSet probes, Probe probe) {
+		this.body = body;
+		this.probeCache = probes;
 		this.probe = probe;
 	}
 	
-	private Value get () {
+	public Value get () {
 		if (this.cache == null) {
-			this.cache = this.gen.generate();
+			this.cache = this.body.generate();
 		}
 		
 		return this.cache;
 	}
 	
+	private ProbeSet getProbes () {
+		if (this.probeCache == null) {
+			this.probeCache = new ProbeSet(this.get());
+		}
+		
+		return this.probeCache;
+	}
+	
 	@Override
-	public ValueFunction resolve(Probe probe, Value value) {
-		if (this.probes.has(probe)) {
+	public ValueFunction resolve(Resolver res) {
+		// since we cannot guarantee the order the functions will be called,
+		// functions will never be resolved if the resolver can mutate.
+		if (res instanceof ResolverMutable) return this;
+		
+		ProbeSet probes = this.getProbes();
+		
+		if (res instanceof ResolverFunctionBody) {
+			res = ((ResolverFunctionBody) res).lock();
+			
+			if (res == null) return this;
+		}
+		
+		if (res.has(probes)) {
+			Resolver fres = res;
+			
 			return new ValueFunction(
-				() -> this.get().resolve(probe, value),
-				this.probes.replace(probe, value),
+				() -> this.get().resolve(fres),
+				null, //probes.resolve(probe, value),
 				this.probe
 			);
-		}else {
+		}else{
 			return this;
 		}
 	}
 	
 	@Override
 	public void getResolves(ProbeSet set) {
-		set.set(this.probes);
-	}
-	
-	private static ValueEffect remapDeclares (ValueEffect ret) {
-		for (Effect effect : ret.getEffects()) {
-			if (effect instanceof Mutable.EffectDeclare) {
-				ret = ret.resolve(((Mutable.EffectDeclare) effect).probe, new Probe());
-			}
-		}
-		
-		return ret;
+		set.set(this.getProbes());
 	}
 	
 	@Override
 	public Value call(Value v) {
-		// to effectively disable the optimizer, this code can be uncommented
-		// which will basically make all functions be evaluated at runtime
-		// when most can be evaluated at compile time.
-		//if (true) return new ValuePartial.Call(this, v);
-		
 		if (v instanceof ValuePartial && !(v instanceof Probe)) {
 			return new ValuePartial.Call(this, v);
-		}else if (v instanceof ValueEffect) {
-			if (((ValueEffect) v).getParent() instanceof ValuePartial) {
-				return new ValuePartial.Call(this, v);
-			}
-			
-			return remapDeclares(new ValueEffect(
-				this.get().resolve(probe, ((ValueEffect) v).getParent()),
-				((ValueEffect) v).getEffects()
-			));
 		}else{
-			Value ret = this.get().resolve(probe, v);
+			Value ret;
 			
-			if (ret instanceof ValueEffect) {
-				ret = remapDeclares((ValueEffect) ret);
+			if (v instanceof ValueEffect) {
+				if (((ValueEffect) v).getParent() instanceof ValuePartial) {
+					return new ValuePartial.Call(this, v);
+				}
+				
+				ret = ValueEffect.create(
+					this.get().resolve(new ResolverProbe(probe, ((ValueEffect) v).getParent())),
+					((ValueEffect) v).getEffects()
+				);
+			}else {
+				ret = this.get().resolve(new ResolverProbe(probe, v));
 			}
 			
-			return ret;
+			return ret.resolve(new ResolverFunctionBody());
 		}
-	}
-	
-	@Override
-	public Value run(Runtime r) {
-		return new RuntimeFunction(r, this);
 	}
 	
 	@Override
@@ -111,34 +116,5 @@ public class ValueFunction implements Value {
 	
 	private static interface Generator {
 		public Value generate ();
-	}
-	
-	private static class RuntimeFunction implements Value{
-		private final Runtime runtime;
-		private final ValueFunction func;
-		
-		public RuntimeFunction (Runtime runtime, ValueFunction func) {
-			this.runtime = runtime;
-			this.func = func;
-		}
-		
-		@Override
-		public RuntimeFunction resolve(Probe probe, Value value) {
-			return new RuntimeFunction(this.runtime, this.func.resolve(probe, value));
-		}
-		
-		@Override
-		public Value call(Value v) {
-			Runtime child = this.runtime.push();
-			child.declare(this.func.probe, v);
-			
-			long start = System.nanoTime();
-			Value ret = this.func.get();
-			Packages.RESOLVE_TIME += System.nanoTime() - start;
-			
-			ret = ret.run(child);
-			
-			return this.runtime.root.extend(child, ret);
-		}
 	}
 }

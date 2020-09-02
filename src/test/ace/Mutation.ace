@@ -443,7 +443,7 @@ test {
 		} ([Mutable] hello)
 	}
 	expect "
-		world
+		hello
 		world
 		
 	`"

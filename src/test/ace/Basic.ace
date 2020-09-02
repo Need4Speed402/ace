@@ -527,3 +527,57 @@ test {
 		
 	`"
 }
+
+test {
+	name 'default identifier value'
+	case {
+		[console] (hello world)
+	}
+	expect "
+		world
+		
+	`"
+}
+
+test {
+	name 'default identifier value with effects'
+	case {
+		[console] (([console] hello) ([console] world))
+	}
+	expect "
+		hello
+		world
+		world
+		
+	`"
+}
+
+test {
+	name 'default identifier used as environment'
+	case {
+		{
+			[console] hello
+		} unused
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'probe as parameter but not in closure'
+	case {
+		[root Function] func {
+			[root Function] message {
+				func message
+			} hello
+		} ([root Function] message {
+			[console] message
+		})
+	}
+	expect "
+		hello
+		
+	`"
+}

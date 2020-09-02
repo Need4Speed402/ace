@@ -18,7 +18,7 @@ public class TokenBase extends TokenEnvironment{
 		return Node.call(Node.id("Package"), super.createNode());
 	}
 	
-	private static Token[] readBase (Stream s, char terminator) {
+	public static Token[] readBase (Stream s, char terminator) {
 		//ignore shebang
 		if (s.isNext("#!")) {
 			while (s.chr() != '\n');

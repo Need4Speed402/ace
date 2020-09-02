@@ -4,15 +4,15 @@ import value.ValuePartial.Probe;
 
 // simple hash set implementation that uses linear probing
 // designed to be memory efficient.
-public class ProbeSet {
+public class ProbeSet{
 	private int[] set = new int[8];
 	private int size;
 	
 	public ProbeSet () {}
 	
-	public ProbeSet (ProbeSet.Resolver ... probes) {
+	public ProbeSet (ProbeSet.ProbeContainer ... probes) {
 		this ();
-		for (ProbeSet.Resolver p : probes) p.getResolves(this);
+		for (ProbeSet.ProbeContainer p : probes) p.getResolves(this);
 	}
 	
 	private ProbeSet(ProbeSet set) {
@@ -98,19 +98,40 @@ public class ProbeSet {
 		return true;
 	}
 	
+	@Override
+	public String toString() {
+		if (this.size == 0) return "[]";
+		
+		StringBuilder b = new StringBuilder();
+		b.append('[');
+		
+		int l = 0;
+		for (int i = 0; i < this.set.length; i++) {
+			if (this.set[i] != 0) {
+				b.append("Probe(").append(this.set[i]).append(")");
+				l++;
+				if (l == this.size) break;
+				b.append(", ");
+			}
+		}
+		
+		b.append("]");
+		return b.toString();
+	}
+	
 	public ProbeSet add (Probe ... probes){
 		ProbeSet set = new ProbeSet(this);
 		set.set(probes);
 		return set;
 	}
 	
-	public ProbeSet replace (Probe remove, Resolver resolver) {
+	public ProbeSet resolve (Probe remove, ProbeContainer resolver) {
 		ProbeSet set = new ProbeSet(this, remove.id);
 		resolver.getResolves(set);
 		return set;
 	}
 	
-	public static interface Resolver {
+	public static interface ProbeContainer {
 		public default void getResolves(ProbeSet set) {}
 	}
 }

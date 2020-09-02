@@ -5,18 +5,23 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import parser.Color;
 import parser.Packages;
 import parser.ParserException;
 import parser.Stream;
+import parser.token.Resolver;
 import parser.token.Token;
 import parser.token.node.TokenBase;
 import parser.token.node.TokenBlock;
 import parser.token.node.TokenIdentifier;
 import parser.token.node.TokenScope;
+import parser.token.resolver.Source;
+import parser.token.resolver.Unsafe;
+import parser.token.resolver.Virtual;
 import parser.token.syntax.TokenString;
-import value.effect.Runtime;
+import runtime.Runtime;
 import value.intrinsic.Environment;
 import value.node.Node;
 
@@ -88,10 +93,52 @@ public class Test {
 		return this.output;
 	}
 	
+	public static Resolver parsePackage (TokenBlock body) {
+		Token[] pack = ((TokenBlock) body).getElements();
+		
+		String packageName = null;
+		ArrayList<Resolver> resolvers = new ArrayList<>();
+		
+		for (int i = 0; i < pack.length;) {
+			String name = ((TokenIdentifier) pack[i + 0]).getIdentifier();
+			
+			if (name.equals("name")) {
+				if (packageName != null) throw new ParserException("name is already defined for this package");
+				
+				packageName = ((TokenIdentifier) pack[i + 1]).getIdentifier();
+				
+				i += 2;
+			}else if (name.equals("unsafe")) {
+				resolvers.add(Unsafe.instance);
+				
+				i++;
+			}else if (name.equals("package")) {
+				resolvers.add(parsePackage((TokenBlock) pack[i + 1]));
+				
+				i += 2;
+			}else if (name.equals("case")) {
+				resolvers.add(new Source(
+					((TokenIdentifier) pack[i + 1]).getIdentifier(),
+					new TokenScope((TokenBlock) pack[i + 2]).createNode()
+				));
+				
+				i += 3;
+			}else {
+				throw new ParserException("Unknown directive: " + name);
+			}
+		}
+		
+		if (packageName == null) {
+			throw new ParserException("a package must have a name");
+		}
+		
+		return new Virtual(packageName, resolvers.toArray(new Resolver[0]));
+	}
+	
 	public static Test[] parseTest (String defName, TokenBlock scope) {
 		Token[] tokens = scope.getElements();
 		
-		TokenScope testCase = null;
+		Node testCase = null;
 		String testName = null;
 		
 		byte[] expect = null;
@@ -113,9 +160,32 @@ public class Test {
 			
 			if (name.equals("test")) {
 				list.push(parseTest(testName == null ? defName : testName, (TokenBlock) body));
+			}else if (name.equals("package")) {
+				if (testCase != null) throw new ParserException("there can only be one case defined per test");
+				Resolver pack = parsePackage((TokenBlock) body);
+				
+				testCase = pack.createNode();
 			}else if (name.equals("case")) {
 				if (testCase != null) throw new ParserException("there can only be one case defined per test");
-				testCase = new TokenScope((TokenBlock) body);
+				testCase = new TokenScope((TokenBlock) body).createNode();
+			}else if (name.equals("entry")) {
+				if (testCase == null) throw new ParserException("No program to apply entry to");
+				
+				Token[] bodyScope;
+				
+				if (body instanceof TokenScope) {
+					bodyScope = ((TokenScope) body).getElements();
+				}else {
+					bodyScope = new Token[] {body};
+				}
+				
+				Node[] params = new Node[bodyScope.length];
+				
+				for (int ii = 0; ii < params.length; ii++) {
+					params[ii] = bodyScope[ii].createNode();
+				}
+				
+				testCase = Node.call(Node.call(Node.call(testCase, Unsafe.IDENTITY), params), Node.id("`"));
 			}else if (name.equals("expect")) {
 				if (expect != null) throw new ParserException("there can only be one expected output defined per test");
 				
@@ -142,7 +212,7 @@ public class Test {
 				input = new byte[0];
 			}
 			
-			list.push(new Test(testName == null ? defName : testName, testCase.createNode(), expect, input));
+			list.push(new Test(testName == null ? defName : testName, testCase, expect, input));
 		}
 		
 		return list.toArray();

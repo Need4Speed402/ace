@@ -3,12 +3,11 @@ package value.intrinsic;
 import parser.ProbeSet;
 import value.Value;
 import value.ValueFunction;
-import value.ValuePartial.Probe;
-import value.effect.Runtime;
+import value.resolver.Resolver;
 
 public class Assign implements Value{
 	public static final Value instance = new ValueFunction(name ->
-		new ValueFunction(value -> new Assign(name, value), name)
+		new ValueFunction(value -> new Assign(name, value))
 	);
 	
 	private final Value name, value;
@@ -25,20 +24,15 @@ public class Assign implements Value{
 	}
 	
 	@Override
-	public Value resolve(Probe probe, Value value) {
-		Value n = this.name.resolve(probe, value);
-		Value v = this.value.resolve(probe, value);
+	public Value resolve(Resolver res) {
+		Value n = this.name.resolve(res);
+		Value v = this.value.resolve(res);
 		
 		if (n == this.name & v == this.value) {
 			return this;
 		}else {
 			return new Assign(n, v);
 		}
-	}
-	
-	@Override
-	public Value run(Runtime r) {
-		return new Assign(this.name.run(r), this.value.run(r));
 	}
 	
 	@Override
