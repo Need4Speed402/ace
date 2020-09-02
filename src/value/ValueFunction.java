@@ -104,8 +104,7 @@ public class ValueFunction implements Value {
 				ValueEffect vv = (ValueEffect) v;
 				
 				if (vv.getParent() instanceof ValuePartial) {
-					//return ValueEffect.create(new ValuePartial.Call(this, vv), vv.getEffectNode());
-					return new ValuePartial.Call(this, v);
+					return ValueEffect.create(new ValuePartial.Call(this, vv.getParent()), vv.getEffectNode());
 				}
 				
 				ret = ValueEffect.create(
