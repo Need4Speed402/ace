@@ -95,7 +95,9 @@ public class Runtime {
 	}
 
 	public void run(Value root) {
+		System.out.println(root);
 		root = root.resolve(new ResolverMutable());
+		
 		if (root instanceof ValueEffect) {
 			Effect[] effects = ((ValueEffect) root).getEffects();
 			

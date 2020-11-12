@@ -66,8 +66,8 @@ public class Packages {
 			
 			Token r = new Virtual ("root",
 				Unsafe.instance,
-				//new Directory("std", new File("/media/wdhhd/documents/eclipse/SimpleAceInterpreter/src/ace"))
-				//	.insert(new Source("root", Node.call(Node.id("unsafe"), Node.id("root")))),
+				new Directory("std", new File("/home/alex/Documents/eclipse_java/ACE/src/ace"))
+					.insert(new Source("root", Node.call(Node.id("unsafe"), Node.id("root")))),
 				new Directory("import", entry.getParentFile())
 					.insert(new Source("root", Node.call(Node.id("unsafe"), Node.id("root"))))
 					.set(new EntrySource(name, entry))

@@ -20,15 +20,10 @@ public class NodeEnvironment implements Node{
 	}
 	
 	public Value run(Value environment) {
-		Node body = arg -> this.contents.run(new ValueFunction(var ->
-			arg.call(environment.call(var))
-		));
-		
-		if (this.resolvers == null) {
-			return new ValueFunction(body);
-		}else {
-			return new ValueFunction(body, this.resolvers);
-		}
+		//return new ValueFunction(env -> new ValueFunction( 
+		//	new Context(this.contents, env)
+		//)).call(environment);
+		return new ValueFunction(new Context(this.contents, environment));
 	}
 	
 	@Override
@@ -50,5 +45,27 @@ public class NodeEnvironment implements Node{
 	@Override
 	public int hashCode() {
 		return this.contents.hashCode() + 7;
+	}
+	
+	private static class Context implements Node {
+		private final Node contents;
+		private final Value environment;
+		
+		public Context (Node contents, Value environment) {
+			this.contents = contents;
+			this.environment = environment;
+		}
+		
+		@Override
+		public Value run(Value handler) {
+			return new ValueFunction (this.contents).call(new ValueFunction(var -> {
+				return handler.call(this.environment.call(var));
+			}));
+		}
+		
+		@Override
+		public String toString() {
+			return this.contents.toString();
+		}
 	}
 }

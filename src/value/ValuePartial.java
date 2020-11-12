@@ -1,9 +1,8 @@
 package value;
 
 import parser.Color;
-import parser.ProbeSet;
-import value.resolver.ResolverMutable;
 import value.resolver.Resolver;
+import value.resolver.ResolverMutable;
 
 public abstract class ValuePartial implements Value {
 	@Override
@@ -18,7 +17,15 @@ public abstract class ValuePartial implements Value {
 	
 	public static class Probe extends ValuePartial {
 		private static int ids = 0;
-		public final int id = ++ids;
+		public final int id;
+		
+		private Probe (int id) {
+			this.id = id;
+		}
+		
+		public Probe () {
+			this(++ids);
+		}
 		
 		@Override
 		public Value resolve(Resolver res) {
@@ -26,15 +33,33 @@ public abstract class ValuePartial implements Value {
 		}
 
 		@Override
-		public void getResolves(ProbeSet set) {
-			set.set(this);
+		public int complexity() {
+			return 1;
 		}
 		
 		@Override
 		public String toString() {
 			return "Probe(" + this.id + ")";
 		}
-	}
+		
+		public Probe identify (Value identifier) {
+			return new ProbeKnownIdentifier(identifier);
+		}
+		
+		private class ProbeKnownIdentifier extends Probe {
+			private Value identifier;
+			
+			public ProbeKnownIdentifier (Value identifier) {
+				super(Probe.this.id);
+				this.identifier = identifier;
+			}
+			
+			@Override
+			public Value getID(Getter getter) {
+				return this.identifier.getID(getter);
+			}
+		}
+	} 
 	
 	public static class Call extends ValuePartial {
 		public final Value parent;
@@ -48,7 +73,7 @@ public abstract class ValuePartial implements Value {
 		@Override
 		public String toString() {
 			StringBuilder b = new StringBuilder();
-			b.append(super.toString()).append('\n');
+			b.append("Call\n");
 			b.append(Color.indent(this.parent.toString(), "|-", "| ")).append('\n');
 			b.append(Color.indent(this.argument.toString(), "|-", "  "));
 			
@@ -74,9 +99,8 @@ public abstract class ValuePartial implements Value {
 		}
 		
 		@Override
-		public void getResolves(ProbeSet set) {
-			this.parent.getResolves(set);
-			this.argument.getResolves(set);
+		public int complexity() {
+			return Value.add(this.parent.complexity(), this.argument.complexity());
 		}
 	}
 	
@@ -91,12 +115,17 @@ public abstract class ValuePartial implements Value {
 		
 		@Override
 		public String toString() {
-			StringBuilder b = new StringBuilder();
-			b.append(super.toString()).append('\n');
-			b.append(Color.indent(this.parent.toString(), "|-", "| ")).append('\n');
-			b.append(Color.indent(this.getter.toString(), "|-", "  "));
+			String s = this.getter.toString(this.parent);
 			
-			return b.toString();
+			if (s == null) {
+				StringBuilder b = new StringBuilder();
+				b.append("Identify\n");
+				b.append(Color.indent(this.parent.toString(), "|-", "| ")).append('\n');
+				b.append(Color.indent(this.getter.toString(), "|-", "  "));
+				return b.toString();
+			}else {
+				return s;
+			}
 		}
 		
 		@Override
@@ -112,9 +141,45 @@ public abstract class ValuePartial implements Value {
 		}
 		
 		@Override
-		public void getResolves(ProbeSet set) {
-			this.parent.getResolves(set);
-			this.getter.getResolves(set);
+		public int complexity() {
+			return Value.add(this.parent.complexity(), this.getter.complexity());
+		}
+		
+		public Value caller (Value caller) {
+			return new IdentifierKnownCall(this.parent, this.getter, caller);
+		}
+		
+		private static class IdentifierKnownCall extends Identifier {
+			private final Value caller;
+			
+			public IdentifierKnownCall(Value parent, Getter getter, Value caller) {
+				super(parent, getter);
+				
+				this.caller = caller;
+			}
+			
+			@Override
+			public Value resolve(Resolver res) {
+				Value r = super.resolve(res);
+				
+				if (r == this) {
+					return this;
+				}else if (r instanceof Identifier){
+					return ((Identifier) r).caller(this.caller.resolve(res));
+				}else {
+					return r;
+				}
+			}
+			
+			@Override
+			public Value call(Value arg) {
+				return caller.call(arg);
+			}
+			
+			@Override
+			public Value getID(Getter getter) {
+				return caller.getID(getter);
+			}
 		}
 	}
 }

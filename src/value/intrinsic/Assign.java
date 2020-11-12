@@ -1,6 +1,5 @@
 package value.intrinsic;
 
-import parser.ProbeSet;
 import value.Value;
 import value.ValueFunction;
 import value.resolver.Resolver;
@@ -18,9 +17,8 @@ public class Assign implements Value{
 	}
 	
 	@Override
-	public void getResolves(ProbeSet set) {
-		this.name.getResolves(set);
-		this.value.getResolves(set);
+	public int complexity() {
+		return Value.add(this.name.complexity(), this.value.complexity());
 	}
 	
 	@Override

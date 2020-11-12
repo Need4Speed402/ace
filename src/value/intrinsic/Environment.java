@@ -2,12 +2,10 @@ package value.intrinsic;
 
 import java.util.HashMap;
 
-import parser.ProbeSet;
 import parser.token.resolver.Unsafe;
 import value.Value;
 import value.node.Node;
 import value.node.NodeIdentifier;
-import value.resolver.Resolver;
 
 public class Environment implements Value {
 	private static Environment instance = new Environment();
@@ -28,46 +26,41 @@ public class Environment implements Value {
 
 	@Override
 	public Value call(Value env) {
-		return env.getID(new IdentifierLookup(env));
+		return env.getID(new IdentifierLookup());
 	}
 	
 	public static Value exec (Node root) {
-		Value program = root.run(instance);
-		//System.out.println(program);
-		return program;
+		//Probe p = new Probe();
+		//System.out.println(p);
+		//System.out.println(root.run(p));
+		
+		return root.run(instance);
 	}
 	
 	private class IdentifierLookup implements Getter {
-		private final Value env;
-		
-		public IdentifierLookup(Value env) {
-			this.env = env;
+		@Override
+		public Value resolved(Value parent, int value) {
+			return Environment.this.env.getOrDefault(value, parent);
 		}
 		
 		@Override
-		public Value resolved(int value) {
-			return Environment.this.env.getOrDefault(value, this.env);
-		}
-		
-		@Override
-		public Getter resolve(Resolver res) {
-			Value r = this.env.resolve(res);
-			
-			if (r == this.env) {
-				return this;
-			}else {
-				return new IdentifierLookup(r);
-			}
-		}
-		
-		@Override
-		public void getResolves(ProbeSet set) {
-			this.env.getResolves(set);
+		public int complexity() {
+			return 1;
 		}
 		
 		@Override
 		public String toString() {
-			return super.toString() + " -> " + this.env;
+			return "DefaultEnvironmentLookup()";
 		}
+		
+		@Override
+		public String toString(Value ident) {
+			return "DefaultEnvironmentLookup(" + ident + ")";
+		}
+	}
+	
+	@Override
+	public String toString() {
+		return "DefaultEnvironment";
 	}
 }

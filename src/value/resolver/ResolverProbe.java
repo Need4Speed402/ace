@@ -6,8 +6,8 @@ import value.Value;
 import value.ValuePartial.Probe;
 
 public class ResolverProbe extends Resolver {
-	private final Probe probe;
-	private final Value value;
+	public final Probe probe;
+	public final Value value;
 	
 	public ResolverProbe (Probe probe, Value value) {
 		this.probe = probe;
@@ -16,7 +16,7 @@ public class ResolverProbe extends Resolver {
 	
 	@Override
 	public Value get(Probe p) {
-		return this.probe == p ? this.value : p;
+		return this.probe.id == p.id ? this.value : p;
 	}
 	
 	@Override

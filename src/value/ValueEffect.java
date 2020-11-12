@@ -3,7 +3,6 @@ package value;
 import java.util.Map.Entry;
 
 import parser.Color;
-import parser.ProbeSet;
 import runtime.Effect;
 import value.ValuePartial.Probe;
 import value.intrinsic.Mutable.EffectDeclare;
@@ -36,9 +35,6 @@ public class ValueEffect implements Value{
 			tail = tail.resolve(mut);
 			parent = parent.resolve(mut);
 			
-			ProbeSet set = new ProbeSet(parent);
-			if (tail != null) tail.getResolves(set);
-			
 			EffectDeclare[] entries = new EffectDeclare[mut.getMap().size()];
 			
 			{
@@ -58,12 +54,9 @@ public class ValueEffect implements Value{
 					EffectDeclare decl = entries[i];
 					if (decl == null) continue;
 					
-					if (set.has(decl.probe)) {
-						entries[i] = null;
-						declares = new EffectNode(decl, declares);
-						decl.value.getResolves(set);
-						resolved = true;
-					}
+					entries[i] = null;
+					declares = new EffectNode(decl, declares);
+					resolved = true;
 				}
 				
 				if (!resolved) {
@@ -146,21 +139,22 @@ public class ValueEffect implements Value{
 	}
 	
 	@Override
-	public void getResolves(ProbeSet set) {
-		this.parent.getResolves(set);
-		
+	public int complexity() {
 		EffectNode current = this.tail;
+		int count = 0;
 		
 		while (current != null) {
-			current.effect.getResolves(set);
+			count += current.effect.complexity();
 			current = current.prev;
 		}
+		
+		return count + this.parent.complexity();
 	}
 	
 	@Override
 	public String toString() {
 		StringBuilder b = new StringBuilder();
-		b.append(super.toString()).append('\n');
+		b.append("Effects\n");
 		b.append(Color.indent(this.parent.toString(), "|-", "| ")).append('\n');
 		
 		if (this.tail != null) this.tail.print(b, true);
@@ -168,7 +162,7 @@ public class ValueEffect implements Value{
 		return b.toString();
 	}
 	
-	private static class EffectNode implements ProbeSet.ProbeContainer{
+	private static class EffectNode{
 		public final EffectNode prev;
 		public final Effect effect;
 		
@@ -203,12 +197,6 @@ public class ValueEffect implements Value{
 			
 			b.append(Color.indent(this.effect.toString(), "|-", first ? "  " : "| "));
 			if (!first) b.append('\n');
-		}
-		
-		@Override
-		public void getResolves(ProbeSet set) {
-			if (this.prev != null) this.prev.getResolves(set);
-			this.effect.getResolves(set);
 		}
 	}
 }

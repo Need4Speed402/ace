@@ -48,7 +48,9 @@ public class NodeIdentifier implements Node, Value {
 	@Override
 	public Value run(Value environment) {
 		//System.out.println(environment);
-		return environment.call(this);
+		Value v = environment.call(this);
+		//System.out.println(v);
+		return v;
 	}
 	
 	@Override
@@ -58,7 +60,7 @@ public class NodeIdentifier implements Node, Value {
 	
 	@Override
 	public Value getID(Getter getter) {
-		return getter.resolved(id);
+		return getter.resolved(this, id);
 	}
 	
 	@Override

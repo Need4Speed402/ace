@@ -1,19 +1,16 @@
 package value.intrinsic;
 
-import parser.ProbeSet;
 import runtime.Effect;
 import runtime.Runtime;
 import value.Value;
 import value.ValueEffect;
 import value.ValueFunction;
 import value.ValuePartial.Probe;
+import value.resolver.Resolver;
 import value.resolver.ResolverFunctionBody;
 import value.resolver.ResolverMutable;
-import value.resolver.Resolver;
 
 public class Mutable implements Value {
-	public static final Probe DUP_PROBE = new Probe();
-	
 	public static final Value instance = new ValueFunction(init -> new Mutable(init));
 	
 	private final Value init;
@@ -24,7 +21,7 @@ public class Mutable implements Value {
 	
 	@Override
 	public Value call(Value v) {
-		Probe probe = new Probe();
+		Probe probe = new MutableProbe();
 		
 		return ValueEffect.create(
 			v.call(new ValueFunction(p -> ValueEffect.create(p, new EffectSet(probe, p))))
@@ -46,12 +43,19 @@ public class Mutable implements Value {
 	
 	@Override
 	public String toString() {
-		return super.toString() + " <- " + this.init;
+		return "MutableDeclare(" + this.init + ")";
 	}
 	
 	@Override
-	public void getResolves(ProbeSet set) {
-		this.init.getResolves(set);
+	public int complexity() {
+		return this.init.complexity() + 1;
+	}
+	
+	public static class MutableProbe extends Probe {
+		@Override
+		public int complexity() {
+			return 0;
+		}
 	}
 	
 	public static class EffectSet implements Effect{
@@ -105,9 +109,8 @@ public class Mutable implements Value {
 		}
 		
 		@Override
-		public void getResolves(ProbeSet set) {
-			set.set(this.probe);
-			this.value.getResolves(set);
+		public int complexity() {
+			return this.value.complexity() + 1;
 		}
 	}
 	
@@ -156,9 +159,8 @@ public class Mutable implements Value {
 		}
 		
 		@Override
-		public void getResolves(ProbeSet set) {
-			set.set(this.probe);
-			this.value.getResolves(set);
+		public int complexity() {
+			return this.value.complexity() + 1;
 		}
 	}
 }

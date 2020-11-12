@@ -1,15 +1,16 @@
 package runtime;
 
-import parser.ProbeSet;
 import value.resolver.Resolver;
 
-public interface Effect extends ProbeSet.ProbeContainer{
+public interface Effect{
 	public void run (Runtime runtime);
-	
-	public default void getResolves (ProbeSet set) {}
 	
 	public default Effect resolve (Resolver resolver) {
 		return this;
+	}
+	
+	public default int complexity () {
+		return 0;
 	}
 	
 	public static final Effect NO_EFFECT = new Effect() {

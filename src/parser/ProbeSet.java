@@ -6,7 +6,7 @@ import value.ValuePartial.Probe;
 // designed to be memory efficient.
 public class ProbeSet{
 	private int[] set = new int[8];
-	private int size;
+	private int size, count;
 	
 	public ProbeSet () {}
 	
@@ -23,34 +23,43 @@ public class ProbeSet{
 	private ProbeSet(ProbeSet set, int remove) {
 		this.size = set.size;
 		this.set = new int[set.set.length];
+		this.count = set.count();
 		
-		for (int i = 0; i < set.set.length; i++) {
+		for (int i = 0; i < set.set.length; i += 2) {
 			if (set.set[i] == remove) {
 				this.size--;
+				this.count -= set.set[i + 1];
 				continue;
 			}
 			
-			if (set.set[i] != 0) set(this.set, set.set[i]);
+			if (set.set[i] != 0) set(this.set, set.set[i], set.set[i + 1]);
 		}
-		
 	}
 	
-	public boolean has(Probe probe) {
-		int hash = probe.id % this.set.length;
+	public int count(Probe probe) {
+		int hash = (probe.id % (this.set.length >> 1)) << 1;
 		
 		while (this.set[hash] != 0) {
-			if (this.set[hash] == probe.id) return true;
+			if (this.set[hash] == probe.id) return this.set[hash + 1];
 			
-			hash++;
+			hash += 2;
 			if (hash >= this.set.length) hash = 0;
 		}
 		
-		return false;
+		return 0;
+	}
+	
+	public int count () {
+		return this.count;
+	}
+	
+	public boolean has (Probe probe) {
+		return this.count(probe) > 0;
 	}
 	
 	public void ensureAvailable (int size) {
 		int wants = this.set.length;
-		while ((this.size + size) * 2 > wants) {
+		while ((this.size + size) * 4 > wants) {
 			wants *= 2;
 		}
 		
@@ -58,8 +67,8 @@ public class ProbeSet{
 			int[] set = this.set;
 			this.set = new int[wants];
 			
-			for (int i = 0; i < set.length; i++) {
-				if (set[i] > 0) set(this.set, set[i]);
+			for (int i = 0; i < set.length; i += 2) {
+				if (set[i] > 0) set(this.set, set[i], set[i + 1]);
 			}
 		}
 	}
@@ -67,9 +76,11 @@ public class ProbeSet{
 	public void set (ProbeSet set) {
 		this.ensureAvailable(set.size);
 		
-		for (int i = 0; i < set.set.length; i++) {
+		this.count += set.count();
+		
+		for (int i = 0; i < set.set.length; i += 2) {
 			if (set.set[i] != 0) {
-				if (set(this.set, set.set[i])) this.size++;
+				if (set(this.set, set.set[i], set.set[i + 1])) this.size++;
 			}
 		}
 	}
@@ -77,25 +88,33 @@ public class ProbeSet{
 	public void set (Probe ... probes) {
 		this.ensureAvailable(probes.length);
 		
+		this.count += probes.length;
+		
 		for (Probe p : probes) {
-			if (set(this.set, p.id)) this.size++;
+			if (set(this.set, p.id, 1)) this.size++;
 		}
 	}
 	
-	public static boolean set (int[] set, int id) {
-		int hash = id % set.length;
+	public static boolean set (int[] set, int id, int inc) {
+		int hash = (id % (set.length >> 1)) << 1;
 		
 		while (set[hash] != 0) {
 			if (set[hash] == id) {
+				set[hash + 1] += inc;
 				return false;
 			}
 			
-			hash++;
+			hash += 2;
 			if (hash >= set.length) hash = 0;
 		}
 		
 		set[hash] = id;
+		set[hash + 1] = inc;
 		return true;
+	}
+	
+	public int size () {
+		return this.size;
 	}
 	
 	@Override
@@ -106,7 +125,7 @@ public class ProbeSet{
 		b.append('[');
 		
 		int l = 0;
-		for (int i = 0; i < this.set.length; i++) {
+		for (int i = 0; i < this.set.length; i += 2) {
 			if (this.set[i] != 0) {
 				b.append("Probe(").append(this.set[i]).append(")");
 				l++;
@@ -136,6 +155,8 @@ public class ProbeSet{
 	}
 	
 	public static interface ProbeContainer {
-		public default void getResolves(ProbeSet set) {}
+		public default int getResolves(ProbeSet set) {
+			return 0;
+		}
 	}
 }
