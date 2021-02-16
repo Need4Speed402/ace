@@ -46,17 +46,7 @@ public class Mutable implements Value {
 		return "MutableDeclare(" + this.init + ")";
 	}
 	
-	@Override
-	public int complexity() {
-		return this.init.complexity() + 1;
-	}
-	
-	public static class MutableProbe extends Probe {
-		@Override
-		public int complexity() {
-			return 0;
-		}
-	}
+	public static class MutableProbe extends Probe { }
 	
 	public static class EffectSet implements Effect{
 		public final Probe probe;
@@ -107,11 +97,6 @@ public class Mutable implements Value {
 				}
 			}
 		}
-		
-		@Override
-		public int complexity() {
-			return this.value.complexity() + 1;
-		}
 	}
 	
 	public static class EffectDeclare implements Effect {
@@ -156,11 +141,6 @@ public class Mutable implements Value {
 					return new EffectDeclare(this.probe, v);
 				}
 			}
-		}
-		
-		@Override
-		public int complexity() {
-			return this.value.complexity() + 1;
 		}
 	}
 }

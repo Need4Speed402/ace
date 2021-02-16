@@ -12,7 +12,7 @@ import parser.token.resolver.Virtual;
 import runtime.Runtime;
 import test.Test;
 import value.Value;
-import value.intrinsic.Environment;
+import value.intrinsic.Global;
 import value.node.Node;
 
 public class Packages {
@@ -79,7 +79,7 @@ public class Packages {
 			long progstart = System.nanoTime();
 			NODE_TIME += progstart - start;
 			
-			Value v = Environment.exec(program);
+			Value v = Global.exec(program);
 			
 			RESOLVE_TIME += System.nanoTime() - progstart;
 			

@@ -11,28 +11,8 @@ public interface Value {
 		return this;
 	}
 	
-	public default Value getID (Getter getter) {
-		return getter.resolved(this, DEFAULT_ID);
-	}
-	
-	public default int complexity() {
-		return 0;
-	}
-	
-	public interface Getter{
-		public Value resolved (Value parent, int value);
-		
-		public default Getter resolve (Resolver resolver) {
-			return this;
-		}
-		
-		public default String toString (Value ident) {
-			return null;
-		}
-		
-		public default int complexity() {
-			return 0;
-		}
+	public default int getID () {
+		return DEFAULT_ID;
 	}
 	
 	public static int add (int ... nums) {
@@ -41,4 +21,59 @@ public interface Value {
 		if (add != 0) add += nums.length - 1;
 		return add;
 	}
+	
+	public static String print (String name, Object ... objects) {
+		StringBuilder b = new StringBuilder ();
+		b.append(name).append('\n');
+		
+		for (int ii = 0; ii < objects.length; ii++) {
+			String s = objects[ii].toString();
+			b.append(ii == objects.length - 1 ? '\u2514' : '\u251C');
+			
+			for (int i = 0; i < s.length(); i++) {
+				char c = s.charAt(i);
+				b.append(c);
+				if (c == '\n') {
+					b.append(ii == objects.length - 1 ? " " : "\u2502");
+				}
+			}
+			
+			if (ii < objects.length - 1) b.append('\n');
+		}
+		
+		return b.toString();
+	}
+	
+	/*public class CallReturn {
+		private final Value value;
+		private final Effect[] effects;
+		
+		public CallReturn (Value value, Effect[] effects) {
+			this.value = value;
+			this.effects = effects;
+		}
+		
+		public CallReturn (Value value) {
+			this.value = value;
+			this.effects = new Effect[0];
+		}
+		
+		public Value getValue() {
+			return this.value;
+		}
+		
+		public Effect[] getEffects () {
+			return this.effects;
+		}
+		
+		public Effect[] mergeEffects (CallReturn other) {
+			Effect[] otherEffects = other.getEffects();
+			Effect[] out = new Effect[this.effects.length + otherEffects.length];
+
+			System.arraycopy(this.effects, 0, out, 0, this.effects.length);
+			System.arraycopy(otherEffects, 0, out, this.effects.length, otherEffects.length);
+
+			return out;
+		}
+	}*/
 }

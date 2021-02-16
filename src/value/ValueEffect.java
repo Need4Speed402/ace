@@ -2,7 +2,6 @@ package value;
 
 import java.util.Map.Entry;
 
-import parser.Color;
 import runtime.Effect;
 import value.ValuePartial.Probe;
 import value.intrinsic.Mutable.EffectDeclare;
@@ -33,42 +32,44 @@ public class ValueEffect implements Value{
 			ResolverMutable mut = new ResolverMutable();
 			
 			tail = tail.resolve(mut);
-			parent = parent.resolve(mut);
-			
 			EffectDeclare[] entries = new EffectDeclare[mut.getMap().size()];
 			
-			{
-				int i = 0;
-				
-				for (Entry<Probe, Value> entry : mut.getMap().entrySet()) {
-					entries[i++] = new EffectDeclare(entry.getKey(), entry.getValue());
-				}
-			}
-			
-			EffectNode declares = null;
-			
-			while (true) {
-				boolean resolved = false;
-				
-				for (int i = 0; i < entries.length; i++) {
-					EffectDeclare decl = entries[i];
-					if (decl == null) continue;
+			if (entries.length > 0) {
+				{
+					int i = 0;
 					
-					entries[i] = null;
-					declares = new EffectNode(decl, declares);
-					resolved = true;
+					for (Entry<Probe, Value> entry : mut.getMap().entrySet()) {
+						entries[i++] = new EffectDeclare(entry.getKey(), entry.getValue());
+					}
 				}
 				
-				if (!resolved) {
-					break;
+				parent = parent.resolve(mut);
+				
+				EffectNode declares = null;
+				
+				while (true) {
+					boolean resolved = false;
+					
+					for (int i = 0; i < entries.length; i++) {
+						EffectDeclare decl = entries[i];
+						if (decl == null) continue;
+						
+						entries[i] = null;
+						declares = new EffectNode(decl, declares);
+						resolved = true;
+					}
+					
+					if (!resolved) {
+						break;
+					}
 				}
-			}
-			
-			if (declares != null) {
-				if (tail != null) {
-					tail = tail.concat(declares);
-				}else {
-					tail = declares;
+				
+				if (declares != null) {
+					if (tail != null) {
+						tail = tail.concat(declares);
+					}else {
+						tail = declares;
+					}
 				}
 			}
 		}
@@ -122,47 +123,42 @@ public class ValueEffect implements Value{
 	}
 	
 	@Override
-	public Value getID(Getter getter) {
-		return ValueEffect.create(this.parent.getID(getter), this.tail);
+	public int getID() {
+		return this.parent.getID();
 	}
 	
 	@Override
 	public Value resolve(Resolver res) {
-		EffectNode tail = this.tail == null ? null : this.tail.resolve(res);
-		Value parent = this.parent.resolve(res);
-		
-		if (parent == this.parent & tail == this.tail) {
-			return this;
-		}else{
-			return ValueEffect.create(parent, tail);
-		}
-	}
-	
-	@Override
-	public int complexity() {
-		EffectNode current = this.tail;
-		int count = 0;
-		
-		while (current != null) {
-			count += current.effect.complexity();
-			current = current.prev;
-		}
-		
-		return count + this.parent.complexity();
+		return ValueEffect.create(res.cache(this.parent), this.tail.resolve(res));
 	}
 	
 	@Override
 	public String toString() {
-		StringBuilder b = new StringBuilder();
-		b.append("Effects\n");
-		b.append(Color.indent(this.parent.toString(), "|-", "| ")).append('\n');
+		int len = 1;
+		{
+			EffectNode current = this.tail;
+			
+			while (current != null) {
+				len ++;
+				current = current.prev;
+			}
+		}
 		
-		if (this.tail != null) this.tail.print(b, true);
-
-		return b.toString();
+		Object[] values = new Object[len];
+		values[0] = this.parent;
+		
+		{
+			EffectNode current = this.tail;
+			for (int i = values.length - 1; i >= 1; i--) {
+				values[i] = current.effect;
+				current = current.prev;
+			}
+		}
+		
+		return Value.print("Effects", values); 
 	}
 	
-	private static class EffectNode{
+	private static class EffectNode {
 		public final EffectNode prev;
 		public final Effect effect;
 		
@@ -190,13 +186,6 @@ public class ValueEffect implements Value{
 			}else{
 				return new EffectNode(effect, prev);
 			}
-		}
-		
-		public void print (StringBuilder b, boolean first) {
-			if (this.prev != null) this.prev.print(b, false);
-			
-			b.append(Color.indent(this.effect.toString(), "|-", first ? "  " : "| "));
-			if (!first) b.append('\n');
 		}
 	}
 }

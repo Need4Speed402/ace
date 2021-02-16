@@ -11,8 +11,9 @@ import parser.token.syntax.TokenString;
 import value.Value;
 
 public class NodeIdentifier implements Node, Value {
-	private static int counter = 0;
-	public final int id;
+	// Will start counting from 1. 0 is reserved as the default identifier
+	private static int counter = 1;
+	public final int id = counter++; 
 	
 	private static HashMap<Integer, String> builtinSearch;
 	
@@ -41,16 +42,9 @@ public class NodeIdentifier implements Node, Value {
 		return builtinSearch;
 	}
 	
-	protected NodeIdentifier() {
-		this.id = ++counter;
-	}
-	
 	@Override
 	public Value run(Value environment) {
-		//System.out.println(environment);
-		Value v = environment.call(this);
-		//System.out.println(v);
-		return v;
+		return environment.call(this);
 	}
 	
 	@Override
@@ -59,8 +53,8 @@ public class NodeIdentifier implements Node, Value {
 	}
 	
 	@Override
-	public Value getID(Getter getter) {
-		return getter.resolved(this, id);
+	public int getID() {
+		return this.id;
 	}
 	
 	@Override

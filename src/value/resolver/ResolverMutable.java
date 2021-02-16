@@ -2,7 +2,6 @@ package value.resolver;
 
 import java.util.HashMap;
 
-import parser.ProbeSet;
 import value.Value;
 import value.ValuePartial.Probe;
 
@@ -31,15 +30,6 @@ public class ResolverMutable extends Resolver {
 		return this.memory;
 	}
 
-	@Override
-	public boolean has(ProbeSet set) {
-		for (Probe p : this.memory.keySet()) {
-			if (set.has(p)) return true;
-		}
-		
-		return false;
-	}
-	
 	public boolean has(Probe p) {
 		return this.memory.containsKey(p);
 	}

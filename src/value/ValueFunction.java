@@ -1,17 +1,16 @@
 package value;
 
-import parser.Color;
 import value.ValuePartial.Probe;
 import value.node.Node;
 import value.resolver.Resolver;
+import value.resolver.ResolverArgument;
 import value.resolver.ResolverFunctionBody;
 import value.resolver.ResolverMutable;
-import value.resolver.ResolverProbe;
 
 public class ValueFunction implements Value {
 	private final Generator body;
 	private final Probe probe;
-	
+
 	private Value cache;
 	
 	public ValueFunction (Node node) {
@@ -37,23 +36,15 @@ public class ValueFunction implements Value {
 		// since we cannot guarantee the order the functions will be called,
 		// functions will never be resolved if the resolver can mutate.
 		if (res instanceof ResolverMutable) return this;
+		if (res instanceof ResolverFunctionBody) res = ((ResolverFunctionBody) res).lock();
+		if (res instanceof ResolverArgument) res = ((ResolverArgument) res).add(this.probe);
 		
-		if (res instanceof ResolverFunctionBody) {
-			res = ((ResolverFunctionBody) res).lock();
-			
-			if (res == null) return this;
-		}
-		
+		// this alias is here to get around java's dumb mutation rules around closures.
 		Resolver r = res;
 		return new ValueFunction(
-			this.probe,
+			(Probe) res.get(this.probe),
 			() -> this.get().resolve(r)
 		);
-	}
-	
-	@Override
-	public int complexity() {
-		return 1;
 	}
 	
 	@Override
@@ -63,38 +54,15 @@ public class ValueFunction implements Value {
 			return ValueEffect.create(this.call(vv.getParent()), vv.getEffectNode());
 		}
 		
-		if ((v instanceof ValuePartial) && !(v instanceof Probe)) {
-			return new ValuePartial.Call(this, v);
-		}
-		
-		Value ret = this.get().resolve(new ResolverProbe(this.probe, v));
-		//decide if the added complexity of resolving the probe
-		//potentially early will pay off
-		int deferComplexity = Value.add(v.complexity(), this.get().complexity());
-		int substituteComplexity = ret.complexity();
-		
-		if (deferComplexity < substituteComplexity) {
-			Value iret = this.get().resolve(new ResolverProbe(this.probe, this.probe.identify(v)));
-			
-			return new ValuePartial.Call(new ValueFunction(
-				this.probe,
-				() -> iret
-			), v);
-		}
-		
-		return ret.resolve(new ResolverFunctionBody());
+		return this.get().resolve(new ResolverArgument(this.probe, v));
 	}
 	
 	@Override
 	public String toString() {
-		StringBuilder b = new StringBuilder();
-		b.append("Function(").append(this.probe).append(")\n");
-		b.append(Color.indent(this.get().toString(), "|-", "  "));
-		
-		return b.toString();
+		return Value.print("Function " + this.probe, this.get());
 	}
 	
 	private static interface Generator {
-		public Value generate ();
+		public CallReturn generate ();
 	}
 }

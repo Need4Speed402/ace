@@ -320,7 +320,7 @@ test {
 }
 
 test {
-	name 'effects in enviroment call with indirection'
+	name 'effects in environment call with indirection'
 	case {
 		[root Function] msg {
 			{lol lol} ([root Function] void {[console] msg})

@@ -22,7 +22,8 @@ import parser.token.resolver.Unsafe;
 import parser.token.resolver.Virtual;
 import parser.token.syntax.TokenString;
 import runtime.Runtime;
-import value.intrinsic.Environment;
+import value.ValuePartial.Probe;
+import value.intrinsic.Global;
 import value.node.Node;
 
 public class Test {
@@ -77,7 +78,7 @@ public class Test {
 			long start = System.nanoTime();
 			
 			try {
-				r.run(Environment.exec(this.body));
+				r.run(Global.exec(this.body));
 				
 				this.duration = System.nanoTime() - start;
 			}catch (Throwable e) {
@@ -158,7 +159,12 @@ public class Test {
 				throw new RuntimeException("First token in pair must be an identifier");
 			}
 			
-			if (name.equals("test")) {
+			if (name.equals("print")){
+				System.out.println(Global.exec(body.createNode()));
+			}else if (name.equals("tree")){
+				Probe global = new Probe();
+				System.out.println(global + " -> " + body.createNode().run(global));
+			}else if (name.equals("test")) {
 				list.push(parseTest(testName == null ? defName : testName, (TokenBlock) body));
 			}else if (name.equals("package")) {
 				if (testCase != null) throw new ParserException("there can only be one case defined per test");

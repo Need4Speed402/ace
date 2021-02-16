@@ -2,7 +2,6 @@ package value.resolver;
 
 import java.util.HashMap;
 
-import parser.ProbeSet;
 import value.ValuePartial.Probe;
 
 public class ResolverFunctionBody extends Resolver{
@@ -20,7 +19,6 @@ public class ResolverFunctionBody extends Resolver{
 	
 	public ResolverFunctionBody lock () {
 		if (this.locked) return this;
-		if (this.defs.size() == 0) return null;
 		
 		return new ResolverFunctionBody(this.defs, true);
 	}
@@ -41,14 +39,5 @@ public class ResolverFunctionBody extends Resolver{
 	@Override
 	public Probe get(Probe p) {
 		return this.defs.getOrDefault(p, p);
-	}
-
-	@Override
-	public boolean has(ProbeSet set) {
-		for (Probe p : this.defs.keySet()) {
-			if (set.has(p)) return true;
-		}
-		
-		return false;
 	}
 }

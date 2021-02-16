@@ -9,6 +9,7 @@ public class Unsafe extends Virtual {
 	public static final NodeIdentifier ASSIGN = Node.id();
 	public static final NodeIdentifier MUTABLE = Node.id();
 	public static final NodeIdentifier CONSOLE = Node.id();
+	public static final NodeIdentifier DPRINT = Node.id();
 	
 	public static final NodeIdentifier PARENT = Node.id();
 	public static final Node DEFAULT_MOD = Node.id();
@@ -28,6 +29,7 @@ public class Unsafe extends Virtual {
 			new Source("assign", ASSIGN),
 			new Source("Mutable", MUTABLE),
 			new Source("console", CONSOLE),
+			new Source("dprint", DPRINT),
 			
 			new Virtual("root",
 				new Source("``", DO),
