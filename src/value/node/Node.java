@@ -3,10 +3,11 @@ package value.node;
 import java.util.HashMap;
 
 import value.Value;
+import value.Value.CallReturn;
 import value.node.NodeDelegate.Loader;
 
 public interface Node {
-	public Value run (Value environment);
+	public CallReturn run (Value environment);
 	
 	public static final HashMap<NodeCall, NodeCall> calls = new HashMap<>();
 	public static final HashMap<Node, NodeEnvironment> envs = new HashMap<>();

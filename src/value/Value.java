@@ -1,11 +1,13 @@
 package value;
 
+import runtime.Effect;
+import runtime.EffectList;
 import value.resolver.Resolver;
 
 public interface Value {
 	public static final int DEFAULT_ID = 0;
 	
-	public Value call (Value v);
+	public CallReturn call (Value v);
 	
 	public default Value resolve (Resolver resolver) {
 		return this;
@@ -44,36 +46,42 @@ public interface Value {
 		return b.toString();
 	}
 	
-	/*public class CallReturn {
-		private final Value value;
-		private final Effect[] effects;
-		
-		public CallReturn (Value value, Effect[] effects) {
-			this.value = value;
-			this.effects = effects;
-		}
+	public class CallReturn {
+		public final Value value;
+		public final Effect effect;
 		
 		public CallReturn (Value value) {
 			this.value = value;
-			this.effects = new Effect[0];
+			this.effect = Effect.NO_EFFECT;
 		}
 		
-		public Value getValue() {
-			return this.value;
+		public CallReturn (Value value, Effect effect) {
+			this.value = value;
+			this.effect = effect;
 		}
 		
-		public Effect[] getEffects () {
-			return this.effects;
+		public CallReturn (Value value, Effect ... effects) {
+			this.value = value;
+			this.effect = EffectList.create(effects);
 		}
 		
-		public Effect[] mergeEffects (CallReturn other) {
-			Effect[] otherEffects = other.getEffects();
-			Effect[] out = new Effect[this.effects.length + otherEffects.length];
-
-			System.arraycopy(this.effects, 0, out, 0, this.effects.length);
-			System.arraycopy(otherEffects, 0, out, this.effects.length, otherEffects.length);
-
-			return out;
+		public CallReturn call (Value value) {
+			CallReturn res = this.value.call(value);
+			return new CallReturn(res.value, this.effect, res.effect);
 		}
-	}*/
+		
+		public CallReturn call (CallReturn value) {
+			CallReturn res = this.value.call(value.value);
+			return new CallReturn(res.value, this.effect, value.effect, res.effect);
+		}
+		
+		public CallReturn resolve (Resolver resolver) {
+			return new CallReturn(this.value.resolve(resolver), this.effect.resolve(resolver));
+		}
+		
+		@Override
+		public String toString() {
+			return Value.print("CallReturn", this.value, this.effect);
+		}
+	}
 }

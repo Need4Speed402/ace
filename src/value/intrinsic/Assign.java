@@ -6,14 +6,14 @@ import value.node.NodeIdentifier;
 import value.resolver.Resolver;
 
 public class Assign implements Value{
-	public static final Value instance = new ValueFunction(name -> new ValueFunction(value -> {
+	public static final Value instance = new ValueFunction(name -> new CallReturn(new ValueFunction(value -> {
 		// 'name' is the identifier used to derive what this value's identity should be
 		// 'value' is the base value on which to apply a new identity.
 		//Every value in ace has two parts, the behavior it will exhibit when it is called,
 		// and what its identity is. The assign operator lets you choose what both behaviors
 		// will be individually.
-		return create(name, value);
-	}));
+		return new CallReturn(create(name, value));
+	})));
 	
 	public static Value create (Value name, Value value) {
 		if (name == value) return name;
@@ -37,7 +37,7 @@ public class Assign implements Value{
 	}
 	
 	@Override
-	public Value call (Value v) {
+	public CallReturn call (Value v) {
 		return this.value.call(v);
 	}
 	
@@ -80,7 +80,7 @@ public class Assign implements Value{
 		}
 		
 		@Override
-		public Value call(Value v) {
+		public CallReturn call(Value v) {
 			throw new Error("Identity cache is only designed to handle identity querries");
 		}
 		

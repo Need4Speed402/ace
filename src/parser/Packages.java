@@ -9,9 +9,9 @@ import parser.token.resolver.EntrySource;
 import parser.token.resolver.Source;
 import parser.token.resolver.Unsafe;
 import parser.token.resolver.Virtual;
+import runtime.Effect;
 import runtime.Runtime;
 import test.Test;
-import value.Value;
 import value.intrinsic.Global;
 import value.node.Node;
 
@@ -79,7 +79,7 @@ public class Packages {
 			long progstart = System.nanoTime();
 			NODE_TIME += progstart - start;
 			
-			Value v = Global.exec(program);
+			Effect v = Global.exec(program);
 			
 			RESOLVE_TIME += System.nanoTime() - progstart;
 			

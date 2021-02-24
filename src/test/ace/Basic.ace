@@ -113,6 +113,19 @@ test {
 test {
 	name 'print twice'
 	case {
+		[console] hello
+		([console] hello)
+	}
+	expect "
+		hello
+		hello
+		
+	`"
+}
+
+test {
+	name 'print twice inside function'
+	case {
 		[root Function] message {
 			[console] message
 			([console] message)

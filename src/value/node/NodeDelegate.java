@@ -1,6 +1,7 @@
 package value.node;
 
 import value.Value;
+import value.Value.CallReturn;
 
 public class NodeDelegate implements Node {
 	private Node cache;
@@ -16,7 +17,7 @@ public class NodeDelegate implements Node {
 	}
 	
 	@Override
-	public Value run(Value environment) {
+	public CallReturn run(Value environment) {
 		return this.get().run(environment);
 	}
 	

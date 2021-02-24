@@ -1,11 +1,138 @@
 package value.intrinsic;
 
+import runtime.Effect;
+import runtime.Runtime;
 import value.Value;
+import value.Value.CallReturn;
+import value.ValueFunction;
+import value.resolver.Resolver;
+
+public class Compare {
+	public static final Value instance = new ValueFunction(a -> new CallReturn(new ValueFunction(b -> new CallReturn(new ValueFunction(x -> new CallReturn(new ValueFunction (y -> new CallReturn(create(a, y, b, x)))))))));
+
+	public static Value create (Value base, Value def, Value comp, Value pass) {
+		if (def == pass) return pass;
+		
+		int aa = base.getID();
+		int bb = comp.getID();
+		
+		if (aa == -1 | bb == -1) {
+			return new ValueCompare(base, comp, pass, def);
+		}else if (aa == bb) {
+			return pass;
+		}else {
+			return def;
+		}
+	}
+	
+
+	private static class ValueCompare implements Value {
+		public final Value a, b, pass, fail;
+		
+		public ValueCompare (Value a, Value b, Value pass, Value fail) {
+			this.a = a;
+			this.b = b;
+			this.pass = pass;
+			this.fail = fail;
+		}
+		
+		@Override
+		public CallReturn call(Value v) {
+			CallReturn pass = this.pass.call(v);
+			CallReturn fail = this.fail.call(v);
+
+			return new CallReturn(new ValueCompare(this.a, this.b, pass.value, fail.value), new EffectCompare(this.a, this.b, pass.effect, fail.effect));
+		}
+		
+		@Override
+		public Value resolve(Resolver resolver) {
+			return Compare.create(
+				this.a.resolve(resolver),
+				this.fail.resolve(resolver),
+				this.b.resolve(resolver),
+				this.pass.resolve(resolver)
+			);
+		}
+		
+		@Override
+		public int getID() {
+			int aa = this.pass.getID();
+			int bb = this.fail.getID();
+			
+			if (aa != bb | bb == -1) {
+				return -1;
+			}else {
+				return aa;
+			}
+		}
+		
+		@Override
+		public String toString() {
+			return Value.print("Compare", this.a, this.b, this.pass, this.fail);
+		}
+	}
+
+	private static class EffectCompare implements Effect {
+		public final Value a, b;
+		public final Effect pass, fail;
+		
+		public EffectCompare (Value a, Value b, Effect pass, Effect fail) {
+			this.a = a;
+			this.b = b;
+			this.pass = pass;
+			this.fail = fail;
+		}
+		
+		@Override
+		public Effect resolve(Resolver resolver) {
+			Value a = this.a.resolve(resolver);
+			Value b = this.b.resolve(resolver);
+			int aa = a.getID();
+			int bb = b.getID();
+			
+			Effect pass = this.pass.resolve(resolver);
+			Effect fail = this.fail.resolve(resolver);
+			
+			if (pass == fail) {
+				return pass;
+			}else if (aa == -1 | bb == -1) {
+				return new EffectCompare(
+					a,
+					b,
+					pass,
+					fail
+				);
+			}else if (aa == bb){
+				return pass;
+			}else {
+				return fail;
+			}
+		}
+		
+		@Override
+		public void run(Runtime runtime) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public String toString() {
+			return Value.print("CompareEffects", this.a, this.b, this.pass, this.fail);
+		}
+	};
+}
+
+/*import java.util.ArrayList;
+
+import runtime.Effect;
+import runtime.Runtime;
+import value.Value;
+import value.Value.CallReturn;
 import value.ValueFunction;
 import value.intrinsic.Assign.IdentityCache;
 import value.resolver.Resolver;
 
-public abstract class Compare implements Value{
+public class Compare<K>{
 	public static Value create (Value base, Value def, Value comp, Value pass) {
 		if (def == pass) return pass;
 		
@@ -65,19 +192,10 @@ public abstract class Compare implements Value{
 		}
 		
 		for (int i = 0; i < bound.length; i++) unbound[i + unboundLength] = bound[i];
-		return new MapCompare(base, def, unbound, unboundLength, map);
+		return new Compare(base, def, unbound, unboundLength, map);
 	}
 
-	protected final Value base, def;
-
-	private Compare (Value base, Value def) {
-		this.base = base;
-		this.def = def;
-	}
-	
-	public abstract Pair[] getPairs ();
-	
-	public static final Value instance = new ValueFunction(a -> new ValueFunction(b -> new ValueFunction(x -> new ValueFunction (y -> create(a, y, b, x)))));
+	public static final Value instance = new ValueFunction(a -> new CallReturn(new ValueFunction(b -> new CallReturn(new ValueFunction(x -> new CallReturn(new ValueFunction (y -> new CallReturn(create(a, y, b, x)))))))));
 	
 	public static class Pair {
 		public final Value key, value;
@@ -107,193 +225,150 @@ public abstract class Compare implements Value{
 		}
 	}
 	
-	public static class SingleCompare extends Compare {
-		private final Value comp, pass;
-		
-		public SingleCompare (Value base, Value def, Value comp, Value pass) {
-			super (base, def);
-			this.comp = comp;
-			this.pass = pass;
-		}
-		
-		@Override
-		public Pair[] getPairs() {
-			return new Pair[] { new Pair(this.comp, this.pass) };
-		}
-
-		@Override
-		public Value resolve(Resolver resolver) {
-			return create(
-				resolver.cache(this.base),
-				resolver.cache(this.def),
-				resolver.cache(this.comp),
-				resolver.cache(this.pass)
-			);
-		}
-		
-		@Override
-		public Value call(Value arg) {
-			return new SingleCompare(this.base, this.def.call(arg), this.comp, this.pass.call(arg));
-		}
-		
-		@Override
-		public int getID() {
-			int xx = this.pass.getID();
-			int yy = this.def.getID();
-			
-			if (xx == -1 | yy == -1 | xx != yy) {
-				return -1;
-			}else {
-				return xx;
-			}
-		}
-		
-		@Override
-		public String toString() {
-			return Value.print("Compare", this.base, this.def, new Pair(this.comp, this.pass));
-		}
+	protected final Value base;
+	protected final K def;
+	protected final K[] values;
+	protected final Value[] keys;
+	protected final int[] map;
+	
+	private Compare (Value base, K def, int[] map, Value[] keys, K[] values) {
+		this.base = base;
+		this.def = def;
+		this.map = map;
+		this.keys = keys;
+		this.values = values;
 	}
 	
-	//as an optimization, the compiler will optimize patters of chained together compares (which are quite common)
-	// and turn it into an efficient hashmap lookup.
-	private static class MapCompare extends Compare {
-		//the bound array has two parts: unbound values (values of which we don't know their id yet)
-		// and the rest of the array is going to contain bound values. The bound array contains the values
-		// that the keys would map to when looking up in the hashmap. The
-		//the bound array is going contain values that we are comparing against
-		// when we don't know what their actual id is yet.
-		//the boundIndex int is specifies the start index of their the bound values start. Unbound values always start at 0.
-		//this is done to prevent heap fragmentation and cache performance.
-		private final Value[] bound;
-		private final int boundIndex;
-		private final int[] map;
+	@Override
+	public Pair[] getPairs() {
+		int count = this.boundIndex / 2;
+		for (int i = 0; i < this.map.length; i++) if (this.map[i] != 0) count++;
+		Pair[] pairs = new Pair[count];
 		
-		public MapCompare (Value base, Value def, Value[] bound, int boundIndex, int[] map) {
-			super(base, def);
-			this.bound = bound;
-			this.boundIndex = boundIndex;
-			this.map = map;
+		for (int i = 0; i < this.map.length; i++) {
+			int id = this.map[i];
+			if (id == 0) continue;
+			pairs[--count] = new Pair(new IdentityCache(id - 1), this.bound[this.boundIndex + i]);
 		}
 		
-		@Override
-		public Pair[] getPairs() {
-			int count = this.boundIndex / 2;
-			for (int i = 0; i < this.map.length; i++) if (this.map[i] != 0) count++;
-			Pair[] pairs = new Pair[count];
-			
-			for (int i = 0; i < this.map.length; i++) {
-				int id = this.map[i];
-				if (id == 0) continue;
-				pairs[--count] = new Pair(new IdentityCache(id - 1), this.bound[this.boundIndex + i]);
-			}
-			
-			for (int i = 0; i < this.boundIndex; i += 2) {
-				pairs[--count] = new Pair(this.bound[i], this.bound[i + 1]);
-			}
-			
-			return pairs;
+		for (int i = 0; i < this.boundIndex; i += 2) {
+			pairs[--count] = new Pair(this.bound[i], this.bound[i + 1]);
 		}
 		
-		@Override
-		public Value resolve(Resolver resolver) {
-			Value[] newUnbound;
-			int[] newMap = new int[this.map.length];
-			int boundLength = 0;
+		return pairs;
+	}
+	
+	public K resolve(int[] map, Value[] keys, K[] values, Resolver resolver, GenericResolver<K> genericResolver) {
+		for (int i = 0; i < this.map.length; i++) {
+			map[i] = this.map[i];
+			values[i] = this.values[i];
+		}
+		
+		ArrayList<Value> unbound = new ArrayList<>();
+		ArrayList<K> unboundValues = new ArrayList<>();
+		
+		//the keys array contains items that we don't know the id of yet.
+		// we're going to try to resolve these first
+		for (int i = 0; i < this.keys.length; i++) {
+			Value v = this.keys[i].resolve(resolver);
+			int id = v.getID() + 1;
 			
-			for (int i = 0; i < this.map.length; i++) newMap[i] = this.map[i];
-			if (this.boundIndex == 0) {
-				newUnbound = new Value[this.map.length];
-				
-				for (int i = 0; i < this.map.length; i++) {
-					Value b = this.bound[i];
-					if (b == null) continue;
-					newUnbound[i] = resolver.cache(b);
-				}
-			}else {
-				newUnbound = new Value[this.bound.length];
-				Value[] newBound = new Value[this.map.length];
+			if (id == -1) {
+				unbound.add(v);
+				unboundValues.add(this.values[this.map.length + i]);
+			}else{
+				int current = id % map.length;
 
-				for (int i = 0; i < this.boundIndex; i += 2) {
-					Value key = resolver.cache(this.bound[i]);
-					int id = key.getID() + 1;
-					
-					if (id == 0) {
-						// we still don't know what the value is, pass it on.
-						newUnbound[boundLength++] = key;
-						newUnbound[boundLength++] = resolver.cache(this.bound[i + 1]);
-					}else{
-						// we now know the id of this value, move it from the unbound portion
-						// into the bound portion and add an entry into the hash set.
-						
-						int current = id % newMap.length;
-						while (true) {
-							if (newMap[i] == 0) {
-								newMap[i] = id;
-								newBound[i] = this.bound[i + 1];
-								break;
-							}else {
-								current = (current + 1) % newMap.length;
-							}
-						}
+				while (true) {
+					if (map[current] == 0) {
+						map[current] = id;
+						values[current] = this.values[this.map.length + i];
+						break;
+					}else {
+						current = (current + 1) % map.length;
 					}
 				}
+			}
+		}
 
-				for (int i = 0; i < newBound.length; i++) {
-					Value v = newBound[i];
-					if (v == null) v = this.bound[this.boundIndex + i];
-					if (v != null) v = resolver.cache(v);
-					newUnbound[i + boundLength] = v;
-				}
-			}
+		{
+			int id = base.getID() + 1;
 			
-			Value base = resolver.cache(this.base);
-			Value def = resolver.cache(this.def);
-			
-			{
-				int id = base.getID() + 1;
+			//we know what the id is for the thing we want to compare against. Look it up into the hashmap.
+			if (id != 0) {
+				int current = id % map.length;
 				
-				//we know what the id is for the thing we want to compare against. Look it up into the hashmap.
-				if (id != 0) {
-					int current = id % newMap.length;
-					
-					while (true) {
-						if (newMap[current] == id) {
-							return newUnbound[current + boundLength];
-						}else if (newMap[current] == 0) {
-							break;
-						}else {
-							current = (current + 1) % newMap.length;
-						}
-					}
-					
-					// if all the items we care about are bound, then if we still haven't found anything, we return the default value.
-					if (boundLength == 0) {
-						return def;
+				while (true) {
+					if (map[current] == id) {
+						return values[current];
+					}else if (map[current] == 0) {
+						break;
+					}else {
+						current = (current + 1) % map.length;
 					}
 				}
+				
+				// if all the items we care about are bound, then if we still haven't found anything, we return the default value.
+				if (unbound.size() == 0) {
+					return def;
+				}
 			}
-			
-			if (def instanceof Compare && ((Compare) def).base == base) {
-				return create(base, ((Compare) def).def, Pair.join(this.getPairs(), ((Compare) def).getPairs()));
-			}
-			
-			return new MapCompare(base, def, newUnbound, boundLength, newMap);
 		}
 		
+		Value[] unboundComplete = new Value[unbound.size()];
+		
+		for (int i = 0; i < unbound.size(); i++) {
+			unboundComplete[i] = unbound.get(i);
+			values[this.map.length + i] = unboundValues.get(i);
+		}
+		
+		return null;
+
+		if (def instanceof Compare && ((Compare) def).base == base) {
+			return create(base, ((Compare) def).def, Pair.join(this.getPairs(), ((Compare) def).getPairs()));
+		}
+		
+		return new MapCompare(base, def, newUnbound, boundLength, newMap);
+	
+	
+	@Override
+	public String toString() {
+		Pair[] pairs = this.getPairs();
+		Object[] elements = new Object[2 + pairs.length];
+		elements[0] = this.base;
+		elements[1] = this.def;
+		for (int i = 0; i < pairs.length; i++) elements[i + 2] = pairs[i];
+				
+		return Value.print("Compare", elements);
+	}
+	
+	private static class ValueCompare implements Value{
+		private final Compare<Value> map;
+
+		private ValueCompare (Value base, Value def, int[] map, Value[] keys, Value[] values) {
+			this.map = new Compare<Value>(base, def, map, keys, values);
+		}
+	
+		@Override
+		public CallReturn call(Value v) {
+			Value[] values = new Value[map.values.length];
+			Effect[] effects = new Effect[map.values.length];
+			CallReturn def = map.def.call(v);
+			
+			for (int i = 0; i < map.values.length; i++) {
+				CallReturn ret = map.values[i].call(v);
+				values[i] = ret.value;
+				effects[i] = ret.effect;
+			}
+			
+			return new CallReturn(new ValueCompare(map.base, def.value, map.map, map.keys, values), new EffectCompare(map.base, def.effect, map.map, map.keys, effects));
+		}
+
 		@Override
 		public int getID() {
 			int running = -1;
-			for (int i = 0; i < this.boundIndex; i += 2) {
-				int id = this.bound[i + 1].getID();
-				
-				if (id == -1) return -1;
-				if (running == -1) running = id;
-				else if (running != id) return -1;
-			}
-			
-			for (int i = this.boundIndex; i < this.bound.length; i++) {
-				if (this.bound[i] == null) continue;
-				int id = this.bound[i].getID();
+			for (int i = 0; i < map.values.length; i++) {
+				int id = map.values[i].getID();
 				
 				if (id == -1) return -1;
 				if (running == -1) running = id;
@@ -304,30 +379,29 @@ public abstract class Compare implements Value{
 		}
 		
 		@Override
-		public Value call(Value v) {
-			Value[] newBound = new Value[this.bound.length];
-			
-			for (int i = 0; i < this.boundIndex; i += 2) {
-				newBound[i] = this.bound[i];
-				newBound[i + 1] = this.bound[i + 1].call(v);
-			}
-			
-			for (int i = this.boundIndex; i < this.bound.length; i++) {
-				newBound[i] = this.bound[i].call(v);
-			}
-			
-			return new MapCompare(this.base, this.def, newBound, this.boundIndex, this.map);
-		}
-		
-		@Override
-		public String toString() {
-			Pair[] pairs = this.getPairs();
-			Object[] elements = new Object[2 + pairs.length];
-			elements[0] = this.base;
-			elements[1] = this.def;
-			for (int i = 0; i < pairs.length; i++) elements[i + 2] = pairs[i];
-					
-			return Value.print("Compare", elements);
+		public Value resolve(Resolver resolver) {
+			int[] map = new int[this.map.map.length];
+			Value[] values = new Value[this.map.values.length];
+			Value v = this.map.resolve(map, values, resolver, s -> s.resolve(resolver));
+			if (v != null) return v;
+			return new ValueCompare(this.base.resolve(resolver), this.def, map, )
 		}
 	}
-}
+
+	private static class EffectCompare implements Effect{
+		private final Compare<Effect> map;
+
+		private EffectCompare (Value base, Effect def, int[] map, Value[] keys, Effect[] values) {
+			this.map = new Compare<Effect>(base, def, map, keys, values);
+		}
+
+		@Override
+		public void run(Runtime runtime) {
+			throw new RuntimeException ("not sure what to do here");
+		}
+	}
+	
+	private static interface GenericResolver<K> {
+		public K resolve(K value);
+	}
+}*/

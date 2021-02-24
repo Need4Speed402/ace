@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import value.Value;
-import value.ValueEffect;
 import value.ValuePartial.Probe;
 import value.resolver.ResolverMutable;
 import value.resolver.ResolverProbe;
@@ -94,17 +93,8 @@ public class Runtime {
 		throw new Error("Cannot resolve: " + p + ". This indicates a bug with the interpreter");
 	}
 
-	public void run(Value root) {
-		System.out.println(root);
-		root = root.resolve(new ResolverMutable());
-		
-		if (root instanceof ValueEffect) {
-			Effect[] effects = ((ValueEffect) root).getEffects();
-			
-			for (int i = 0; i < effects.length; i++) {
-				effects[i].run(this);
-			}
-		}
+	public void run(Effect program) {
+		program.resolve(new ResolverMutable()).run(this);
 	}
 
 	@Override

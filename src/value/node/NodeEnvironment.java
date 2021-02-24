@@ -2,6 +2,7 @@ package value.node;
 
 import parser.Color;
 import value.Value;
+import value.Value.CallReturn;
 import value.ValueFunction;
 
 public class NodeEnvironment implements Node{
@@ -11,8 +12,12 @@ public class NodeEnvironment implements Node{
 		this.contents = new ValueFunction(contents);
 	}
 	
-	public Value run(Value environment) {
-		return new ValueFunction(handler -> this.contents.call(new ValueFunction(var -> handler.call(environment.call(var)))));
+	public CallReturn run(Value environment) {
+		return new CallReturn(new ValueFunction(handler -> this.contents.call(new ValueFunction(var -> {
+			CallReturn envCall = environment.call(var);
+			CallReturn hCall = handler.call(envCall.value);
+			return new CallReturn(hCall.value, envCall.effect, hCall.effect);
+		}))));
 	}
 	
 	@Override

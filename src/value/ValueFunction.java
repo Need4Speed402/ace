@@ -11,7 +11,7 @@ public class ValueFunction implements Value {
 	private final Generator body;
 	private final Probe probe;
 
-	private Value cache;
+	private CallReturn cache;
 	
 	public ValueFunction (Node node) {
 		this.probe = new Probe();
@@ -23,7 +23,7 @@ public class ValueFunction implements Value {
 		this.probe = probe;
 	}
 	
-	public Value get () {
+	public CallReturn get () {
 		if (this.cache == null) {
 			this.cache = this.body.generate();
 		}
@@ -37,7 +37,7 @@ public class ValueFunction implements Value {
 		// functions will never be resolved if the resolver can mutate.
 		if (res instanceof ResolverMutable) return this;
 		if (res instanceof ResolverFunctionBody) res = ((ResolverFunctionBody) res).lock();
-		if (res instanceof ResolverArgument) res = ((ResolverArgument) res).add(this.probe);
+		if (res instanceof ResolverArgument) ((ResolverArgument) res).add(this.probe);
 		
 		// this alias is here to get around java's dumb mutation rules around closures.
 		Resolver r = res;
@@ -48,12 +48,7 @@ public class ValueFunction implements Value {
 	}
 	
 	@Override
-	public Value call(Value v) {
-		if (v instanceof ValueEffect) {
-			ValueEffect vv = (ValueEffect) v;
-			return ValueEffect.create(this.call(vv.getParent()), vv.getEffectNode());
-		}
-		
+	public CallReturn call(Value v) {
 		return this.get().resolve(new ResolverArgument(this.probe, v));
 	}
 	

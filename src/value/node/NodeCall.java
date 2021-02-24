@@ -1,6 +1,7 @@
 package value.node;
 
 import value.Value;
+import value.Value.CallReturn;
 
 public class NodeCall implements Node{
 	private Node function;
@@ -14,9 +15,9 @@ public class NodeCall implements Node{
 	}
 	
 	@Override
-	public Value run(Value environment) {
-		Value vf = this.function.run(environment);
-		Value vp = this.argument.run(environment);
+	public CallReturn run(Value environment) {
+		CallReturn vf = this.function.run(environment);
+		CallReturn vp = this.argument.run(environment);
 		
 		return vf.call(vp);
 	}

@@ -43,13 +43,13 @@ public class NodeIdentifier implements Node, Value {
 	}
 	
 	@Override
-	public Value run(Value environment) {
+	public CallReturn run(Value environment) {
 		return environment.call(this);
 	}
 	
 	@Override
-	public Value call(Value v) {
-		return v;
+	public CallReturn call(Value v) {
+		return new CallReturn(v);
 	}
 	
 	@Override

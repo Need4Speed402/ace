@@ -3,48 +3,21 @@ package value.intrinsic;
 import runtime.Effect;
 import runtime.Runtime;
 import value.Value;
-import value.ValueEffect;
+import value.Value.CallReturn;
 import value.ValueFunction;
 import value.ValuePartial.Probe;
 import value.resolver.Resolver;
 import value.resolver.ResolverFunctionBody;
 import value.resolver.ResolverMutable;
 
-public class Mutable implements Value {
-	public static final Value instance = new ValueFunction(init -> new Mutable(init));
-	
-	private final Value init;
-	
-	public Mutable (Value init) {
-		this.init = init;
-	}
-	
-	@Override
-	public Value call(Value v) {
+public class Mutable{
+	public static final Value instance = new ValueFunction(init -> new CallReturn(new ValueFunction(handler -> {
 		Probe probe = new MutableProbe();
-		
-		return ValueEffect.create(
-			v.call(new ValueFunction(p -> ValueEffect.create(p, new EffectSet(probe, p))))
-			 .call(new ValueFunction(p -> probe)),
-			new EffectDeclare(probe, init)
-		);
-	}
-	
-	@Override
-	public Value resolve(Resolver res) {
-		Value init = this.init.resolve(res);
-		
-		if (init == this.init) {
-			return this;
-		}else {
-			return new Mutable(init);
-		}
-	}
-	
-	@Override
-	public String toString() {
-		return "MutableDeclare(" + this.init + ")";
-	}
+
+		return handler
+			.call(new ValueFunction (setValue -> new CallReturn(setValue, new EffectSet(probe, setValue))))
+			.call(new ValueFunction (p -> new CallReturn(probe)));
+		})));
 	
 	public static class MutableProbe extends Probe { }
 	

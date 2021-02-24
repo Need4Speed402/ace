@@ -1,11 +1,13 @@
 package value;
 
+import runtime.Effect;
+import runtime.Runtime;
 import value.resolver.Resolver;
 
 public abstract class ValuePartial implements Value {
 	@Override
-	public Value call (Value arg) {
-		return new Call(this, arg);
+	public CallReturn call(Value arg) {
+		return new CallReturn (new Call(this, arg), new CallEffects(this, arg));
 	}
 	
 	@Override
@@ -51,7 +53,31 @@ public abstract class ValuePartial implements Value {
 		
 		@Override
 		public Value resolve(Resolver res) {
-			return res.cache(this.parent).call(res.cache(this.argument));
+			return res.call(this.parent, this.argument).value;
+		}
+	}
+	
+	public static class CallEffects implements Effect {
+		public final Value parent, argument;
+		
+		public CallEffects(Value parent, Value argument) {
+			this.parent = parent;
+			this.argument = argument;
+		}
+
+		@Override
+		public void run(Runtime runtime) {
+			parent.call(argument).effect.run(runtime);
+		}
+		
+		@Override
+		public Effect resolve(Resolver res) {
+			return res.call(this.parent, this.argument).effect;
+		}
+		
+		@Override
+		public String toString() {
+			return Value.print("CallEffects", this.parent, this.argument);
 		}
 	}
 }

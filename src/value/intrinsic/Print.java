@@ -6,13 +6,13 @@ import parser.token.syntax.TokenString;
 import runtime.Effect;
 import runtime.Runtime;
 import value.Value;
-import value.ValueEffect;
+import value.Value.CallReturn;
 import value.ValueFunction;
 import value.node.NodeIdentifier;
 import value.resolver.Resolver;
 
 public class Print {
-	public static final Value instance = new ValueFunction(message -> ValueEffect.create(message, Print.create(message)));
+	public static final Value instance = new ValueFunction(message -> new CallReturn(message, Print.create(message)));
 	
 	public static Effect create (Value message) {
 		int id = message.getID();
