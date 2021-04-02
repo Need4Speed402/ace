@@ -2,47 +2,41 @@ package value.resolver;
 
 import java.util.HashMap;
 
+import runtime.Effect;
 import value.Value;
 import value.Value.CallReturn;
-import value.ValuePartial.Probe;
 
 public abstract class Resolver {
-	private final HashMap<Pair, CallReturn> cache = new HashMap<>();
-
-	public abstract Value get (Probe p);
+	public final HashMap<Resolvable, CallReturn> cache;
 	
-	public CallReturn call (Value function, Value argument) {
-		Pair p = new Pair(function, argument);
-		CallReturn v = this.cache.get(p);
-		
-		if (v == null) {
-			v = function.resolve(this).call(argument.resolve(this));
-			this.cache.put(p, v);
-		}
-
-		return v;
+	public Resolver () {
+		this.cache = new HashMap<>();	
 	}
 	
-	private static class Pair {
-		public final Value function, argument;
-		
-		public Pair (Value function, Value argument) {
-			this.function = function;
-			this.argument = argument;
-		}
-		
-		@Override
-		public int hashCode() {
-			return this.function.hashCode() + this.argument.hashCode() + 7;
-		}
-		
-		@Override
-		public boolean equals(Object obj) {
-			if (obj instanceof Pair) {
-				return ((Pair) obj).function.equals(this.function) && ((Pair) obj).argument.equals(this.argument);
-			}
+	public Resolver (HashMap<Resolvable, CallReturn> cache) {
+		this.cache = cache;
+	}
 
-			return false;
+	private CallReturn cache (Resolvable obj) {
+		CallReturn out = this.cache.get(obj);
+		
+		if (out == null) {
+			out = obj.resolve(this);
+			this.cache.put(obj, out);
 		}
+
+		return out;
+	}
+	
+	public Value resolveValue (Resolvable obj) {
+		return this.cache(obj).value;
+	}
+	
+	public Effect resolveEffect (Resolvable obj) {
+		return this.cache(obj).effect;
+	}
+	
+	public static interface Resolvable {
+		public CallReturn resolve (Resolver resolver);
 	}
 }

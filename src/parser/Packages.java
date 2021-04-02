@@ -88,8 +88,6 @@ public class Packages {
 			
 			RUN_TIME += System.nanoTime() - start;
 			
-			System.out.println(run.size());
-			
 			if (RUNTIME_STATS) {
 				System.out.println(Color.white(Color.bgBlack(" - Runtime Statistics - ")));
 				System.out.println("AST / Parsing: " + formatTime(AST_TIME));

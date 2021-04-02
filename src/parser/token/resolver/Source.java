@@ -74,19 +74,17 @@ public class Source extends Resolver{
 		Node root = Node.id();
 		
 		return Node.call(Unsafe.FUNCTION, root, Node.env(
-			Node.call(Unsafe.MUTABLE, Unsafe.DEFAULT_MOD, Node.call(Unsafe.FUNCTION, set, Node.env(
-				Node.call(Unsafe.FUNCTION, get, Node.env(
-					Node.call(Unsafe.DO, Node.call(set, Node.call(Unsafe.FUNCTION, param, Node.env(
+			Node.call(Unsafe.MUTABLE, Unsafe.DEFAULT_MOD, set, get, Node.env(
+				Node.call(Unsafe.DO, Node.call(set, Node.call(Unsafe.FUNCTION, param, Node.env(
+					Node.call(Unsafe.DO,
 						Node.call(Unsafe.DO,
-							Node.call(Unsafe.DO,
-								Node.call(set, Node.call(root, Unsafe.PARENT, Node.id(this.getName()))),
-								Node.call(set, Node.call(Node.env(this.source), root))
-							),
-							Node.call(get, Node.id(), param)
-						)
-					))), Node.call(Unsafe.FUNCTION, param, Node.env(Node.call(get, Node.id(), param))))
-				))
-			)))
+							Node.call(set, Node.call(root, Unsafe.PARENT, Node.id(this.getName()))),
+							Node.call(set, Node.call(Node.env(this.source), root))
+						),
+						Node.call(get, param)
+					)
+				))), Node.call(Unsafe.FUNCTION, param, Node.env(Node.call(get, param))))
+			))
 		));
 	}
 

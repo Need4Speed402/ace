@@ -2,7 +2,6 @@ package value.intrinsic;
 
 import value.Value;
 import value.ValueFunction;
-import value.node.NodeIdentifier;
 import value.resolver.Resolver;
 
 public class Assign implements Value{
@@ -27,13 +26,13 @@ public class Assign implements Value{
 	private final Value name, value;
 	
 	private Assign (Value name, Value value) {
-		this.name = new IdentityCache(name);
+		this.name = name;
 		this.value = value;
 	}
 	
 	@Override
-	public Value resolve(Resolver res) {
-		return create(this.name.resolve(res), this.value.resolve(res));
+	public CallReturn resolve(Resolver res) {
+		return new CallReturn(create(res.resolveValue(this.name), res.resolveValue(this.value)));
 	}
 	
 	@Override
@@ -49,48 +48,5 @@ public class Assign implements Value{
 	@Override
 	public String toString() {
 		return Value.print("Assign", this.name, this.value);
-	}
-	
-	public static class IdentityCache implements Value{
-		private final int id;
-		private final Value value;
-
-		public IdentityCache (int id) {
-			this.value = null;
-			this.id = id;
-		}
-		
-		public IdentityCache (Value value) {
-			this.value = value;
-			this.id = value.getID();
-		}
-		
-		@Override
-		public Value resolve(Resolver resolver) {
-			if (this.id == -1) {
-				return new IdentityCache(this.value.resolve(resolver));
-			}else {
-				return this;
-			}
-		}
-		
-		@Override
-		public int getID() {
-			return this.id;
-		}
-		
-		@Override
-		public CallReturn call(Value v) {
-			throw new Error("Identity cache is only designed to handle identity querries");
-		}
-		
-		@Override
-		public String toString() {
-			if (this.id == -1) {
-				return this.value.toString();
-			}else {
-				return NodeIdentifier.asString(this.id);
-			}
-		}
 	}
 }

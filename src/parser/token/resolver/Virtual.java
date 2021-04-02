@@ -66,15 +66,15 @@ public class Virtual extends Resolver {
 			Node genRoot, parent;
 			
 			if (this.getName().equals("root")) {
-				genRoot = Node.call(get, Node.id());
+				genRoot = get;
 				
 				if (pairRoot != null) {
-					parent = Node.call(get, Node.id(), Node.id("root"));
+					parent = Node.call(get, Node.id("root"));
 				}else{
 					parent = proot;
 				}
 			}else if (pairRoot != null) {
-				genRoot = Node.call(get, Node.id(), Node.id("root"));
+				genRoot = Node.call(get, Node.id("root"));
 				parent = Node.call(proot, Unsafe.PARENT, Node.id(this.getName()));
 			} else {
 				genRoot = proot;
@@ -124,18 +124,14 @@ public class Virtual extends Resolver {
 		Node arg = Node.id();
 		
 		return Node.call(Unsafe.FUNCTION, proot, Node.env(
-			Node.call(Unsafe.MUTABLE, Unsafe.DEFAULT_MOD,
-				Node.call(Unsafe.FUNCTION, set, Node.env(
-					Node.call(Unsafe.FUNCTION, get, Node.env(
-						Node.call(Unsafe.DO,
-							Node.call(set, Node.call(Unsafe.FUNCTION, arg, Node.env(
-								Node.call(Node.call(set, out), arg)
-							))),
-							Node.call(Unsafe.FUNCTION, arg, Node.env(Node.call(get, Node.id(), arg)))
-						)
-					))
-				))
-			)
+			Node.call(Unsafe.MUTABLE, Unsafe.DEFAULT_MOD, set, get, Node.env(
+				Node.call(Unsafe.DO,
+					Node.call(set, Node.call(Unsafe.FUNCTION, arg, Node.env(
+						Node.call(Node.call(set, out), arg)
+					))),
+					Node.call(Unsafe.FUNCTION, arg, Node.env(Node.call(get, arg)))
+				)
+			))
 		));
 	}
 

@@ -1,14 +1,31 @@
 package value.intrinsic;
 
-import runtime.Effect;
-import runtime.Runtime;
 import value.Value;
-import value.Value.CallReturn;
 import value.ValueFunction;
+import value.ValuePartial;
 import value.resolver.Resolver;
 
-public class Compare {
+public class Compare extends ValuePartial {
 	public static final Value instance = new ValueFunction(a -> new CallReturn(new ValueFunction(b -> new CallReturn(new ValueFunction(x -> new CallReturn(new ValueFunction (y -> new CallReturn(create(a, y, b, x)))))))));
+
+	public static class Pair {
+		public final Value identifier, instance;
+		
+		public Pair (Value identifier, Value instance) {
+			this.identifier = identifier;
+			this.instance = instance;
+		}
+	}
+	
+	public static Value create (Value def, Pair ... pairs) {
+		Value current = def;
+		
+		for (int i = 0; i < pairs.length; i++) {
+			current = create(def, current, pairs[i].identifier, pairs[i].instance);
+		}
+		
+		return current;
+	}
 
 	public static Value create (Value base, Value def, Value comp, Value pass) {
 		if (def == pass) return pass;
@@ -17,7 +34,7 @@ public class Compare {
 		int bb = comp.getID();
 		
 		if (aa == -1 | bb == -1) {
-			return new ValueCompare(base, comp, pass, def);
+			return new Compare(base, comp, pass, def);
 		}else if (aa == bb) {
 			return pass;
 		}else {
@@ -25,101 +42,63 @@ public class Compare {
 		}
 	}
 	
-
-	private static class ValueCompare implements Value {
-		public final Value a, b, pass, fail;
+	public final Value a, b, pass, fail;
+	
+	private Compare (Value a, Value b, Value pass, Value fail) {
+		this.a = a;
+		this.b = b;
+		this.pass = pass;
+		this.fail = fail;
+	}
+	
+	@Override
+	public CallReturn resolve(Resolver resolver) {
+		return new CallReturn (create(
+			resolver.resolveValue(this.a),
+			resolver.resolveValue(this.fail),
+			resolver.resolveValue(this.b),
+			resolver.resolveValue(this.pass)
+		));
+	}
+	
+	@Override
+	public int getID() {
+		int aa = this.pass.getID();
+		int bb = this.fail.getID();
 		
-		public ValueCompare (Value a, Value b, Value pass, Value fail) {
-			this.a = a;
-			this.b = b;
-			this.pass = pass;
-			this.fail = fail;
-		}
-		
-		@Override
-		public CallReturn call(Value v) {
-			CallReturn pass = this.pass.call(v);
-			CallReturn fail = this.fail.call(v);
-
-			return new CallReturn(new ValueCompare(this.a, this.b, pass.value, fail.value), new EffectCompare(this.a, this.b, pass.effect, fail.effect));
-		}
-		
-		@Override
-		public Value resolve(Resolver resolver) {
-			return Compare.create(
-				this.a.resolve(resolver),
-				this.fail.resolve(resolver),
-				this.b.resolve(resolver),
-				this.pass.resolve(resolver)
-			);
-		}
-		
-		@Override
-		public int getID() {
-			int aa = this.pass.getID();
-			int bb = this.fail.getID();
-			
-			if (aa != bb | bb == -1) {
-				return -1;
-			}else {
-				return aa;
-			}
-		}
-		
-		@Override
-		public String toString() {
-			return Value.print("Compare", this.a, this.b, this.pass, this.fail);
+		if (aa != bb | bb == -1) {
+			return -1;
+		}else {
+			return aa;
 		}
 	}
+	
+	@Override
+	public String toString() {
+		return Value.printHash("Compare", super.hashCode(), this.a, this.b, this.pass, this.fail);
+	}
 
-	private static class EffectCompare implements Effect {
-		public final Value a, b;
-		public final Effect pass, fail;
-		
-		public EffectCompare (Value a, Value b, Effect pass, Effect fail) {
-			this.a = a;
-			this.b = b;
-			this.pass = pass;
-			this.fail = fail;
+	boolean calculatedHash = false;
+	int hashCode = 0;
+	
+	@Override
+	public int hashCode() {
+		if (!this.calculatedHash) {
+			this.hashCode = (this.a.hashCode() + this.b.hashCode() + this.pass.hashCode() + this.fail.hashCode()) * 7;
+			this.calculatedHash = true;
+		}
+		return this.hashCode;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Compare) {
+			Compare c = (Compare) obj;
+			return ((this.a.equals(c.a) && this.b.equals(c.b)) || (this.a.equals(c.b) && this.b.equals(c.a))) && this.pass.equals(c.pass) && this.fail.equals(c.fail);
 		}
 		
-		@Override
-		public Effect resolve(Resolver resolver) {
-			Value a = this.a.resolve(resolver);
-			Value b = this.b.resolve(resolver);
-			int aa = a.getID();
-			int bb = b.getID();
-			
-			Effect pass = this.pass.resolve(resolver);
-			Effect fail = this.fail.resolve(resolver);
-			
-			if (pass == fail) {
-				return pass;
-			}else if (aa == -1 | bb == -1) {
-				return new EffectCompare(
-					a,
-					b,
-					pass,
-					fail
-				);
-			}else if (aa == bb){
-				return pass;
-			}else {
-				return fail;
-			}
-		}
-		
-		@Override
-		public void run(Runtime runtime) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-		@Override
-		public String toString() {
-			return Value.print("CompareEffects", this.a, this.b, this.pass, this.fail);
-		}
-	};
+		return false;
+	}
 }
 
 /*import java.util.ArrayList;

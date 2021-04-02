@@ -4,10 +4,9 @@ import value.ValuePartial.Probe;
 import value.node.Node;
 import value.resolver.Resolver;
 import value.resolver.ResolverArgument;
-import value.resolver.ResolverFunctionBody;
 import value.resolver.ResolverMutable;
 
-public class ValueFunction implements Value {
+public class ValueFunction implements Value{
 	private final Generator body;
 	private final Probe probe;
 
@@ -32,22 +31,6 @@ public class ValueFunction implements Value {
 	}
 	
 	@Override
-	public ValueFunction resolve(Resolver res) {
-		// since we cannot guarantee the order the functions will be called,
-		// functions will never be resolved if the resolver can mutate.
-		if (res instanceof ResolverMutable) return this;
-		if (res instanceof ResolverFunctionBody) res = ((ResolverFunctionBody) res).lock();
-		if (res instanceof ResolverArgument) ((ResolverArgument) res).add(this.probe);
-		
-		// this alias is here to get around java's dumb mutation rules around closures.
-		Resolver r = res;
-		return new ValueFunction(
-			(Probe) res.get(this.probe),
-			() -> this.get().resolve(r)
-		);
-	}
-	
-	@Override
 	public CallReturn call(Value v) {
 		return this.get().resolve(new ResolverArgument(this.probe, v));
 	}
@@ -59,5 +42,20 @@ public class ValueFunction implements Value {
 	
 	private static interface Generator {
 		public CallReturn generate ();
+	}
+
+	@Override
+	public CallReturn resolve(Resolver res) {
+		// since we cannot guarantee the order the functions will be called,
+		// functions will never be resolved if the resolver can mutate.
+		if (res instanceof ResolverMutable) return new CallReturn(this);
+		if (res instanceof ResolverArgument) res = ((ResolverArgument) res).add(this.probe);
+		
+		// this alias is here to get around java's dumb mutation rules around closures.
+		Resolver r = res;
+		return new CallReturn (new ValueFunction(
+			(Probe) res.resolveValue(this.probe),
+			() -> this.get().resolve(r)
+		));
 	}
 }

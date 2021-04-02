@@ -1,6 +1,7 @@
 package runtime;
 
 import value.Value;
+import value.Value.CallReturn;
 import value.resolver.Resolver;
 
 public class EffectList implements Effect{
@@ -70,14 +71,14 @@ public class EffectList implements Effect{
 	}
 	
 	@Override
-	public Effect resolve(Resolver resolver) {
+	public CallReturn resolve(Resolver resolver) {
 		Effect[] n = new Effect[this.effects.length];
 		
 		for (int i = 0; i < n.length; i++) {
-			n[i] = this.effects[i].resolve(resolver);
+			n[i] = resolver.resolveEffect(this.effects[i]);
 		}
 		
-		return EffectList.create(n);
+		return new CallReturn (null, EffectList.create(n));
 	}
 	
 	@Override

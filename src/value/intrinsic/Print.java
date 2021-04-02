@@ -37,13 +37,13 @@ public class Print {
 		}
 		
 		@Override
-		public Effect resolve(Resolver resolver) {
-			return Print.create(this.message.resolve(resolver));
+		public CallReturn resolve(Resolver resolver) {
+			return new CallReturn(null, Print.create(resolver.resolveValue(this.message)));
 		}
 		
 		@Override
 		public String toString() {
-			return "Print(" + this.message + ")";
+			return "Print " + this.message;
 		}
 	}
 	
@@ -67,7 +67,7 @@ public class Print {
 		
 		@Override
 		public String toString() {
-			return "Print(" + new TokenString(new String(this.message, 0, this.message.length - 1)) + ")";
+			return "Print " + new TokenString(new String(this.message, 0, this.message.length - 1));
 		}
 	}
 }

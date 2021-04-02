@@ -7,7 +7,8 @@ import value.resolver.Resolver;
 public abstract class ValuePartial implements Value {
 	@Override
 	public CallReturn call(Value arg) {
-		return new CallReturn (new Call(this, arg), new CallEffects(this, arg));
+		Call c = new Call(this, arg);
+		return new CallReturn (c, c);
 	}
 	
 	@Override
@@ -17,67 +18,46 @@ public abstract class ValuePartial implements Value {
 	
 	public static class Probe extends ValuePartial {
 		@Override
-		public Value resolve(Resolver res) {
-			return res.get(this);
-		}
-
-		@Override
 		public String toString() {
-			int hash = this.hashCode();
-			char[] chars = "0123456789ABCDEF".toCharArray();
-			
-			return "Probe " 
-				+ chars[(hash >> 28) & 0xF]
-				+ chars[(hash >> 24) & 0xF]
-				+ chars[(hash >> 20) & 0xF]
-				+ chars[(hash >> 16) & 0xF]
-				+ chars[(hash >> 12) & 0xF]
-				+ chars[(hash >> 8) & 0xF]
-				+ chars[(hash >> 4) & 0xF]
-				+ chars[(hash >> 0) & 0xF];
+			return Value.printHash("Probe", this.hashCode());
 		}
 	} 
 	
-	public static class Call extends ValuePartial {
-		public final Value parent, argument;
+	public static class Call extends ValuePartial implements Effect{
+		public final Value function, argument;
 		
-		public Call (Value parent, Value argument) {
-			this.parent = parent;
+		public Call (Value function, Value argument) {
+			this.function = function;
 			this.argument = argument;
 		}
 		
 		@Override
 		public String toString() {
-			return Value.print("Call", this.parent, this.argument);
+			return Value.printHash("Call", super.hashCode(), this.function, this.argument);
 		}
 		
-		@Override
-		public Value resolve(Resolver res) {
-			return res.call(this.parent, this.argument).value;
-		}
-	}
-	
-	public static class CallEffects implements Effect {
-		public final Value parent, argument;
-		
-		public CallEffects(Value parent, Value argument) {
-			this.parent = parent;
-			this.argument = argument;
-		}
-
 		@Override
 		public void run(Runtime runtime) {
-			parent.call(argument).effect.run(runtime);
+			function.call(argument).effect.run(runtime);
 		}
 		
 		@Override
-		public Effect resolve(Resolver res) {
-			return res.call(this.parent, this.argument).effect;
+		public CallReturn resolve(Resolver resolver) {
+			return resolver.resolveValue(this.function).call(resolver.resolveValue(this.argument));
 		}
 		
 		@Override
-		public String toString() {
-			return Value.print("CallEffects", this.parent, this.argument);
+		public int hashCode() {
+			return (this.function.hashCode() + this.argument.hashCode()) * 13;
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof Call) {
+				Call c = (Call) obj;
+				return c.function.equals(this.function) && c.argument.equals(this.argument);
+			}
+			return false;
 		}
 	}
 }

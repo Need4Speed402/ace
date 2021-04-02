@@ -24,9 +24,9 @@ test {
 test {
 	name 'create mutable and use value'
 	case {
-		[Mutable] hello ([root Function] set {[root Function] get {
-			[console] (get void)
-		}})
+		[Mutable] hello set get {
+			[console] get
+		}
 	}
 	expect "
 		hello
@@ -37,10 +37,10 @@ test {
 test {
 	name 'create mutable and use value twice'
 	case {
-		[Mutable] hello ([root Function] set {[root Function] get {
-			[console] (get void)
-			([console] (get void))
-		}})
+		[Mutable] hello set get {
+			[console] get
+			([console] get)
+		}
 	}
 	expect "
 		hello
@@ -52,10 +52,10 @@ test {
 test {
 	name 'create mutable one and print static inverted'
 	case {
-		[Mutable] hello ([root Function] set {[root Function] get {
+		[Mutable] hello set get {
 			[console] world
-			([console] (get void))
-		}})
+			([console] get)
+		}
 	}
 	expect "
 		world
@@ -67,10 +67,10 @@ test {
 test {
 	name 'create mutable one and print static'
 	case {
-		[Mutable] hello ([root Function] set {[root Function] get {
-			[console] (get void)
+		[Mutable] hello set get {
+			[console] get
 			([console] world)
-		}})
+		}
 	}
 	expect "
 		hello
@@ -82,9 +82,9 @@ test {
 test {
 	name 'create mutable reset and then use'
 	case {
-		[Mutable] hello ([root Function] set {[root Function] get {
-			[root ``] (set world) ([console] (get void))
-		}})
+		[Mutable] hello set get {
+			[root ``] (set world) ([console] get)
+		}
 	}
 	expect "
 		world
@@ -95,6 +95,10 @@ test {
 test {
 	name 'create mutable use reset use'
 	case {
+		[Mutable] hello set get {
+			[root ``] (set world) ([console] get)
+			([root ``] (set !!) ([console] get))
+		}
 		[Mutable] hello ([root Function] set {[root Function] get {
 			[root ``] (set world) ([console] (get void))
 			([root ``] (set !!) ([console] (get void)))
@@ -110,12 +114,12 @@ test {
 test {
 	name "wierd thing that didn't work once`"
 	case {
-		[Mutable] hello ([root Function] set {[root Function] get {
+		[Mutable] hello set get {
 			[root ``] (
 				[root ``] (lol lol) ([console] world)
 				([root ``] (set !!) ([console] !!))
 			) ([console] !!)
-		}})
+		}
 	}
 	expect "
 		world
@@ -128,12 +132,12 @@ test {
 test {
 	name 'create mutable use reset use twice'
 	case {
-		[Mutable] hello ([root Function] set {[root Function] get {
+		[Mutable] hello set get {
 			[root ``] (
-				[root ``] (set world) ([console] (get void))
-				([root ``] (set !!) ([console] (get void)))
-			) ([console] (get void))
-		}})
+				[root ``] (set world) ([console] get)
+				([root ``] (set !!) ([console] get))
+			) ([console] get)
+		}
 	}
 	expect "
 		world
@@ -146,11 +150,11 @@ test {
 test {
 	name 'create two mutable and use simultaneously'
 	case {
-		[Mutable] [console] ([root Function] set {[root Function] get {
-			[Mutable] hello ([root Function] set1 {[root Function] get1 {
-				(get void) (get1 void)
-			}})
-		}})
+		[Mutable] [console] set get {
+			[Mutable] hello set1 get1 {
+				get get1
+			}
+		}
 	}
 	expect "
 		hello
@@ -161,11 +165,11 @@ test {
 test {
 	name 'create two linearly dependant mutable instances'
 	case {
-		[Mutable] hello ([root Function] set {[root Function] get {
-			[Mutable] (get void) ([root Function] set1 {[root Function] get1 {
-				[console] (get1 void)
-			}})
-		}})
+		[Mutable] hello set get {
+			[Mutable] get set1 get1 {
+				[console] get1
+			}
+		}
 	}
 	expect "
 		hello
@@ -176,11 +180,11 @@ test {
 test {
 	name 'two concurrent mutable instances'
 	case {
-		[Mutable] hello ([root Function] set1 {[root Function] get1 {
-			[Mutable] world ([root Function] set2 {[root Function] get2 {
-				([console] (get1 void)) ([console] (get2 void))
-			}})
-		}})
+		[Mutable] hello set1 get1 {
+			[Mutable] world set2 get2 {
+				([console] get1) ([console] get2)
+			}
+		}
 	}
 	expect "
 		hello
@@ -192,11 +196,11 @@ test {
 test {
 	name 'two concurrent mutable instances, mutate one'
 	case {
-		[Mutable] hello ([root Function] set1 {[root Function] get1 {
-			[Mutable] world ([root Function] set2 {[root Function] get2 {
-				[root ``] (set2 hello) (([console] (get1 void)) ([console] (get2 void)))
-			}})
-		}})
+		[Mutable] hello set1 get1 {
+			[Mutable] world set2 get2 {
+				[root ``] (set2 hello) (([console] get1) ([console] get2))
+			}
+		}
 	}
 	expect "
 		hello
@@ -208,11 +212,11 @@ test {
 test {
 	name 'two concurrent mutable instances, mutate both'
 	case {
-		[Mutable] hello ([root Function] set1 {[root Function] get1 {
-			[Mutable] world ([root Function] set2 {[root Function] get2 {
-				[root ``] ((set2 hello) (set1 world)) (([console] (get1 void)) ([console] (get2 void)))
-			}})
-		}})
+		[Mutable] hello set1 get1 {
+			[Mutable] world set2 get2 {
+				[root ``] ((set2 hello) (set1 world)) (([console] get1) ([console] get2))
+			}
+		}
 	}
 	expect "
 		world
@@ -224,14 +228,14 @@ test {
 test {
 	name 'create mutable use reset use common indirection'
 	case {
-		[Mutable] hello ([root Function] set {[root Function] get {
+		[Mutable] hello set get {
 			[root Function] print {
 				[root ``] (set world) (print void)
 				([root ``] (set !!) (print void))
 			} ([root Function] void {
-				[console] (get void)
+				[console] get
 			})
-		}})
+		}
 	}
 	expect "
 		world
@@ -246,15 +250,15 @@ test {
 		[root Function] createMutable {
 			[console] (createMutable void get)
 		} ([root Function] void {
-			[Mutable] hello ([root Function] mSet {[root Function] mGet {
+			[Mutable] hello mSet mGet {
 				[root Function] env {
-					[root Scope] ([compare] env get {mGet void} {
+					[root Scope] ([compare] env get {mGet} {
 						[root Scope] ([compare] env set {
 							mSet
-						} {mGet void env})
+						} {mGet env})
 					})
 				}
-			}})
+			}
 		})
 	}
 	expect "
@@ -271,16 +275,17 @@ test {
 				[root Function] b {
 					[root ``] ([console] (a get)) ([console] (b get))
 				} (createMutable void)
-			} (createMutable void)		} ([root Function] void {
-			[Mutable] hello ([root Function] mSet {[root Function] mGet {
+			} (createMutable void)
+		} ([root Function] void {
+			[Mutable] hello mSet mGet {
 				[root Function] env {
-					[root Scope] ([compare] env get {mGet void} {
+					[root Scope] ([compare] env get {mGet} {
 						[root Scope] ([compare] env set {
 							mSet
-						} {mGet void env})
+						} {mGet env})
 					})
 				}
-			}})
+			}
 		})
 	}
 	expect "
@@ -300,15 +305,15 @@ test {
 				} (createMutable void)
 			} (createMutable void)
 		} ([root Function] void {
-			[Mutable] hello ([root Function] mSet {[root Function] mGet {
+			[Mutable] hello mSet mGet {
 				[root Function] env {
-					[root Scope] ([compare] env get {mGet void} {
+					[root Scope] ([compare] env get {mGet} {
 						[root Scope] ([compare] env set {
 							mSet
-						} {mGet void env})
+						} {mGet env})
 					})
 				}
-			}})
+			}
 		})
 	}
 	expect "
@@ -328,15 +333,15 @@ test {
 				} (createMutable void)
 			} (createMutable void)
 		} ([root Function] void {
-			[Mutable] hello ([root Function] mSet {[root Function] mGet {
+			[Mutable] hello mSet mGet {
 				[root Function] env {
-					[root Scope] ([compare] env get {mGet void} {
+					[root Scope] ([compare] env get {mGet} {
 						[root Scope] ([compare] env set {
 							mSet
-						} {mGet void env})
+						} {mGet env})
 					})
 				}
-			}})
+			}
 		})
 	}
 	expect "
@@ -354,15 +359,15 @@ test {
 				[console] (mut get)
 			} (createMutable hello)
 		} ([root Function] init {
-			[Mutable] init ([root Function] mSet {[root Function] mGet {
+			[Mutable] init mSet mGet {
 				[root Function] env {
-					[root Scope] ([compare] env get {mGet void} {
+					[root Scope] ([compare] env get {mGet} {
 						[root Scope] ([compare] env set {
 							mSet
-						} {mGet void env})
+						} {mGet env})
 					})
 				}
-			}})
+			}
 		})
 	}
 	expect "
@@ -375,11 +380,9 @@ test {
 	name 'mutable behind function'
 	case {
 		[root Function] create {
-			create ([root Function] set {
-				[root Function] get {
-					[console] (get void)
-				}
-			})
+			create set get {
+				[console] get
+			}
 		} ([Mutable] hello)
 	}
 	expect "
@@ -392,11 +395,9 @@ test {
 	name 'multiple behind function call'
 	case {
 		[root Function] create {
-			create void ([root Function] set {
-				[root Function] get {
-					[console] (get void)
-				}
-			})
+			create void set get {
+				[console] get
+			}
 		} ([root Function] void {[Mutable] hello})
 	}
 	expect "
@@ -409,15 +410,11 @@ test {
 	name 'multiple mutable behind function'
 	case {
 		[root Function] create {
-			create void ([root Function] set {
-				[root Function] get {
-					create void ([root Function] set2 {
-						[root Function] get2 {
-							[root ``] ([console] (get void)) ([console] (get2 void))
-						}
-					})
+			create void set get {
+				create void set2 get2 {
+					[root ``] ([console] get) ([console] get2)
 				}
-			})
+			}
 		} ([root Function] void {[Mutable] hello})
 	}
 	expect "
@@ -430,16 +427,12 @@ test {
 test {
 	name 'duplicated instance set one'
 	case {
-		[root Function] create {
-			create ([root Function] set {
-				[root Function] get {
-					create ([root Function] set2 {
-						[root Function] get2 {
-							[root ``] (set2 world) ([root ``] ([console] (get void)) ([console] (get2 void)))
-						}
-					})
+		[root Function] create {	
+			create set get {
+				create set2 get2 {
+					[root ``] (set2 world) ([root ``] ([console] get) ([console] get2))
 				}
-			})
+			}
 		} ([Mutable] hello)
 	}
 	expect "
@@ -453,15 +446,11 @@ test {
 	name 'mutible mutable behind function set one behind function'
 	case {
 		[root Function] create {
-			create void ([root Function] set {
-				[root Function] get {
-					create void ([root Function] set2 {
-						[root Function] get2 {
-							[root ``] (set2 world) ([root ``] ([console] (get void)) ([console] (get2 void)))
-						}
-					})
+			create void set get {
+				create void set2 get2 {
+					[root ``] (set2 world) ([root ``] ([console] get) ([console] get2))
 				}
-			})
+			}
 		} ([root Function] void {[Mutable] hello})
 	}
 	expect "
@@ -475,15 +464,11 @@ test {
 	name 'multiple mutable behind function set one reversed'
 	case {
 		[root Function] create {
-			create void ([root Function] set {
-				[root Function] get {
-					create void ([root Function] set2 {
-						[root Function] get2 {
-							[root ``] (set world) ([root ``] ([console] (get void)) ([console] (get2 void)))
-						}
-					})
+			create void set get {
+				create void set2 get2 {
+					[root ``] (set world) ([root ``] ([console] get) ([console] get2))
 				}
-			})
+			}
 		} ([root Function] void {[Mutable] hello})
 	}
 	expect "
@@ -497,17 +482,13 @@ test {
 	name 'multiple mutable behind function set one both'
 	case {
 		[root Function] create {
-			create void ([root Function] set {
-				[root Function] get {
-					create void ([root Function] set2 {
-						[root Function] get2 {
-							[root ``] (set world)
-								([root ``] (set2 yeah) (
-									([root ``] ([console] (get void)) ([console] (get2 void)))))
-						}
-					})
+			create void set get {
+				create void set2 get2 {
+					[root ``] (set world)
+						([root ``] (set2 yeah) (
+							([root ``] ([console] get) ([console] get2))))
 				}
-			})
+			}
 		} ([root Function] void {[Mutable] hello})
 	}
 	expect "
@@ -525,15 +506,15 @@ test {
 				[root ``] (mut set world) ([console] (mut get))
 			} (createMutable hello)
 		} ([root Function] init {
-			[Mutable] init ([root Function] mSet {[root Function] mGet {
+			[Mutable] init mSet mGet {
 				[root Function] env {
-					[root Scope] ([compare] env get {mGet void} {
+					[root Scope] ([compare] env get {mGet} {
 						[root Scope] ([compare] env set {
 							mSet
-						} {mGet void env})
+						} {mGet env})
 					})
 				}
-			}})
+			}
 		})
 	}
 	expect "
@@ -550,15 +531,15 @@ test {
 				[root ``] ([console] (mut get)) ([root ``] (mut set world) ([console] (mut get)))
 			} (createMutable hello)
 		} ([root Function] init {
-			[Mutable] init ([root Function] mSet {[root Function] mGet {
+			[Mutable] init mSet mGet {
 				[root Function] env {
-					[root Scope] ([compare] env get {mGet void} {
+					[root Scope] ([compare] env get {mGet} {
 						[root Scope] ([compare] env set {
 							mSet
-						} {mGet void env})
+						} {mGet env})
 					})
 				}
-			}})
+			}
 		})
 	}
 	expect "
@@ -571,11 +552,11 @@ test {
 test {
 	name 'mutable instance behind mutable'
 	case {
-		[Mutable] [Mutable] ([root Function] set {[root Function] get {
-			get void hello ([root Function] set1 {[root Function] get1 {
-				[console] (get1 void)
-			}})
-		}})
+		[Mutable] [Mutable] set get {
+			get hello set1 get1 {
+				[console] get1
+			}
+		}
 	}
 	expect "
 		hello
@@ -586,13 +567,32 @@ test {
 test {
 	name 'mutable instance behind mutable tripple'
 	case {
-		[Mutable] [Mutable] ([root Function] set {[root Function] get {
-			get void [Mutable] ([root Function] set1 {[root Function] get1 {
-				get1 void hello ([root Function] set2 {[root Function] get2 {
-					[console] (get2 void)
-				}})
-			}})
-		}})
+		[Mutable] [Mutable] set get {
+			get [Mutable] set1 get1 {
+				get1 hello set2 get2 {
+					[console] get2
+				}
+			}
+		}
+	}
+	expect "
+		hello
+		
+	`"
+}
+
+test {
+	name 'mutable instance behind mutable tripple'
+	case {
+		[Mutable] [Mutable] set get {
+			get get set1 get1 {
+				get1 get1 set2 get2 {
+					get2 get2 set3 get3 {
+						[console] get3
+					}
+				}
+			}
+		}
 	}
 	expect "
 		hello
@@ -603,7 +603,7 @@ test {
 test {
 	name 'mutation common initializer use twice set once reversed with mutable behind other mutable'
 	case {
-		[Mutable] [Mutable] ([root Function] setMutable {[root Function] getMutable {
+		[Mutable] [Mutable] setMutable getMutable {
 			[root Function] createMutable {
 				[root Function] a {
 					[root Function] b {
@@ -611,17 +611,17 @@ test {
 					} (createMutable void)
 				} (createMutable void)
 			} ([root Function] void {
-				getMutable void hello ([root Function] mSet {[root Function] mGet {
+				getMutable hello mSet mGet {
 					[root Function] env {
-						[root Scope] ([compare] env get {mGet void} {
+						[root Scope] ([compare] env get {mGet} {
 							[root Scope] ([compare] env set {
 								mSet
-							} {mGet void env})
+							} {mGet env})
 						})
 					}
-				}})
+				}
 			})
-		}})
+		}
 	}
 	expect "
 		hello
@@ -633,9 +633,9 @@ test {
 test {
 	name 'mutable of function with effects'
 	case {
-		[Mutable] ([root Function] void {[console] hello}) ([root Function] set {[root Function] get {
-			get void void
-		}})
+		[Mutable] ([root Function] void {[console] hello}) set get {
+			get void
+		}
 	}
 	expect "
 		hello
@@ -646,10 +646,10 @@ test {
 test {
 	name 'mutable of function with effects with dummy set'
 	case {
-		[Mutable] void ([root Function] set {[root Function] get {
+		[Mutable] void set get {
 			[root ``] (set ([root Function] void {[console] hello}))
-			(get void void)
-		}})
+			(get void)
+		}
 	}
 	expect "
 		hello
@@ -660,10 +660,10 @@ test {
 test {
 	name 'effects in mutable set'
 	case {
-		[Mutable] void ([root Function] set {[root Function] get {
+		[Mutable] void set get {
 			[root ``] (set ([console] hello))
-			(get void)
-		}})
+			get
+		}
 	}
 	expect "
 		hello

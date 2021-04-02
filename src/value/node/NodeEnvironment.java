@@ -13,11 +13,14 @@ public class NodeEnvironment implements Node{
 	}
 	
 	public CallReturn run(Value environment) {
-		return new CallReturn(new ValueFunction(handler -> this.contents.call(new ValueFunction(var -> {
+		CallReturn ret =  new CallReturn(new ValueFunction(handler -> this.contents.call(new ValueFunction(var -> {
 			CallReturn envCall = environment.call(var);
 			CallReturn hCall = handler.call(envCall.value);
 			return new CallReturn(hCall.value, envCall.effect, hCall.effect);
 		}))));
+		
+		System.out.println(ret.value);
+		return ret;
 	}
 	
 	@Override

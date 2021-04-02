@@ -3,21 +3,42 @@ package value.resolver;
 import java.util.HashMap;
 
 import value.Value;
+import value.Value.CallReturn;
 import value.ValuePartial.Probe;
+import value.intrinsic.Mutable.MutableProbe;
 
 public class ResolverArgument extends Resolver{
-	private final HashMap<Probe, Value> map = new HashMap<>();
+	private final boolean locked;
 	
 	public ResolverArgument (Probe argument, Value value) {
-		this.map.put(argument, value);
-	}
-	
-	public void add (Probe p) {
-		if (!this.map.containsKey(p)) this.map.put(p, new Probe());
+		this.cache.put(argument, new CallReturn(value));
+		this.locked = false;
 	}
 
-	@Override
-	public Value get(Probe p) {
-		return this.map.getOrDefault(p, p);
+	public ResolverArgument (HashMap<Resolvable, CallReturn> cache) {
+		super(cache);
+		this.locked = true;
+	}
+	
+	public ResolverArgument add (Probe p) {
+		if (!this.cache.containsKey(p)) this.cache.put(p, new CallReturn(new Probe()));
+		if (this.locked) return this;
+		return new ResolverArgument(this.cache);
+	}
+	
+	public MutableProbe setMutable (MutableProbe probe) {
+		if (this.locked) return probe;
+
+		CallReturn p = this.cache.get(probe);
+		MutableProbe mutable;
+		
+		if (p == null) {
+			mutable = new MutableProbe();
+			this.cache.put(probe, new CallReturn(mutable));
+		}else {
+			mutable = (MutableProbe) p.value;
+		}
+		
+		return mutable;
 	}
 }

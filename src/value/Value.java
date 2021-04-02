@@ -3,14 +3,17 @@ package value;
 import runtime.Effect;
 import runtime.EffectList;
 import value.resolver.Resolver;
+import value.resolver.Resolver.Resolvable;
 
-public interface Value {
+public interface Value extends Resolvable{
 	public static final int DEFAULT_ID = 0;
+	public static final char[] numberChars = "0123456789ABCDEF".toCharArray();
 	
 	public CallReturn call (Value v);
 	
-	public default Value resolve (Resolver resolver) {
-		return this;
+	@Override
+	public default CallReturn resolve(Resolver resolver) {
+		return new CallReturn(this, (Effect) null);
 	}
 	
 	public default int getID () {
@@ -22,6 +25,24 @@ public interface Value {
 		for (int i : nums) add += i;
 		if (add != 0) add += nums.length - 1;
 		return add;
+	}
+	
+	public static String printHash (String name, int hash, Object ... objects) {
+		String fullName = name + " " +	
+			+ numberChars[(hash >> 28) & 0xF]
+			+ numberChars[(hash >> 24) & 0xF]
+			+ numberChars[(hash >> 20) & 0xF]
+			+ numberChars[(hash >> 16) & 0xF]
+			+ numberChars[(hash >> 12) & 0xF]
+			+ numberChars[(hash >> 8) & 0xF]
+			+ numberChars[(hash >> 4) & 0xF]
+			+ numberChars[(hash >> 0) & 0xF];
+		
+		if (objects.length == 0) {
+			return fullName;
+		}else {
+			return Value.print(fullName, objects);
+		}
 	}
 	
 	public static String print (String name, Object ... objects) {
@@ -76,12 +97,32 @@ public interface Value {
 		}
 		
 		public CallReturn resolve (Resolver resolver) {
-			return new CallReturn(this.value.resolve(resolver), this.effect.resolve(resolver));
+			//we want to execute the resolve for the effects first because effects are run before the values are calculated
+			//this wouldn't matter if our system was completely immutable, but it isn't.
+			Effect effect = resolver.resolveEffect(this.effect);
+			Value value = resolver.resolveValue(this.value);
+
+			return new CallReturn(value, effect);
 		}
 		
 		@Override
 		public String toString() {
 			return Value.print("CallReturn", this.value, this.effect);
+			//return this.value.toString();
+		}
+		
+		@Override
+		public int hashCode() {
+			return (this.value.hashCode() + this.effect.hashCode()) * 3;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof CallReturn) {
+				CallReturn cr = (CallReturn) obj;
+				return this.value.equals(cr.value) && this.effect.equals(cr.effect);
+			}
+			return false;
 		}
 	}
 }

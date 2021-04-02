@@ -320,3 +320,56 @@ test {
 		
 	`"
 }
+
+;; interpreters and early versions of the optimizer had a lot of trouble here.
+;; Its troubles were due to the execution speed, not that the result would be incorrect.
+;; this should execute instantly
+test {
+	name 'environment nesting'
+	case {
+		[root Function] createEnv {
+			{
+				{
+					{
+						{
+							{
+								{
+									{
+										{
+											{
+												{
+													i1 i2 i3 i4 i5 i6 i7 i8 i9 i10
+												} (createEnv i10 bcd)
+											} (createEnv i9 yza)
+										} (createEnv i8 vwx)
+									} (createEnv i7 stu)
+								} (createEnv i6 pqr)
+							} (createEnv i5 mno)
+						} (createEnv i4 jkl)
+					} (createEnv i3 ghi)
+				} (createEnv i2 def)
+			} (createEnv i1 abc)
+		} ([root Function] name { [root Function] value {
+			([root Function] env {
+				[root Scope] ([compare] env name {
+					[console] value
+				} {
+					env
+				})
+			})
+		}})
+	}
+	expect "
+		abc
+		def
+		ghi
+		jkl
+		mno
+		pqr
+		stu
+		vwx
+		yza
+		bcd
+		
+	`"
+}
